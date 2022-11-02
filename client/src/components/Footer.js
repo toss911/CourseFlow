@@ -4,7 +4,6 @@ import {
     Image,
     Flex,
     Text,
-    Button,
 } from "@chakra-ui/react";
 
 export function Footer() {
@@ -22,8 +21,8 @@ export function Footer() {
                 </Box>
 
                 <Flex>
-                    <Text color="#C8CCDB">All Course</Text>
-                    <Text color="#C8CCDB" pl="132px">
+                    <Text variant='body2' color="#C8CCDB">All Course</Text>
+                    <Text variant='body2' color="#C8CCDB" pl="132px">
                         Bundle Package
                     </Text>
                 </Flex>

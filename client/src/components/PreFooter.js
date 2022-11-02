@@ -5,6 +5,7 @@ import {
   Flex,
   Text,
   Button,
+  Heading,
 } from "@chakra-ui/react";
 
 export function PreFooter() {
@@ -23,16 +24,16 @@ export function PreFooter() {
     arc="asset"
   />
 
-  <Box textColor="#FFFFFF" fontSize="36px">
+  <Box textColor="#FFFFFF">
     <Flex
       flexDirection="column"
       position="absolute"
       top="125px"
       left="161px"
     >
-      <Text pb="44px">
+      <Heading variant='headline2' pb="44px">
         Interested in Becoming <br />a Software Developer?
-      </Text>
+      </Heading>
       <Button
         height="60px"
         width="240px"
