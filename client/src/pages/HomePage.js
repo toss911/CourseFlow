@@ -1,5 +1,6 @@
 import { Box, Image, Flex, Text, Heading } from "@chakra-ui/react";
-//import { Carousel } from "react-responsive-carousel";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 //import { Carousel } from "@trendyol-js/react-carousel";
 
 import { PreFooter } from "../components/PreFooter";
@@ -353,15 +354,6 @@ function HomePage() {
           right="0px"
           top="-120px"
         />
-        <Image
-          src="/assets/landing-page/review/circle-small.svg"
-          alt="background-circle-small"
-          w="26.35px"
-          h="26.35px"
-          position="absolute"
-          right="110px"
-          top="-40px"
-        />
 
         <Heading variant="headline2" color="black">
           Our Graduates
@@ -370,146 +362,146 @@ function HomePage() {
 
         <Flex flexDirection="row" align="center" justify="center" mb="200px">
           {/* //----------------------Reviewer 1 -------------------// */}
-          {/* <Carousel
-            axis="horizontal"
-            // centerMode={true}
-            // showStatus="true"
-            // swipeable
-            // infiniteLoop
-            // emulateTouch
-            // interval={2000}
-            // autoPlay
-          > */}
-          <Flex
-            flexDirection="column"
-            align="start"
-            justify="center"
-            bg="blue.100"
-            borderRadius="8px"
-            pl="72.28px"
-            mt="61.85px"
-            w="578.78px"
-            h="309.48px"
-            position="relative"
+          <Carousel
+            centerMode={true}
+            infiniteLoop
+            emulateTouch
+            interval={2000}
+            autoPlay
           >
-            <Image
-              src="/assets/landing-page/review/profile-student-1.svg"
-              alt="profile-3"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
-
-            <Heading variant="headline3" color="blue.400" pt="66.79px">
-              Saiful Islam
-            </Heading>
-            <Text
-              variant="body2"
-              color="gray.700"
-              pt="24px"
-              pb="68.69px"
-              pr="25.36px"
-              w="481.14px"
+            <Flex
+              flexDirection="column"
+              align="start"
+              justify="center"
+              bg="blue.100"
+              borderRadius="8px"
+              pl="72.28px"
+              mt="61.85px"
+              w="578.78px"
+              h="309.48px"
+              position="relative"
             >
-              Start with something simple and small, then expand over time. If
-              people call it a ‘toy’ you’re definitely onto something. If you’re
-              waiting for encouragement from others, you’re doing it wrong. By
-              the time people think an idea is good, it’s probably too late.
-            </Text>
-          </Flex>
+              <Image
+                src="/assets/landing-page/review/profile-student-1.svg"
+                alt="profile-1"
+                w="200px"
+                h="240px"
+                position="absolute"
+                right="540px"
+              />
 
-          {/* //----------------------Reviewer 2 -------------------// */}
+              <Heading variant="headline3" color="blue.400" pt="66.79px">
+                Saiful Islam
+              </Heading>
+              <Text
+                variant="body2"
+                color="gray.700"
+                pt="24px"
+                pb="68.69px"
+                pr="25.36px"
+                w="481.14px"
+              >
+                Start with something simple and small, then expand over time. If
+                people call it a ‘toy’ you’re definitely onto something. If
+                you’re waiting for encouragement from others, you’re doing it
+                wrong. By the time people think an idea is good, it’s probably
+                too late.
+              </Text>
+            </Flex>
 
-          <Flex
-            flexDirection="column"
-            align="start"
-            justify="center"
-            bg="blue.100"
-            borderRadius="8px"
-            pl="72.28px"
-            mt="61.85px"
-            w="578.78px"
-            h="309.48px"
-            ml="220px"
-            position="relative"
-          >
-            <Image
-              src="/assets/landing-page/review/profile-student-2.svg"
-              alt="profile-3"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
+            {/* //----------------------Reviewer 2 -------------------// */}
 
-            <Heading variant="headline3" color="blue.400" pt="66.79px">
-              Saiful Islam
-            </Heading>
-            <Text
-              variant="body2"
-              color="gray.700"
-              pt="24px"
-              pb="68.69px"
-              pr="25.36px"
-              w="481.14px"
+            <Flex
+              flexDirection="column"
+              align="start"
+              justify="center"
+              bg="blue.100"
+              borderRadius="8px"
+              pl="72.28px"
+              mt="61.85px"
+              w="578.78px"
+              h="309.48px"
+              ml="220px"
+              position="relative"
             >
-              Start with something simple and small, then expand over time. If
-              people call it a ‘toy’ you’re definitely onto something. If you’re
-              waiting for encouragement from others, you’re doing it wrong. By
-              the time people think an idea is good, it’s probably too late.
-            </Text>
-            <Image
-              src="/assets/landing-page/review/quote-double-small.svg"
-              alt="quote-large-left"
-              position="absolute"
-              bottom="15px"
-              right="25px"
-            />
-          </Flex>
+              <Image
+                src="/assets/landing-page/review/profile-student-2.svg"
+                alt="profile-2"
+                w="200px"
+                h="240px"
+                position="absolute"
+                right="540px"
+              />
 
-          {/* //----------------------Reviewer 3 -------------------// */}
+              <Heading variant="headline3" color="blue.400" pt="66.79px">
+                Saiful Islam
+              </Heading>
+              <Text
+                variant="body2"
+                color="gray.700"
+                pt="24px"
+                pb="68.69px"
+                pr="25.36px"
+                w="481.14px"
+              >
+                Start with something simple and small, then expand over time. If
+                people call it a ‘toy’ you’re definitely onto something. If
+                you’re waiting for encouragement from others, you’re doing it
+                wrong. By the time people think an idea is good, it’s probably
+                too late.
+              </Text>
+              <Image
+                src="/assets/landing-page/review/quote-double-small.svg"
+                alt="quote-large-left"
+                position="absolute"
+                bottom="15px"
+                right="25px"
+              />
+            </Flex>
 
-          <Flex
-            flexDirection="column"
-            align="start"
-            justify="center"
-            bg="blue.100"
-            borderRadius="8px"
-            pl="72.28px"
-            mt="61.85px"
-            w="578.78px"
-            h="309.48px"
-            ml="220px"
-            position="relative"
-          >
-            <Image
-              src="/assets/landing-page/review/profile-student-3.svg"
-              alt="profile-3"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
+            {/* //----------------------Reviewer 3 -------------------// */}
 
-            <Heading variant="headline3" color="blue.400" pt="66.79px">
-              Saiful Islam
-            </Heading>
-            <Text
-              variant="body2"
-              color="gray.700"
-              pt="24px"
-              pb="68.69px"
-              pr="25.36px"
-              w="481.14px"
+            <Flex
+              flexDirection="column"
+              align="start"
+              justify="center"
+              bg="blue.100"
+              borderRadius="8px"
+              pl="72.28px"
+              mt="61.85px"
+              w="578.78px"
+              h="309.48px"
+              ml="220px"
+              position="relative"
             >
-              Start with something simple and small, then expand over time. If
-              people call it a ‘toy’ you’re definitely onto something. If you’re
-              waiting for encouragement from others, you’re doing it wrong. By
-              the time people think an idea is good, it’s probably too late.
-            </Text>
-          </Flex>
-          {/* </Carousel> */}
+              <Image
+                src="/assets/landing-page/review/profile-student-3.svg"
+                alt="profile-3"
+                w="200px"
+                h="240px"
+                position="absolute"
+                right="540px"
+              />
+
+              <Heading variant="headline3" color="blue.400" pt="66.79px">
+                Saiful Islam
+              </Heading>
+              <Text
+                variant="body2"
+                color="gray.700"
+                pt="24px"
+                pb="68.69px"
+                pr="25.36px"
+                w="481.14px"
+              >
+                Start with something simple and small, then expand over time. If
+                people call it a ‘toy’ you’re definitely onto something. If
+                you’re waiting for encouragement from others, you’re doing it
+                wrong. By the time people think an idea is good, it’s probably
+                too late.
+              </Text>
+            </Flex>
+          </Carousel>
           <Image
             src="/assets/landing-page/review/plus.svg"
             alt="background-plus"
@@ -533,6 +525,15 @@ function HomePage() {
           position="absolute"
           top="110px"
           left="610px"
+        />
+        <Image
+          src="/assets/landing-page/review/circle-small.svg"
+          alt="background-circle-small"
+          w="26.35px"
+          h="26.35px"
+          position="absolute"
+          right="110px"
+          top="-40px"
         />
       </Flex>
 
