@@ -1,12 +1,51 @@
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-//import { Carousel } from "@trendyol-js/react-carousel";
-import { Box, Image, Flex, Text, Heading, Button } from "@chakra-ui/react";
+import {
+  Center,
+  Box,
+  Image,
+  Flex,
+  Text,
+  Heading,
+  Button,
+} from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar";
 import { NavbarLogin } from "../components/NavbarLogin ";
 import { Footer } from "../components/Footer";
 import { PreFooter } from "../components/PreFooter";
+import { useState } from "react";
+import ReviewSlider from "../components/ReviewSlider.js";
+import ReviewNonSlider from "../components/ReviewNonSlider.js";
 
+const SlideData = [
+  {
+    image: "/assets/landing-page/review/profile-student-1.svg",
+    alt: "profile-reviewer-1",
+    name: "Saiful Islam",
+    content: `Start with something simple and small, then expand over time. If
+people call it a ‘toy’ you’re definitely onto something. If you’re
+waiting for encouragement from others, you’re doing it wrong. By
+the time people think an idea is good, it’s probably too late.`,
+  },
+  {
+    image: "/assets/landing-page/review/profile-student-2.svg",
+    alt: "profile-reviewer-2",
+    name: "Saiful Islam",
+    content: `Start with something simple and small, then expand over time. If
+people call it a ‘toy’ you’re definitely onto something. If you’re
+waiting for encouragement from others, you’re doing it wrong. By
+the time people think an idea is good, it’s probably too late.`,
+  },
+  {
+    image: "/assets/landing-page/review/profile-student-3.svg",
+    alt: "profile-reviewer-3",
+    name: "Saiful Islam",
+    content: `Start with something simple and small, then expand over time. If
+people call it a ‘toy’ you’re definitely onto something. If you’re
+waiting for encouragement from others, you’re doing it wrong. By
+the time people think an idea is good, it’s probably too late.`,
+  },
+];
 function HomePage() {
   return (
     <>
@@ -404,166 +443,21 @@ function HomePage() {
         <Heading variant="headline2" color="black">
           Our Graduates
         </Heading>
-        {/* //------------------Flex wrapper all reviewer-------------// */}
+        {/* //------------------Flex wrapper all reviewer----------------------------------// */}
 
-        <Flex flexDirection="row" align="center" justify="center" mb="200px">
-          {/* //----------------------Reviewer 1 -------------------// */}
-          {/* <Carousel
-            axis="horizontal"
-            // centerMode={true}
-            // showStatus="true"
-            // swipeable
-            // infiniteLoop
-            // emulateTouch
-            // interval={2000}
-            // autoPlay
-          > */}
-          <Flex
-            flexDirection="column"
-            align="start"
-            justify="center"
-            bg="blue.100"
-            borderRadius="8px"
-            pl="72.28px"
-            mt="61.85px"
-            w="578.78px"
-            h="309.48px"
-            position="relative"
-          >
-            <Image
-              src="/assets/landing-page/review/profile-student-1.svg"
-              alt="profile-3"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
-
-            <Image
-              src="/assets/landing-page/review/profile-student-1.svg"
-              alt="profile-1"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
-
-            <Heading variant="headline3" color="blue.400" pt="66.79px">
-              Saiful Islam
-            </Heading>
-            <Text
-              variant="body2"
-              color="gray.700"
-              pt="24px"
-              pb="68.69px"
-              pr="25.36px"
-              w="481.14px"
-            >
-              Start with something simple and small, then expand over time. If
-              people call it a ‘toy’ you’re definitely onto something. If you’re
-              waiting for encouragement from others, you’re doing it wrong. By
-              the time people think an idea is good, it’s probably too late.
-            </Text>
-          </Flex>
-
-          {/* //----------------------Reviewer 2 -------------------// */}
-
-          <Flex
-            flexDirection="column"
-            align="start"
-            justify="center"
-            bg="blue.100"
-            borderRadius="8px"
-            pl="72.28px"
-            mt="61.85px"
-            w="578.78px"
-            h="309.48px"
-            ml="220px"
-            position="relative"
-          >
-            <Image
-              src="/assets/landing-page/review/profile-student-2.svg"
-              alt="profile-2"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
-
-            <Heading variant="headline3" color="blue.400" pt="66.79px">
-              Saiful Islam
-            </Heading>
-            <Text
-              variant="body2"
-              color="gray.700"
-              pt="24px"
-              pb="68.69px"
-              pr="25.36px"
-              w="481.14px"
-            >
-              Start with something simple and small, then expand over time. If
-              people call it a ‘toy’ you’re definitely onto something. If you’re
-              waiting for encouragement from others, you’re doing it wrong. By
-              the time people think an idea is good, it’s probably too late.
-            </Text>
-            <Image
-              src="/assets/landing-page/review/quote-double-small.svg"
-              alt="quote-large-left"
-              position="absolute"
-              bottom="15px"
-              right="25px"
-            />
-          </Flex>
-
-          <Flex
-            flexDirection="column"
-            align="start"
-            justify="center"
-            bg="blue.100"
-            borderRadius="8px"
-            pl="72.28px"
-            mt="61.85px"
-            w="578.78px"
-            h="309.48px"
-            ml="220px"
-            position="relative"
-          >
-            <Image
-              src="/assets/landing-page/review/profile-student-3.svg"
-              alt="profile-3"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
-
-            <Image
-              src="/assets/landing-page/review/profile-student-3.svg"
-              alt="profile-3"
-              w="200px"
-              h="240px"
-              position="absolute"
-              right="540px"
-            />
-
-            <Heading variant="headline3" color="blue.400" pt="66.79px">
-              Saiful Islam
-            </Heading>
-            <Text
-              variant="body2"
-              color="gray.700"
-              pt="24px"
-              pb="68.69px"
-              pr="25.36px"
-              w="481.14px"
-            >
-              Start with something simple and small, then expand over time. If
-              people call it a ‘toy’ you’re definitely onto something. If you’re
-              waiting for encouragement from others, you’re doing it wrong. By
-              the time people think an idea is good, it’s probably too late.
-            </Text>
-          </Flex>
-          {/* </Carousel> */}
+        <Flex
+          w="100vw"
+          flexDirection="row"
+          align="center"
+          justify="center"
+          mb="200px"
+        >
+          {/* -------------Non-Carousel START------------ */}
+          {/* <ReviewNonSlider /> */}
+          {/* -----------Carousel START ---------------*/}
+          <Box w="100%" mt="61.85px">
+            <ReviewSlider slides={SlideData} />
+          </Box>
           <Image
             src="/assets/landing-page/review/plus.svg"
             alt="background-plus"
@@ -574,20 +468,7 @@ function HomePage() {
             bottom="130px"
           />
         </Flex>
-        <Image
-          src="/assets/landing-page/review/quote-large.svg"
-          alt="quote-large-left"
-          position="absolute"
-          top="110px"
-          left="655px"
-        />
-        <Image
-          src="/assets/landing-page/review/quote-large.svg"
-          alt="quote-large-left"
-          position="absolute"
-          top="110px"
-          left="610px"
-        />
+
         <Image
           src="/assets/landing-page/review/circle-small.svg"
           alt="background-circle-small"
@@ -602,6 +483,7 @@ function HomePage() {
       {/* //-----------------------End Review section-------------------------// */}
       {/* //Pre-Footer section */}
       <PreFooter />
+
       {/* //-----------------------End Pre-Footer section-------------------------// */}
       {/* //Footer section  */}
       <Footer />
