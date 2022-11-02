@@ -37,11 +37,7 @@ export function PreFooter() {
       <Button
         height="60px"
         width="240px"
-        border="1px"
-        borderColor="orange.500"
-        fontSize="16px"
-        textColor="orange.500"
-      >
+       variant='secondary'>
         Check Out Our Course
       </Button>
     </Flex>
