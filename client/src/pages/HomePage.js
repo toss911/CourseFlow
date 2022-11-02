@@ -1,15 +1,16 @@
 import { Box, Image, Flex, Text, Heading } from "@chakra-ui/react";
 
 function HomePage() {
-  return (<>
-    {/* //Nav section */}
-    {/* //Start Codind here [Sun] */}
-    {/* //-----------------------End Nav section-------------------------// */}
-    {/* //Hero section */}
-    {/* //Start Codind here [Sun] */}
-    {/* //-----------------------End Hero section-------------------------// */}
-    {/* // Features Section */}
-    
+  return (
+    <>
+      {/* //Nav section */}
+      {/* //Start Codind here [Sun] */}
+      {/* //-----------------------End Nav section-------------------------// */}
+      {/* //Hero section */}
+      {/* //Start Codind here [Sun] */}
+      {/* //-----------------------End Hero section-------------------------// */}
+      {/* // Features Section */}
+
       <Box
         position="relative"
         w="1440px"
@@ -364,21 +365,94 @@ function HomePage() {
       </Flex>
       {/* //-----------------------End Instructor section-------------------------// */}
       {/* //Review section */}
-      <Flex mt="105px" flexDirection="column" align="center" justify="center">
+      <Flex
+        mt="216px"
+        flexDirection="column"
+        align="center"
+        justify="center"
+        position="relative"
+      >
+        <Image
+          src="/assets/landing-page/review/circle-large.svg"
+          alt="profile-3"
+          w="73px"
+          h="73px"
+          position="absolute"
+          right="0px"
+          top="-120px"
+        />
+        <Image
+          src="/assets/landing-page/review/circle-small.svg"
+          alt="profile-3"
+          w="26.35px"
+          h="26.35px"
+          position="absolute"
+          right="110px"
+          top="-40px"
+        />
         <Heading variant="headline2" color="black">
           Our Graduates
         </Heading>
-        <Image
-          src="/assets/landing-page/review/profile-student-1.svg"
-          alt="profile-3"
-          w="200px"
-          h="240px"
-        />
-        <Heading variant="headline3" color="blue.400">
-          Saiful Islam
-        </Heading>
-        <Text variant="body2"></Text>
+        <Flex
+          flexDirection="column"
+          align="start"
+          justify="center"
+          bg="blue.100"
+          borderRadius="8px"
+          pl="72.28px"
+          mt="61.85px"
+          w="578.78px"
+          h="309.48px"
+          position="relative"
+        >
+          <Image
+            src="/assets/landing-page/review/profile-student-1.svg"
+            alt="profile-3"
+            w="200px"
+            h="240px"
+            position="absolute"
+            right="540px"
+          />
+          <Image
+            src="/assets/landing-page/review/quote-large.svg"
+            alt="quote-large-left"
+            position="absolute"
+            top="0px"
+            left="-160px"
+          />
+          <Image
+            src="/assets/landing-page/review/quote-large.svg"
+            alt="quote-large-left"
+            position="absolute"
+            top="0px"
+            left="-115px"
+          />
+          <Heading variant="headline3" color="blue.400" pt="66.79px">
+            Saiful Islam
+          </Heading>
+          <Text
+            variant="body2"
+            color="gray.700"
+            pt="24px"
+            pb="68.69px"
+            pr="25.36px"
+            w="481.14px"
+          >
+            Start with something simple and small, then expand over time. If
+            people call it a ‘toy’ you’re definitely onto something. If you’re
+            waiting for encouragement from others, you’re doing it wrong. By the
+            time people think an idea is good, it’s probably too late.
+          </Text>
+          <Image
+            src="/assets/landing-page/review/quote-double-small.svg"
+            alt="quote-large-left"
+            position="absolute"
+            bottom="15px"
+            right="25px"
+          />
+        </Flex>
       </Flex>
+
       {/* //-----------------------End Review section-------------------------// */}
       {/* //Pre-Footer section //Start Codind here [Chain] */}
       {/* //-----------------------End Pre-Footer section-------------------------// */}
