@@ -455,7 +455,7 @@ function HomePage() {
           {/* -------------Non-Carousel START------------ */}
           {/* <ReviewNonSlider /> */}
           {/* -----------Carousel START ---------------*/}
-          <Box w="100%" mt="61.85px">
+          <Box w="1440px" mt="61.85px">
             <ReviewSlider slides={SlideData} />
           </Box>
           <Image
