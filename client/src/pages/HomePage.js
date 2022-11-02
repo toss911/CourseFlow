@@ -298,35 +298,71 @@ function HomePage() {
       </Box>
       {/* //-----------------------End Features section-------------------------// */}
       {/* //Instructor section */}
-      <Flex flexDirection="column" align="center" justify="center">
+      <Flex mt="105px" flexDirection="column" align="center" justify="center">
         <Flex>
-          <Heading w="100%" h="90px" lineHeight="125%" variant="headline2">
+          <Heading w="100%" variant="headline2">
             Our Professional Intructor
           </Heading>
         </Flex>
         <Flex flexDirection="row" align="center" justify="center">
-          <Image
-            src="/assets/landing-page/instructor/image-profile-1.svg"
-            alt="profile-1"
-            w="357px"
-            h="420px"
-          />
-          <Image
-            src="/assets/landing-page/instructor/image-profile-2.svg"
-            alt="profile-2"
-            w="357px"
-            h="420px"
-          />
-          <Image
-            src="/assets/landing-page/instructor/image-profile-3.svg"
-            alt="profile-3"
-            w="357px"
-            h="420px"
-          />
+          <Flex flexDirection="column" align="center" justify="center">
+            <Image
+              src="/assets/landing-page/instructor/image-profile-1.svg"
+              alt="profile-1"
+              w="357px"
+              h="420px"
+              mt="60px"
+            />
+            <Heading variant="headline3" mt="24px">
+              Jane Cooper
+            </Heading>
+            <Text variant="body2" color="blue.400" mt="8px">
+              UX/UI Designer
+            </Text>
+          </Flex>
+          <Flex
+            ml="24px"
+            flexDirection="column"
+            align="center"
+            justify="center"
+          >
+            <Image
+              src="/assets/landing-page/instructor/image-profile-2.svg"
+              alt="profile-2"
+              w="357px"
+              h="420px"
+              mt="60px"
+            />
+            <Heading variant="headline3" mt="24px">
+              Esther Howard
+            </Heading>
+            <Text variant="body2" color="blue.400" mt="8px">
+              Program Manager
+            </Text>
+          </Flex>
+          <Flex
+            ml="24px"
+            flexDirection="column"
+            align="center"
+            justify="center"
+          >
+            <Image
+              src="/assets/landing-page/instructor/image-profile-3.svg"
+              alt="profile-3"
+              w="357px"
+              h="420px"
+              mt="60px"
+            />
+            <Heading variant="headline3" mt="24px">
+              Brooklyn Simmons
+            </Heading>
+            <Text variant="body2" color="blue.400" mt="8px">
+              Software Engineer
+            </Text>
+          </Flex>
         </Flex>
       </Flex>
     </>
-
     //-----------------------End Instructor section-------------------------//
     //Review section
     //Start Codind here [Bank]
