@@ -1,6 +1,8 @@
 import { Box, Image, Flex, Text, Heading, Button } from '@chakra-ui/react';
 import { Navbar } from '../components/Navbar';
 import { NavbarLogin } from '../components/NavbarLogin ';
+import { Footer } from '../components/Footer';
+import { PreFooter } from '../components/PreFooter';
 
 function HomePage() {
   return (

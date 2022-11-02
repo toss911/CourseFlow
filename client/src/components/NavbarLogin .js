@@ -48,7 +48,11 @@ export const NavbarLogin = () => {
           <Menu>
             <MenuButton
               as={Button}
+              boxShadow='none'
+              _hover='none'
+              _active='none'
               bg='white'
+              color='gray.800'
               rightIcon={<TriangleDownIcon ml='12px' />}
             >
               <Text variant='body2' position='relative'>
