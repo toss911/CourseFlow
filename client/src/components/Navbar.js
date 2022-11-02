@@ -10,14 +10,17 @@ export const Navbar = () => {
       h='88px'
       bg='white'
       box-shadow='2px 2px 12px rgba(64, 50, 133, 0.12)'
+      paddingLeft='160px'
+      paddingRight='160px'
     >
-      <Flex alignItems='center' flexDirection='row'>
-        <Image
-          ml='160px'
-          src='/assets/landing-page/bg/CourseFlow.svg'
-          alt='logo'
-        />
-        <HStack spacing='60px' ml='1013px'>
+      <Flex
+        alignItems='center'
+        justifyContent='space-between'
+        flexDirection='row'
+        w='100%'
+      >
+        <Image src='/assets/landing-page/bg/CourseFlow.svg' alt='logo' />
+        <HStack spacing='60px'>
           <Link
             color='#191C77'
             fontWeight='700'

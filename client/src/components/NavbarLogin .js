@@ -26,15 +26,22 @@ export const NavbarLogin = () => {
       width='full'
       h='88px'
       bg='white'
+      paddingLeft='160px'
+      paddingRight='160px'
       box-shadow='2px 2px 12px rgba(64, 50, 133, 0.12)'
     >
-      <Flex alignItems='center' flexDirection='row'>
+      <Flex
+        alignItems='center'
+        justifyContent='space-between'
+        flexDirection='row'
+        w='100%'
+      >
         <Image
           ml='160px'
           src='/assets/landing-page/bg/CourseFlow.svg'
           alt='logo'
         />
-        <HStack spacing='75px' ml='1013px'>
+        <HStack spacing='75px'>
           <Link
             color='#191C77'
             fontWeight='700'

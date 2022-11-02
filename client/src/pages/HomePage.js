@@ -9,8 +9,8 @@ function HomePage() {
     <>
       {/* //Nav section */}
       {/* //Start Codind here [Sun] */}
-      {/* <Navbar /> */}
-      <NavbarLogin />
+      <Navbar />
+      {/* <NavbarLogin /> */}
 
       {/* //-----------------------End Nav section-------------------------// */}
       {/* //Hero section */}
