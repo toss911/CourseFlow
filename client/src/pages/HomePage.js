@@ -1,7 +1,9 @@
 import { Box, Image, Flex, Text, Heading } from "@chakra-ui/react";
-import { Carousel } from "react-responsive-carousel";
+//import { Carousel } from "react-responsive-carousel";
 //import { Carousel } from "@trendyol-js/react-carousel";
 
+import { PreFooter } from "../components/PreFooter";
+import { Footer } from "../components/Footer";
 function HomePage() {
   return (
     <>
@@ -569,13 +571,13 @@ function HomePage() {
           left="610px"
         />
       </Flex>
-      {/* </Flex> */}
+
       {/* //-----------------------End Review section-------------------------// */}
       {/* //Pre-Footer section */}
-      {/*//Start Codind here [Chain] */}
+      <PreFooter />
       {/* //-----------------------End Pre-Footer section-------------------------// */}
       {/* //Footer section  */}
-      {/* //Start Codind here [Chain]  */}
+      <Footer />
       {/* //-----------------------End Footer section-------------------------// */}
     </>
   );
