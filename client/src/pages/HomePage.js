@@ -1,15 +1,15 @@
 import { Box, Image, Flex, Text, Heading } from "@chakra-ui/react";
 
 function HomePage() {
-  return (
-    //Nav section
-    //Start Codind here [Sun]
-    //-----------------------End Nav section-------------------------//
-    //Hero section
-    //Start Codind here [Sun]
-    //-----------------------End Hero section-------------------------//
-    // Features Section
-    <>
+  return (<>
+    {/* //Nav section */}
+    {/* //Start Codind here [Sun] */}
+    {/* //-----------------------End Nav section-------------------------// */}
+    {/* //Hero section */}
+    {/* //Start Codind here [Sun] */}
+    {/* //-----------------------End Hero section-------------------------// */}
+    {/* // Features Section */}
+    
       <Box
         position="relative"
         w="1440px"
@@ -300,7 +300,7 @@ function HomePage() {
       {/* //Instructor section */}
       <Flex mt="105px" flexDirection="column" align="center" justify="center">
         <Flex>
-          <Heading w="100%" variant="headline2">
+          <Heading w="100%" variant="headline2" color="black">
             Our Professional Intructor
           </Heading>
         </Flex>
@@ -313,7 +313,7 @@ function HomePage() {
               h="420px"
               mt="60px"
             />
-            <Heading variant="headline3" mt="24px">
+            <Heading variant="headline3" mt="24px" color="black">
               Jane Cooper
             </Heading>
             <Text variant="body2" color="blue.400" mt="8px">
@@ -333,7 +333,7 @@ function HomePage() {
               h="420px"
               mt="60px"
             />
-            <Heading variant="headline3" mt="24px">
+            <Heading variant="headline3" mt="24px" color="black">
               Esther Howard
             </Heading>
             <Text variant="body2" color="blue.400" mt="8px">
@@ -353,7 +353,7 @@ function HomePage() {
               h="420px"
               mt="60px"
             />
-            <Heading variant="headline3" mt="24px">
+            <Heading variant="headline3" mt="24px" color="black">
               Brooklyn Simmons
             </Heading>
             <Text variant="body2" color="blue.400" mt="8px">
@@ -362,17 +362,30 @@ function HomePage() {
           </Flex>
         </Flex>
       </Flex>
+      {/* //-----------------------End Instructor section-------------------------// */}
+      {/* //Review section */}
+      <Flex mt="105px" flexDirection="column" align="center" justify="center">
+        <Heading variant="headline2" color="black">
+          Our Graduates
+        </Heading>
+        <Image
+          src="/assets/landing-page/review/profile-student-1.svg"
+          alt="profile-3"
+          w="200px"
+          h="240px"
+        />
+        <Heading variant="headline3" color="blue.400">
+          Saiful Islam
+        </Heading>
+        <Text variant="body2"></Text>
+      </Flex>
+      {/* //-----------------------End Review section-------------------------// */}
+      {/* //Pre-Footer section //Start Codind here [Chain] */}
+      {/* //-----------------------End Pre-Footer section-------------------------// */}
+      {/* //Footer section  */}
+      {/* //Start Codind here [Chain]  */}
+      {/* //-----------------------End Footer section-------------------------// */}
     </>
-    //-----------------------End Instructor section-------------------------//
-    //Review section
-    //Start Codind here [Bank]
-    //-----------------------End Review section-------------------------//
-    //Pre-Footer section
-    //Start Codind here [Chain]
-    //-----------------------End Pre-Footer section-------------------------//
-    //Footer section
-    //Start Codind here [Chain]
-    //-----------------------End Footer section-------------------------//
   );
 }
 export default HomePage;
