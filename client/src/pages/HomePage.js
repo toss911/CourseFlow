@@ -1,5 +1,6 @@
 import { Box, Image, Flex, Text, Heading } from "@chakra-ui/react";
-
+import { PreFooter } from "../components/PreFooter";
+import { Footer } from "../components/Footer";
 function HomePage() {
   return (
     <>
@@ -447,9 +448,13 @@ function HomePage() {
           />
         </Flex>
       </Flex>
-
+      
       {/* //-----------------------End Review section-------------------------// */}
+
       {/* //Pre-Footer section //Start Codind here [Chain] */}
+
+      <PreFooter/>
+      <Footer/>
       {/* //-----------------------End Pre-Footer section-------------------------// */}
       {/* //Footer section  */}
       {/* //Start Codind here [Chain]  */}
