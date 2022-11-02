@@ -396,6 +396,7 @@ function HomePage() {
           right="110px"
           top="-40px"
         />
+
         <Heading variant="headline2" color="black">
           Our Graduates
         </Heading>
@@ -404,9 +405,9 @@ function HomePage() {
         <Flex flexDirection="row" align="center" justify="center" mb="200px">
           {/* //----------------------Reviewer 1 -------------------// */}
           {/* <Carousel
-            axis={"horizontal"}
+            axis="horizontal"
             // centerMode={true}
-            // showStatus={true}
+            // showStatus="true"
             // swipeable
             // infiniteLoop
             // emulateTouch
@@ -433,20 +434,7 @@ function HomePage() {
               position="absolute"
               right="540px"
             />
-            <Image
-              src="/assets/landing-page/review/quote-large.svg"
-              alt="quote-large-left"
-              position="absolute"
-              top="0px"
-              left="-160px"
-            />
-            <Image
-              src="/assets/landing-page/review/quote-large.svg"
-              alt="quote-large-left"
-              position="absolute"
-              top="0px"
-              left="-115px"
-            />
+
             <Heading variant="headline3" color="blue.400" pt="66.79px">
               Saiful Islam
             </Heading>
@@ -463,13 +451,6 @@ function HomePage() {
               waiting for encouragement from others, you’re doing it wrong. By
               the time people think an idea is good, it’s probably too late.
             </Text>
-            <Image
-              src="/assets/landing-page/review/quote-double-small.svg"
-              alt="quote-large-left"
-              position="absolute"
-              bottom="15px"
-              right="25px"
-            />
           </Flex>
 
           {/* //----------------------Reviewer 2 -------------------// */}
@@ -495,20 +476,7 @@ function HomePage() {
               position="absolute"
               right="540px"
             />
-            <Image
-              src="/assets/landing-page/review/quote-large.svg"
-              alt="quote-large-left"
-              position="absolute"
-              top="0px"
-              left="-160px"
-            />
-            <Image
-              src="/assets/landing-page/review/quote-large.svg"
-              alt="quote-large-left"
-              position="absolute"
-              top="0px"
-              left="-115px"
-            />
+
             <Heading variant="headline3" color="blue.400" pt="66.79px">
               Saiful Islam
             </Heading>
@@ -557,20 +525,7 @@ function HomePage() {
               position="absolute"
               right="540px"
             />
-            <Image
-              src="/assets/landing-page/review/quote-large.svg"
-              alt="quote-large-left"
-              position="absolute"
-              top="0px"
-              left="-160px"
-            />
-            <Image
-              src="/assets/landing-page/review/quote-large.svg"
-              alt="quote-large-left"
-              position="absolute"
-              top="0px"
-              left="-115px"
-            />
+
             <Heading variant="headline3" color="blue.400" pt="66.79px">
               Saiful Islam
             </Heading>
@@ -587,13 +542,6 @@ function HomePage() {
               waiting for encouragement from others, you’re doing it wrong. By
               the time people think an idea is good, it’s probably too late.
             </Text>
-            <Image
-              src="/assets/landing-page/review/quote-double-small.svg"
-              alt="quote-large-left"
-              position="absolute"
-              bottom="15px"
-              right="25px"
-            />
           </Flex>
           {/* </Carousel> */}
           <Image
@@ -606,8 +554,22 @@ function HomePage() {
             bottom="130px"
           />
         </Flex>
+        <Image
+          src="/assets/landing-page/review/quote-large.svg"
+          alt="quote-large-left"
+          position="absolute"
+          top="110px"
+          left="655px"
+        />
+        <Image
+          src="/assets/landing-page/review/quote-large.svg"
+          alt="quote-large-left"
+          position="absolute"
+          top="110px"
+          left="610px"
+        />
       </Flex>
-
+      {/* </Flex> */}
       {/* //-----------------------End Review section-------------------------// */}
       {/* //Pre-Footer section */}
       {/*//Start Codind here [Chain] */}
