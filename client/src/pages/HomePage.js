@@ -1,4 +1,12 @@
-import { Box, Image, Flex, Text, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  Image,
+  Flex,
+  Text,
+  Heading,
+  Input,
+  Button,
+} from "@chakra-ui/react";
 
 function HomePage() {
   return (
@@ -10,7 +18,6 @@ function HomePage() {
       {/* //Start Codind here [Sun] */}
       {/* //-----------------------End Hero section-------------------------// */}
       {/* // Features Section */}
-
       <Box w="100vw">
         <Flex className="feature" justify="center" align="center">
           <Box position="relative">
@@ -49,7 +56,7 @@ function HomePage() {
               align="flex-start"
               gap="120px"
               pt="161px"
-              pb="123px"
+              pb="165px"
             >
               <Flex
                 className="feature-1"
@@ -69,7 +76,7 @@ function HomePage() {
                   align="flex-start"
                   padding="0px"
                   gap="40px"
-                  w="547px"
+                  w="575px"
                   h="330px"
                 >
                   <Heading variant="headline2" color="black">
@@ -105,19 +112,10 @@ function HomePage() {
                         w="487px"
                         h="88px"
                       >
-                        <Text
-                          fontSize="24px"
-                          fontWeight="500"
-                          letterSpacing="-0.02em"
-                        >
+                        <Heading variant="headline3" color="black">
                           Secure & Easy
-                        </Text>
-                        <Text
-                          variant="body2"
-                          w="487px"
-                          h="48px"
-                          color="gray.700"
-                        >
+                        </Heading>
+                        <Text variant="body2" color="gray.700">
                           Duis aute irure dolor in reprehenderit in voluptate
                           velit es se cillum dolore eu fugiat nulla pariatur.
                           Excepteur sint.
@@ -146,19 +144,10 @@ function HomePage() {
                         w="487px"
                         h="88px"
                       >
-                        <Text
-                          fontSize="24px"
-                          fontWeight="500"
-                          letterSpacing="-0.02em"
-                        >
+                        <Heading variant="headline3" color="black">
                           Support All Student
-                        </Text>
-                        <Text
-                          variant="body2"
-                          w="487px"
-                          h="48px"
-                          color="gray.700"
-                        >
+                        </Heading>
+                        <Text variant="body2" color="gray.700">
                           Duis aute irure dolor in reprehenderit in voluptate
                           velit es se cillum dolore eu fugiat nulla pariatur.
                           Excepteur sint.
@@ -186,9 +175,9 @@ function HomePage() {
                   w="547px"
                   h="330px"
                 >
-                  <Text fontSize="34px" w="547px" h="90px" fontWeight="500">
+                  <Heading variant="headline2" color="black">
                     Interaction between the tutor and the learners
-                  </Text>
+                  </Heading>
                   <Flex
                     flexDirection="column"
                     align="flex-start"
@@ -219,19 +208,10 @@ function HomePage() {
                         w="487px"
                         h="88px"
                       >
-                        <Text
-                          fontSize="24px"
-                          fontWeight="500"
-                          letterSpacing="-0.02em"
-                        >
+                        <Heading variant="headline3" color="black">
                           Purely Collaborative
-                        </Text>
-                        <Text
-                          variant="body2"
-                          w="487px"
-                          h="48px"
-                          color="gray.700"
-                        >
+                        </Heading>
+                        <Text variant="body2" color="gray.700">
                           Duis aute irure dolor in reprehenderit in voluptate
                           velit es se cillum dolore eu fugiat nulla pariatur.
                           Excepteur sint.
@@ -260,19 +240,10 @@ function HomePage() {
                         w="487px"
                         h="88px"
                       >
-                        <Text
-                          fontSize="24px"
-                          fontWeight="500"
-                          letterSpacing="-0.02em"
-                        >
+                        <Heading variant="headline3" color="black">
                           Support All Student
-                        </Text>
-                        <Text
-                          variant="body2"
-                          w="487px"
-                          h="48px"
-                          color="gray.700"
-                        >
+                        </Heading>
+                        <Text variant="body2" color="gray.700">
                           Duis aute irure dolor in reprehenderit in voluptate
                           velit es se cillum dolore eu fugiat nulla pariatur.
                           Excepteur sint.
