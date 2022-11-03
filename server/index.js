@@ -1,19 +1,21 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { client } from "./utils/db.js";
-import dotenv from "dotenv";
+// import { client } from "./utils/db.js";
+import authRouter from "./routes/auth.js";
 
 async function init() {
-  dotenv.config();
+//   dotenv.config();
 
   const app = express();
   const port = 4000;
 
-  await client.connect();
+//   await client.connect();
 
   app.use(cors());
   app.use(bodyParser.json());
+
+  app.use("/auth", authRouter);
 
 //   app.use("/auth", authRouter);
 //   app.use("/posts", postRouter);
