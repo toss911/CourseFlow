@@ -16,36 +16,8 @@ import { PreFooter } from "../components/PreFooter";
 import { useState } from "react";
 import ReviewSlider from "../components/ReviewSlider.js";
 import ReviewNonSlider from "../components/ReviewNonSlider.js";
+import { SlideData } from "../data/SlideData.js";
 
-const SlideData = [
-  {
-    image: "/assets/landing-page/review/profile-student-1.svg",
-    alt: "profile-reviewer-1",
-    name: "Saiful Islam",
-    content: `Start with something simple and small, then expand over time. If
-people call it a ‘toy’ you’re definitely onto something. If you’re
-waiting for encouragement from others, you’re doing it wrong. By
-the time people think an idea is good, it’s probably too late.`,
-  },
-  {
-    image: "/assets/landing-page/review/profile-student-2.svg",
-    alt: "profile-reviewer-2",
-    name: "Saiful Islam",
-    content: `Start with something simple and small, then expand over time. If
-people call it a ‘toy’ you’re definitely onto something. If you’re
-waiting for encouragement from others, you’re doing it wrong. By
-the time people think an idea is good, it’s probably too late.`,
-  },
-  {
-    image: "/assets/landing-page/review/profile-student-3.svg",
-    alt: "profile-reviewer-3",
-    name: "Saiful Islam",
-    content: `Start with something simple and small, then expand over time. If
-people call it a ‘toy’ you’re definitely onto something. If you’re
-waiting for encouragement from others, you’re doing it wrong. By
-the time people think an idea is good, it’s probably too late.`,
-  },
-];
 function HomePage() {
   return (
     <>

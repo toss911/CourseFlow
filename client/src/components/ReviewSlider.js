@@ -14,6 +14,7 @@ const ReviewSlider = ({ slides }) => {
       emulateTouch
       interval={2000}
       autoPlay
+      showArrows={false}
     >
       {slides.map((slide) => {
         return (
