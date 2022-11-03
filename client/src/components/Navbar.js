@@ -21,20 +21,22 @@ export const Navbar = () => {
         flexDirection="row"
         w="100%"
       >
-        <Image src="/assets/landing-page/bg/CourseFlow.svg" alt="logo" />
+        <Image
+          src="/assets/landing-page/bg/CourseFlow.svg"
+          alt="logo"
+          onClick={() => navigate("/")}
+          cursor="pointer"
+        />
         <HStack spacing="60px">
-          <Link
-            color="#191C77"
-            fontWeight="700"
-            fontSize="16px"
-            lineHeight="150%"
-            fontStyle="bold"
-            onClick={() => navigate("/courses")}
-          >
+          <Link color="#191C77" onClick={() => navigate("/courses")}>
             Our Courses
           </Link>
 
-          <Button variant="primary" ml="20px" onClick={() => navigate("/login")}>
+          <Button
+            variant="primary"
+            ml="20px"
+            onClick={() => navigate("/login")}
+          >
             Log in
           </Button>
         </HStack>

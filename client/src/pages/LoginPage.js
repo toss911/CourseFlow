@@ -20,10 +20,27 @@ import { useState } from "react";
 function Login() {
   const [inputEmail, setInputEmail] = useState("");
   const [inputPassword, setInputPassword] = useState("");
-  const handleEmailChange = (e) => setInputEmail(e.target.value);
-  const handlePasswordChange = (e) => setInputPassword(e.target.value);
-  const isErrorEmail = inputEmail === "";
-  const isErrorPassword = inputPassword === "";
+  const [isErrorEmail, setIsErrorEmail] = useState(false);
+  const [isErrorPassword, setIsErrorPassword] = useState(false);
+
+  const handleEmailChange = (e) => {
+    setInputEmail(e.target.value);
+    if (e.target.value !== "") {
+      setIsErrorEmail(false);
+    } else {
+      setIsErrorEmail(true);
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    setInputPassword(e.target.value);
+    if (e.target.value !== "") {
+      setIsErrorPassword(false);
+    } else {
+      setIsErrorPassword(true);
+    }
+  };
+
   const navigate = useNavigate();
 
   return (
@@ -56,10 +73,8 @@ function Login() {
 
           <FormControl isInvalid={isErrorEmail}>
             <Flex flexDirection="column" justifyContent="flex-start">
-              <FormLabel>
-                <Text variant="body2" color="black" pt="37px">
-                  Email
-                </Text>
+              <FormLabel variant="body2" color="black" pt="37px">
+                Email
               </FormLabel>
               <Input
                 mt="4px"
@@ -77,10 +92,8 @@ function Login() {
               )}
 
               <FormControl isInvalid={isErrorPassword}>
-                <FormLabel>
-                  <Text variant="body2" color="black" pt="40px">
-                    Password
-                  </Text>
+                <FormLabel variant="body2" color="black" pt="40px">
+                  Password
                 </FormLabel>
                 <Input
                   mt="4px"
@@ -102,11 +115,7 @@ function Login() {
               </Button>
               <Text as="b" mt="44px">
                 Don't have an account?
-                <Link
-                  pl="12px"
-                  color="blue.500"
-                  onClick={() => navigate("/register")}
-                >
+                <Link pl="12px" onClick={() => navigate("/register")}>
                   Register
                 </Link>
               </Text>
