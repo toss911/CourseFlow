@@ -253,11 +253,7 @@ function RegisterPage() {
               </Button>
               <Text as="b" mt="44px">
                 Already have an account?
-                <Link
-                  ml="12px"
-                  color="blue.500"
-                  onClick={() => navigate("/login")}
-                >
+                <Link ml="12px" onClick={() => navigate("/login")}>
                   Log in
                 </Link>
               </Text>

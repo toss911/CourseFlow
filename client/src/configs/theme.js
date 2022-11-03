@@ -224,7 +224,29 @@ const components = {
         },
       },
     },
-
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Link: {
+    variants: {
+      default: {
+        fontSize: "16px",
+        lineHeight: `${1.5 * 16}px`,
+        fontWeight: 700,
+        color: "blue.500",
+        _hover: {
+          color: "blue.400",
+          textDecoration: "none",
+        },
+        _active: {
+          color: "blue.600",
+        },
+        _disabled: {
+          color: "gray.500",
+        },
+      },
+    },
     defaultProps: {
       variant: "default",
     },

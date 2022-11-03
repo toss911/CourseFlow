@@ -28,14 +28,7 @@ export const Navbar = () => {
           cursor="pointer"
         />
         <HStack spacing="60px">
-          <Link
-            color="#191C77"
-            fontWeight="700"
-            fontSize="16px"
-            lineHeight="150%"
-            fontStyle="bold"
-            onClick={() => navigate("/courses")}
-          >
+          <Link color="#191C77" onClick={() => navigate("/courses")}>
             Our Courses
           </Link>
 
