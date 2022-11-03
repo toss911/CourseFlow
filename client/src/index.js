@@ -4,14 +4,19 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ChakraProvider } from "@chakra-ui/react";
+import { AuthProvider } from "./contexts/authentication.js";
 import theme from "./configs/theme.js";
+import jwtInterceptor from "./utils/jwtInterceptors.js";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
+jwtInterceptor();
 root.render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </ChakraProvider>
   </React.StrictMode>
 );
