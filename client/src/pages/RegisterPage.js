@@ -14,10 +14,12 @@ import {
   FormHelperText,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar";
-import { NavbarLogin } from "../components/NavbarLogin ";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function RegisterPage() {
+  const navigate = useNavigate();
+
   const [value, onChange] = useState(new Date());
   const [inputName, setInputName] = useState("");
   const [inputDate, setInputDate] = useState("");
@@ -33,15 +35,16 @@ function RegisterPage() {
 
   const handleNameChange = (e) => {
     setInputName(e.target.value);
-    if (/^[a-zA-Z ]*$/.test(inputName)) {
+    if (/^[a-z ,.'-]+$/i.test(e.target.value)) {
       setIsErrorName(false);
     } else {
       setIsErrorName(true);
     }
   };
+
   const handleDateChange = (e) => {
     setInputDate(e.target.value);
-    if (inputDate !== "") {
+    if (e.target.value !== "") {
       setIsErrorDate(false);
     } else {
       setIsErrorDate(true);
@@ -49,7 +52,7 @@ function RegisterPage() {
   };
   const handleEducateChange = (e) => {
     setInputEducate(e.target.value);
-    if (inputEducate !== "") {
+    if (e.target.value !== "") {
       setIsErrorEducate(false);
     } else {
       setIsErrorEducate(true);
@@ -57,7 +60,7 @@ function RegisterPage() {
   };
   const handleEmailChange = (e) => {
     setInputEmail(e.target.value);
-    if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(inputEmail)) {
+    if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(e.target.value)) {
       setIsErrorEmail(false);
     } else {
       setIsErrorEmail(true);
@@ -65,35 +68,12 @@ function RegisterPage() {
   };
   const handlePasswordChange = (e) => {
     setInputPassword(e.target.value);
-    if (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(inputPassword)) {
+    if (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(e.target.value)) {
       setIsErrorPassword(false);
     } else {
       setIsErrorPassword(true);
     }
   };
-
-  //-----------------------------------------------//
-
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-  //   let registerData = {};
-
-  //   if (/^[a-zA-Z ]*$/.test(name)) {
-  //     registerData.name = name;
-  //   }
-  //   if (birthDate !== "") {
-  //     registerData.birthDate = birthDate;
-  //   }
-  //   if (education !== "") {
-  //     registerData.education = education;
-  //   }
-  //   if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) {
-  //     registerData.email = email;
-  //   }
-  //   if (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
-  //     registerData.password = password;
-  //   }
-  // };
 
   return (
     <Box
@@ -106,7 +86,6 @@ function RegisterPage() {
       backgroundSize="cover"
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
-      //overflowY="hidden"
     >
       <Navbar />
       <Flex
@@ -125,32 +104,32 @@ function RegisterPage() {
             Register to start learning!
           </Heading>
           {/* //------------------------- Input Name --------------------// */}
-          <FormControl isInvalid={isErrorName}>
+          <FormControl isInvalid={isErrorName} isRequired>
             <Flex flexDirection="column" justifyContent="flex-start">
-              <FormLabel>
-                <Text variant="body2" color="black" pt="37px">
-                  Name
-                </Text>
+              <FormLabel variant="body2" color="black" pt="37px">
+                Name
               </FormLabel>
               <Input
                 type="text"
                 w="453px"
                 h="48px"
-                placeholder="Name"
+                placeholder="Enter First Name and Last Name"
                 value={inputName}
                 onChange={handleNameChange}
               />
               {!isErrorName ? (
                 <FormHelperText>&nbsp;</FormHelperText>
               ) : (
-                <FormErrorMessage>Name is required.</FormErrorMessage>
+                <FormErrorMessage>
+                  Name must only contain alphabets and some special characters
+                  <br />
+                  (e.g., comma, dot, apostrophe, and hyphen)
+                </FormErrorMessage>
               )}
               {/* //-------------------------- Input Date --------------------// */}
-              <FormControl isInvalid={isErrorDate}>
-                <FormLabel>
-                  <Text variant="body2" color="black" pt="20px">
-                    Date of Birth
-                  </Text>
+              <FormControl isInvalid={isErrorDate} isRequired>
+                <FormLabel variant="body2" color="black" pt="20px">
+                  Date of Birth
                 </FormLabel>
                 <div
                   style={{
@@ -198,16 +177,16 @@ function RegisterPage() {
                   {!isErrorDate ? (
                     <FormHelperText>&nbsp;</FormHelperText>
                   ) : (
-                    <FormErrorMessage>Date is required.</FormErrorMessage>
+                    <FormErrorMessage>
+                      Date of birth is required.
+                    </FormErrorMessage>
                   )}
                 </div>
               </FormControl>
               {/* //---------------------- Input Educational --------------------// */}
-              <FormControl isInvalid={isErrorEducate}>
-                <FormLabel>
-                  <Text variant="body2" color="black" pt="20px">
-                    Educational Background
-                  </Text>
+              <FormControl isInvalid={isErrorEducate} isRequired>
+                <FormLabel variant="body2" color="black" pt="20px">
+                  Educational Background
                 </FormLabel>
                 <Input
                   type="text"
@@ -221,16 +200,14 @@ function RegisterPage() {
                   <FormHelperText>&nbsp;</FormHelperText>
                 ) : (
                   <FormErrorMessage>
-                    Educational Background is required.
+                    Educational background is required.
                   </FormErrorMessage>
                 )}
               </FormControl>
               {/* //------------------------- Input Email --------------------// */}
-              <FormControl isInvalid={isErrorEmail}>
-                <FormLabel>
-                  <Text variant="body2" color="black" pt="20px">
-                    Email
-                  </Text>
+              <FormControl isInvalid={isErrorEmail} isRequired>
+                <FormLabel variant="body2" color="black" pt="20px">
+                  Email
                 </FormLabel>
                 <Input
                   type="email"
@@ -243,15 +220,15 @@ function RegisterPage() {
                 {!isErrorEmail ? (
                   <FormHelperText>&nbsp;</FormHelperText>
                 ) : (
-                  <FormErrorMessage>Email is required.</FormErrorMessage>
+                  <FormErrorMessage>
+                    Email should be in this form: "john@mail.com".
+                  </FormErrorMessage>
                 )}
               </FormControl>
               {/* //------------------------- Input Password --------------------// */}
-              <FormControl isInvalid={isErrorPassword}>
-                <FormLabel>
-                  <Text variant="body2" color="black" pt="20px">
-                    Password
-                  </Text>
+              <FormControl isInvalid={isErrorPassword} isRequired>
+                <FormLabel variant="body2" color="black" pt="20px">
+                  Password
                 </FormLabel>
                 <Input
                   type="password"
@@ -264,7 +241,10 @@ function RegisterPage() {
                 {!isErrorPassword ? (
                   <FormHelperText>&nbsp;</FormHelperText>
                 ) : (
-                  <FormErrorMessage>Password is required.</FormErrorMessage>
+                  <FormErrorMessage>
+                    Password must have minimum eight characters, at least one
+                    letter and one number
+                  </FormErrorMessage>
                 )}
               </FormControl>
               {/* //------------------------- Register Button --------------------// */}
@@ -273,7 +253,11 @@ function RegisterPage() {
               </Button>
               <Text as="b" mt="44px">
                 Already have an account?
-                <Link pl="4" color="blue.500" href="#">
+                <Link
+                  ml="12px"
+                  color="blue.500"
+                  onClick={() => navigate("/login")}
+                >
                   Log in
                 </Link>
               </Text>

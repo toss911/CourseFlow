@@ -96,6 +96,30 @@ const components = {
       },
     },
   },
+  FormLabel: {
+    variants: {
+      body1: {
+        fontSize: "20px",
+        lineHeight: `${1.5 * 20}px`,
+        fontWeight: 400,
+      },
+      body2: {
+        fontSize: "16px",
+        lineHeight: `${1.5 * 16}px`,
+        fontWeight: 400,
+      },
+      body3: {
+        fontSize: "14px",
+        lineHeight: `${1.5 * 14}px`,
+        fontWeight: 400,
+      },
+      body4: {
+        fontSize: "12px",
+        lineHeight: `${1.5 * 12}px`,
+        fontWeight: 400,
+      },
+    },
+  },
   Button: {
     variants: {
       primary: {
