@@ -243,7 +243,7 @@ function RegisterPage() {
                 ) : (
                   <FormErrorMessage>
                     Password must have minimum eight characters, at least one
-                    letter and one number
+                    letter <br /> and one number
                   </FormErrorMessage>
                 )}
               </FormControl>
