@@ -200,6 +200,7 @@ const components = {
         },
       },
     },
+
     defaultProps: {
       variant: "default",
     },
