@@ -17,8 +17,11 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { TriangleDownIcon } from '@chakra-ui/icons';
+import { useNavigate } from "react-router-dom";
 
 export const NavbarLogin = () => {
+  const navigate = useNavigate();
+
   return (
     <Flex
       position='relative'
@@ -44,6 +47,7 @@ export const NavbarLogin = () => {
             fontSize='16px'
             lineHeight='150%'
             fontStyle='bold'
+            onClick={() => navigate("/courses")}
           >
             Our Courses
           </Link>
