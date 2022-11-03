@@ -9,7 +9,7 @@ export const Navbar = () => {
       width='full'
       h='88px'
       bg='white'
-      box-shadow='2px 2px 12px rgba(64, 50, 133, 0.12)'
+      boxShadow='shadow2'
       paddingLeft='160px'
       paddingRight='160px'
     >
