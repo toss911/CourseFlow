@@ -1,4 +1,5 @@
 import { extendTheme } from "@chakra-ui/react";
+import { WarningIcon } from "@chakra-ui/icons";
 
 const colors = {
   blue: {
@@ -30,6 +31,7 @@ const colors = {
   black: "#000000",
   white: "#FFFFFF",
   green: "#2FAC8E",
+  purple: "#9B2FAC",
   linear1: {
     1: "#95BEFF",
     2: "#0040E5",
@@ -157,6 +159,49 @@ const components = {
           opacity: 1,
         },
       },
+    },
+    defaultProps: {
+      variant: "primary",
+    },
+  },
+  Input: {
+    variants: {
+      default: {
+        field: {
+          border: "1px solid",
+          borderColor: "gray.400",
+          borderRadius: "8px",
+          p: "12px 16px 12px 12px",
+          bg: "white",
+          color: "black",
+          fontSize: "16px",
+          fontWeight: 400,
+          lineHeight: "normal",
+          _placeholder: {
+            color: "gray.600",
+          },
+          _focus: {
+            borderColor: "orange.500",
+          },
+          _invalid: {
+            color: "black",
+            pr: "5%",
+            borderColor: "purple",
+            backgroundImage: "url('/assets/WarningIcon.svg')",
+            backgroundPosition: "95% 52.5%",
+            backgroundRepeat: "no-repeat",
+          },
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.200",
+            borderColor: "gray.400",
+            opacity: 1,
+          },
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
     },
   },
 };
