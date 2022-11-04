@@ -79,6 +79,7 @@ function OurCourses() {
           {courses.map((course, key) => {
             return (
               <CourseCard
+                key={key}
                 courseTitle={course.name}
                 courseSummary={course.summary}
                 courseNumLessons={course.lessons_count}
