@@ -8,7 +8,7 @@ coursesRouter.get("/", async (req, res) => {
     const keywords = req.query.keywords || "";
     const page = req.query.page || 1;
     
-    const PAGE_SIZE = 10;
+    const PAGE_SIZE = 12;
     const offset = (page-1) * PAGE_SIZE;
 
     let query = "";
@@ -19,7 +19,7 @@ coursesRouter.get("/", async (req, res) => {
         from lessons
         inner join courses
         on courses.course_id = lessons.course_id
-        where courses.name=$1
+        where courses.name ilike $1
         group by courses.course_id
         order by courses.course_id asc
         limit $2

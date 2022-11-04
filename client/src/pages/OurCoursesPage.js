@@ -27,25 +27,16 @@ function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
 
-  const { getCourses, courses } = useCourses();
+  const { getAllCourses, getCourses, courses, getCoursesbyId } = useCourses();
 
   useEffect(()=>{
-    getCourses( { keywords, page } );
+
+    if(keywords) {
+      getCourses( { keywords, page } );
+    }
+    
+    getAllCourses();
   }, [keywords, page]);
-//   const [course,setCourses] = useState([]);
-//   const [loading,setLoading] = useState(false);
-//   const [currentPage,setCurrentPage] = useState(1);
-//   const [ourCoursesPage,setCoursesPage] = useState(10);
-//   const paginate = (pageNumber) => setCoursesPage(pageNumber)
-// useEffect(()=>{
-//   const fetchPost = async() =>{
-//   setLoading(true);
-//   const res = {cardData}
-//   setCourses(res.cardData);
-//   setLoading(false);
-// }
-//  fetchPost();
-// },[]);
 
   return (
     <Box>
@@ -59,7 +50,7 @@ function OurCourses() {
           </Heading>
           <Box mb="100px">
             <InputGroup w="357px">
-              <Input type="string" placeholder="Search..." pl="40px" value={keywords} onchange={(e)=>{setKeywords(e.target.value)}}/>
+              <Input type="string" placeholder="Search..." pl="40px" onChange={(e)=>{setKeywords(e.target.value)}} value={keywords}/>
               <InputLeftElement
                 pointerEvents="none"
                 children={<SearchIcon color="#646D89" />}
@@ -74,7 +65,7 @@ function OurCourses() {
           justifyContent="center"
           mb="180px"
           flexWrap="wrap"
-          w="70%"
+          w="100%"
         >
           {courses.map((course, key) => {
             return (
@@ -85,6 +76,7 @@ function OurCourses() {
                 courseNumLessons={course.lessons_count}
                 courseTime={course.learning_time}
                 courseImg={course.cover_image_directory}
+                onClick={()=> {getCoursesbyId(course.course_id)}}
               />
             );
           })}
