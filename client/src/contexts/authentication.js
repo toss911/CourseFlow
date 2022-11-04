@@ -18,11 +18,11 @@ function AuthProvider(props) {
         "http://localhost:4000/auth/register",
         data
       );
-      if (result.data.status === 200) {
+      if (/success/g.test(result.data.message)) {
         alert(`${result.data.message}`);
         navigate("/login");
       } else {
-        alert(`${result.data.message}`);
+        return result.data.message;
       }
     } catch (error) {
       alert(`ERROR: Please try again later`);
@@ -32,23 +32,39 @@ function AuthProvider(props) {
   const login = async (data) => {
     try {
       const result = await axios.post("http://localhost:4000/auth/login", data);
-      const token = result.data.token;
-      localStorage.setItem("token", token);
-      const userDataFromToken = jwtDecode(token);
-      setState({ user: userDataFromToken });
-      navigate("/");
+      if (result.data.token) {
+        const token = result.data.token;
+        localStorage.setItem("token", token);
+        const userDataFromToken = jwtDecode(token);
+        setState({ user: userDataFromToken });
+        navigate("/");
+      } else {
+        return result.data.message;
+      }
     } catch (error) {
-      alert(`Invalid Email or Password`);
+      alert(`ERROR: Please try again later`);
     }
   };
+  // localStorage.removeItem("token");
 
   const logout = () => {
     localStorage.removeItem("token");
     setState({ user: null });
+    navigate("/");
   };
 
+  const isAuthenticated = Boolean(localStorage.getItem("token"));
+
+  // if (isAuthenticated && !state.user) {
+  //   const token = localStorage.getItem("token");
+  //   const userDataFromToken = jwtDecode(token);
+  //   setState({ user: userDataFromToken });
+  // }
+
   return (
-    <AuthContext.Provider value={{ state, login, logout, register }}>
+    <AuthContext.Provider
+      value={{ state, login, logout, register, isAuthenticated }}
+    >
       {props.children}
     </AuthContext.Provider>
   );
