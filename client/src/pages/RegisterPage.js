@@ -7,6 +7,8 @@ import {
   Heading,
   Button,
   Input,
+  InputGroup,
+  InputRightElement,
   Link,
   FormControl,
   FormLabel,
@@ -16,63 +18,62 @@ import {
 import { Navbar } from "../components/Navbar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/authentication.js";
+import { Field, Form, Formik } from "formik";
 
 function RegisterPage() {
+  const { register } = useAuth();
+
   const navigate = useNavigate();
 
-  const [value, onChange] = useState(new Date());
-  const [inputName, setInputName] = useState("");
-  const [inputDate, setInputDate] = useState("");
-  const [inputEducate, setInputEducate] = useState("");
-  const [inputEmail, setInputEmail] = useState("");
-  const [inputPassword, setInputPassword] = useState("");
-
-  const [isErrorName, setIsErrorName] = useState(false);
-  const [isErrorDate, setIsErrorDate] = useState(false);
-  const [isErrorEducate, setIsErrorEducate] = useState(false);
-  const [isErrorEmail, setIsErrorEmail] = useState(false);
-  const [isErrorPassword, setIsErrorPassword] = useState(false);
-
-  const handleNameChange = (e) => {
-    setInputName(e.target.value);
-    if (/^[a-z ,.'-]+$/i.test(e.target.value)) {
-      setIsErrorName(false);
-    } else {
-      setIsErrorName(true);
-    }
+  const handleSubmit = (values) => {
+    register(values);
   };
 
-  const handleDateChange = (e) => {
-    setInputDate(e.target.value);
-    if (e.target.value !== "") {
-      setIsErrorDate(false);
-    } else {
-      setIsErrorDate(true);
+  const validateName = (value) => {
+    let error;
+    if (!value) {
+      error = "Name is required";
+    } else if (!/^[a-z ,.'-]+$/i.test(value)) {
+      error = `Name must only contain alphabets and some special characters (e.g., comma, dot, apostrophe, and hyphen)`;
     }
+    return error;
   };
-  const handleEducateChange = (e) => {
-    setInputEducate(e.target.value);
-    if (e.target.value !== "") {
-      setIsErrorEducate(false);
-    } else {
-      setIsErrorEducate(true);
+
+  const validateBirthdate = (value) => {
+    let error;
+    if (!value) {
+      error = "Birthdate is required";
     }
+    return error;
   };
-  const handleEmailChange = (e) => {
-    setInputEmail(e.target.value);
-    if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(e.target.value)) {
-      setIsErrorEmail(false);
-    } else {
-      setIsErrorEmail(true);
+
+  const validateEducation = (value) => {
+    let error;
+    if (!value) {
+      error = "Educational background is required";
     }
+    return error;
   };
-  const handlePasswordChange = (e) => {
-    setInputPassword(e.target.value);
-    if (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(e.target.value)) {
-      setIsErrorPassword(false);
-    } else {
-      setIsErrorPassword(true);
+
+  const validateEmail = (value) => {
+    let error;
+    if (!value) {
+      error = "Email is required";
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(value)) {
+      error = `Email should be in this form: "john@mail.com".`;
     }
+    return error;
+  };
+
+  const validatePassword = (value) => {
+    let error;
+    if (!value) {
+      error = "Password is required";
+    } else if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
+      error = `Password must have minimum eight characters, at least one letter and one number`;
+    }
+    return error;
   };
 
   return (
@@ -103,162 +104,174 @@ function RegisterPage() {
           <Heading variant="headline2" color="blue.500">
             Register to start learning!
           </Heading>
-          {/* //------------------------- Input Name --------------------// */}
-          <FormControl isInvalid={isErrorName} isRequired>
-            <Flex flexDirection="column" justifyContent="flex-start">
-              <FormLabel variant="body2" color="black" pt="37px">
-                Name
-              </FormLabel>
-              <Input
-                type="text"
+          <Formik
+            initialValues={{
+              full_name: "",
+              birthdate: "",
+              education: "",
+              email: "",
+              password: "",
+            }}
+            onSubmit={handleSubmit}
+          >
+            {(props) => (
+              <Flex
+                flexDirection="column"
+                justifyContent="flex-start"
                 w="453px"
-                h="48px"
-                placeholder="Enter First Name and Last Name"
-                value={inputName}
-                onChange={handleNameChange}
-              />
-              {!isErrorName ? (
-                <FormHelperText>&nbsp;</FormHelperText>
-              ) : (
-                <FormErrorMessage>
-                  Name must only contain alphabets and some special characters
-                  <br />
-                  (e.g., comma, dot, apostrophe, and hyphen)
-                </FormErrorMessage>
-              )}
-              {/* //-------------------------- Input Date --------------------// */}
-              <FormControl isInvalid={isErrorDate} isRequired>
-                <FormLabel variant="body2" color="black" pt="20px">
-                  Date of Birth
-                </FormLabel>
-                <div
-                  style={{
-                    position: "relative",
-                    float: "left",
-                  }}
-                >
-                  <Input
-                    color="#9AA1B9"
-                    type="date"
+              >
+                <Form>
+                  {/* //------------------------- Input Name --------------------// */}
+                  <Field name="full_name" validate={validateName}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={
+                          form.errors.full_name && form.touched.full_name
+                        }
+                        isRequired
+                      >
+                        <FormLabel variant="body2" color="black" pt="37px">
+                          Name
+                        </FormLabel>
+                        <Input
+                          type="text"
+                          w="453px"
+                          h="48px"
+                          placeholder="Enter First Name and Last Name"
+                          {...field}
+                        />
+                        <FormErrorMessage>
+                          {form.errors.full_name}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+
+                  {/* //-------------------------- Input Date --------------------// */}
+                  <Field name="birthdate" validate={validateBirthdate}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={
+                          form.errors.birthdate && form.touched.birthdate
+                        }
+                        isRequired
+                      >
+                        <FormLabel variant="body2" color="black" pt="20px">
+                          Date of Birth
+                        </FormLabel>
+                        <InputGroup>
+                          <Input
+                            color="#9AA1B9"
+                            type="date"
+                            w="453px"
+                            h="48px"
+                            placeholder="MM/DD/YYYY"
+                            {...field}
+                            sx={{
+                              "::-webkit-calendar-picker-indicator": {
+                                background:
+                                  "url('/assets/register-page/icons-calendar.svg')",
+                              },
+                            }}
+                          />
+                        </InputGroup>
+                        <FormErrorMessage>
+                          {form.errors.birthdate}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  {/* //---------------------- Input Educational --------------------// */}
+                  <Field name="education" validate={validateEducation}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={
+                          form.errors.education && form.touched.education
+                        }
+                        isRequired
+                      >
+                        <FormLabel variant="body2" color="black" mt="20px">
+                          Educational Background
+                        </FormLabel>
+                        <Input
+                          type="text"
+                          w="453px"
+                          h="48px"
+                          placeholder="Enter Educational Background"
+                          {...field}
+                        />
+                        <FormErrorMessage>
+                          {form.errors.education}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  {/* //------------------------- Input Email --------------------// */}
+                  <Field name="email" validate={validateEmail}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={form.errors.email && form.touched.email}
+                        isRequired
+                      >
+                        <FormLabel variant="body2" color="black" pt="20px">
+                          Email
+                        </FormLabel>
+                        <Input
+                          type="email"
+                          w="453px"
+                          h="48px"
+                          placeholder="Enter Email"
+                          {...field}
+                        />
+                        <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  {/* //------------------------- Input Password --------------------// */}
+                  <Field name="password" validate={validatePassword}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={
+                          form.errors.password && form.touched.password
+                        }
+                        isRequired
+                      >
+                        <FormLabel variant="body2" color="black" pt="20px">
+                          Password
+                        </FormLabel>
+                        <Input
+                          type="password"
+                          w="453px"
+                          h="48px"
+                          placeholder="Enter Password"
+                          {...field}
+                        />
+                        <FormErrorMessage>
+                          {form.errors.password}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  {/* //------------------------- Register Button --------------------// */}
+                  <Button
+                    variant="primary"
+                    mt="40px"
                     w="453px"
-                    h="48px"
-                    placeholder="MM/DD/YYYY"
-                    value={inputDate}
-                    onChange={handleDateChange}
-                    sx={{
-                      "::-webkit-datetime-edit-year-field": {
-                        color: "",
-                      },
-                    }}
-                  />
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "15px",
-                      right: "20px",
-                      width: "21px",
-                      height: "21px",
-                      background: "#fff",
-                      pointerEvents: "none",
-                    }}
+                    h="60px"
+                    type="submit"
                   >
-                    <button
-                      style={{
-                        border: "none",
-                        background: "transparen",
-                      }}
-                    >
-                      <Image
-                        src="/assets/register-page/icons-calendar.svg"
-                        alt="background-image"
-                      />
-                    </button>
-                  </span>
-                  {!isErrorDate ? (
-                    <FormHelperText>&nbsp;</FormHelperText>
-                  ) : (
-                    <FormErrorMessage>
-                      Date of birth is required.
-                    </FormErrorMessage>
-                  )}
-                </div>
-              </FormControl>
-              {/* //---------------------- Input Educational --------------------// */}
-              <FormControl isInvalid={isErrorEducate} isRequired>
-                <FormLabel variant="body2" color="black" pt="20px">
-                  Educational Background
-                </FormLabel>
-                <Input
-                  type="text"
-                  w="453px"
-                  h="48px"
-                  placeholder="Enter Educational Background"
-                  value={inputEducate}
-                  onChange={handleEducateChange}
-                />
-                {!isErrorEducate ? (
-                  <FormHelperText>&nbsp;</FormHelperText>
-                ) : (
-                  <FormErrorMessage>
-                    Educational background is required.
-                  </FormErrorMessage>
-                )}
-              </FormControl>
-              {/* //------------------------- Input Email --------------------// */}
-              <FormControl isInvalid={isErrorEmail} isRequired>
-                <FormLabel variant="body2" color="black" pt="20px">
-                  Email
-                </FormLabel>
-                <Input
-                  type="email"
-                  w="453px"
-                  h="48px"
-                  placeholder="Enter Email"
-                  value={inputEmail}
-                  onChange={handleEmailChange}
-                />
-                {!isErrorEmail ? (
-                  <FormHelperText>&nbsp;</FormHelperText>
-                ) : (
-                  <FormErrorMessage>
-                    Email should be in this form: "john@mail.com".
-                  </FormErrorMessage>
-                )}
-              </FormControl>
-              {/* //------------------------- Input Password --------------------// */}
-              <FormControl isInvalid={isErrorPassword} isRequired>
-                <FormLabel variant="body2" color="black" pt="20px">
-                  Password
-                </FormLabel>
-                <Input
-                  type="password"
-                  w="453px"
-                  h="48px"
-                  placeholder="Enter Password"
-                  value={inputPassword}
-                  onChange={handlePasswordChange}
-                />
-                {!isErrorPassword ? (
-                  <FormHelperText>&nbsp;</FormHelperText>
-                ) : (
-                  <FormErrorMessage>
-                    Password must have minimum eight characters, at least one
-                    letter <br /> and one number
-                  </FormErrorMessage>
-                )}
-              </FormControl>
-              {/* //------------------------- Register Button --------------------// */}
-              <Button variant="primary" mt="40px" w="453px" h="60px">
-                Register
-              </Button>
-              <Text as="b" mt="44px">
-                Already have an account?
-                <Link ml="12px" onClick={() => navigate("/login")}>
-                  Log in
-                </Link>
-              </Text>
-            </Flex>
-          </FormControl>
+                    Register
+                  </Button>
+                </Form>
+                <Text as="b" mt="44px">
+                  Already have an account?
+                  <Link ml="12px" onClick={() => navigate("/login")}>
+                    Log in
+                  </Link>
+                </Text>
+              </Flex>
+            )}
+          </Formik>
         </Flex>
       </Flex>
     </Box>

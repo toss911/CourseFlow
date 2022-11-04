@@ -17,8 +17,9 @@ authRouter.post("/register", async (req, res) => {
     );
 
     if (emailExist.rowCount !== 0) {
-      return res.status(400).json({
+      return res.json({
         message: "This email already has an account.",
+        status: 404,
       });
     } else {
       const salt = await bcrypt.genSalt(10);
@@ -38,6 +39,7 @@ authRouter.post("/register", async (req, res) => {
 
       return res.json({
         message: "Registered successfully.",
+        status: 200,
       });
     }
   } catch (error) {
@@ -89,7 +91,7 @@ authRouter.post("/login", async (req, res) => {
       token,
     });
   } catch (error) {
-    return res.status(500).json(error);
+    return res.json(error);
   }
 });
 

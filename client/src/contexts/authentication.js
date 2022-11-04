@@ -14,12 +14,18 @@ function AuthProvider(props) {
 
   const register = async (data) => {
     try {
-      await axios.post("http://localhost:4000/auth/register", data);
-      alert("Account has been successfully registered!");
-      // ลอง log ผลลัพธ์จาก POST ออกมาดูว่าถ้าเป็นกรณีอีเมลซ้ำ มันจะขึ้น successfully ไหม
-      navigate("/login");
+      const result = await axios.post(
+        "http://localhost:4000/auth/register",
+        data
+      );
+      if (result.data.status === 200) {
+        alert(`${result.data.message}`);
+        navigate("/login");
+      } else {
+        alert(`${result.data.message}`);
+      }
     } catch (error) {
-      alert(error.response);
+      alert(`ERROR: Please try again later`);
     }
   };
 
@@ -30,7 +36,7 @@ function AuthProvider(props) {
       localStorage.setItem("token", token);
       const userDataFromToken = jwtDecode(token);
       setState({ user: userDataFromToken });
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       alert(`Invalid Email or Password`);
     }
