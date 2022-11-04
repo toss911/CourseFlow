@@ -2,18 +2,11 @@ import {
   Center,
   Box,
   Image,
-  Flex,
   Text,
   Heading,
   Button,
-  Container,
-  Spacer,
-  Stack,
   Divider,
-  List,
   ListItem,
-  ListIcon,
-  OrderedList,
   UnorderedList,
   Accordion,
   AccordionItem,
@@ -125,6 +118,7 @@ function CourseDetail() {
             Quis eget vestibulum, faucibus malesuada eu. Et lectus molestie
             egestas faucibus auctor auctor.
           </Text>
+          <Heading mt='100px'>Module Samples</Heading>
           <Accordion defaultIndex={[0]} allowMultiple w='739px'>
             <AccordionItem>
               <h2>
@@ -310,18 +304,19 @@ function CourseDetail() {
           </Accordion>
         </Box>
       </Box>
-
-      <Image
-        src='/assets/CourseDetail/BG.svg'
-        alt='Course picture'
-        h='792px'
-        w='1440px'
-      />
-      <Container w='100vw'>
-        <Heading variants='headline2' mt='120px' color='black'>
+      <Box
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        backgroundImage="url('/assets/CourseDetail/BG.svg')"
+        backgroundPosition='center'
+        backgroundRepeat='no-repeat'
+      >
+        <Heading variants='headline2' color='black' mt='121px'>
           Other Interesting Courses
         </Heading>
-      </Container>
+      </Box>
+
       <Footer />
     </>
   );
