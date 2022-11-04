@@ -13,10 +13,9 @@ import {
   FormHelperText,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar";
-import { NavbarLogin } from "../components/NavbarLogin ";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../contexts/authentication";
+import { useAuth } from "../contexts/authentication.js";
 
 function Login() {
   const [inputEmail, setInputEmail] = useState("");
@@ -29,8 +28,8 @@ function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
     login({
-      inputEmail,
-      inputPassword,
+      email: inputEmail,
+      password: inputPassword,
     });
   };
 
