@@ -57,9 +57,9 @@ coursesRouter.get("/:courseId", async (req, res) => {
             where courses.course_id=$1`,
     [courseId]
   );
-});
-return res.json({
-  data: results.rows,
+  return res.json({
+    data: results.rows,
+  });
 });
 
 export default coursesRouter;
