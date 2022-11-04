@@ -24,7 +24,6 @@ function RegisterPage() {
 
   const navigate = useNavigate();
 
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = {
@@ -277,7 +276,13 @@ function RegisterPage() {
                 )}
               </FormControl>
               {/* //------------------------- Register Button --------------------// */}
-              <Button variant="primary" mt="40px" w="453px" h="60px">
+              <Button
+                variant="primary"
+                type="submit"
+                mt="40px"
+                w="453px"
+                h="60px"
+              >
                 Register
               </Button>
               <Text as="b" mt="44px">
