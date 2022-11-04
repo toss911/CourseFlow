@@ -11,7 +11,6 @@ coursesRouter.get("/", async (req, res) => {
     const PAGE_SIZE = 12;
     const offset = (page-1) * PAGE_SIZE;
 
-    console.log(keywords);
 
     let query = "";
     let values = [];
@@ -41,7 +40,7 @@ coursesRouter.get("/", async (req, res) => {
     }
 
     const results = await pool.query(query, values);
-    console.log(results)
+    
 
     return res.json({
         data: results.rows
