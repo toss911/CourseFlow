@@ -8,7 +8,9 @@ const ReviewSlider = ({ slides }) => {
     <Carousel
       infiniteLoop
       axis="horizontal"
-      //centerMode={true}
+      centerMode
+      centerSlidePercentage="60"
+      showIndicators={false}
       showStatus={false}
       swipeable
       emulateTouch
@@ -26,7 +28,7 @@ const ReviewSlider = ({ slides }) => {
             borderRadius="8px"
             mt="20px"
             pl="72.28px"
-            ml="35%"
+            ml="25%"
             w="578.78px"
             h="309.48px"
             position="relative"
