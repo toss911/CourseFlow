@@ -16,8 +16,12 @@ import {
 import { Navbar } from "../components/Navbar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/authentication.js";
+import { Field, Form, Formik } from "formik";
 
 function RegisterPage() {
+  const { register } = useAuth();
+
   const navigate = useNavigate();
 
   const [value, onChange] = useState(new Date());
@@ -32,6 +36,15 @@ function RegisterPage() {
   const [isErrorEducate, setIsErrorEducate] = useState(false);
   const [isErrorEmail, setIsErrorEmail] = useState(false);
   const [isErrorPassword, setIsErrorPassword] = useState(false);
+
+  const validateName = (value) => {
+    let error;
+    if (!value) {
+      error = "Name is required";
+    } else if (/^[a-z ,.'-]+$/i.test(value)) {
+      error = `Name must only contain alphabets and some special characters\n(e.g., comma, dot, apostrophe, and hyphen)`;
+    }
+  };
 
   const handleNameChange = (e) => {
     setInputName(e.target.value);
@@ -103,29 +116,32 @@ function RegisterPage() {
           <Heading variant="headline2" color="blue.500">
             Register to start learning!
           </Heading>
-          {/* //------------------------- Input Name --------------------// */}
-          <FormControl isInvalid={isErrorName} isRequired>
+          <Formik>
+            {/* //------------------------- Input Name --------------------// */}
             <Flex flexDirection="column" justifyContent="flex-start">
-              <FormLabel variant="body2" color="black" pt="37px">
-                Name
-              </FormLabel>
-              <Input
-                type="text"
-                w="453px"
-                h="48px"
-                placeholder="Enter First Name and Last Name"
-                value={inputName}
-                onChange={handleNameChange}
-              />
-              {!isErrorName ? (
-                <FormHelperText>&nbsp;</FormHelperText>
-              ) : (
-                <FormErrorMessage>
-                  Name must only contain alphabets and some special characters
-                  <br />
-                  (e.g., comma, dot, apostrophe, and hyphen)
-                </FormErrorMessage>
-              )}
+              <FormControl isInvalid={isErrorName} isRequired>
+                <FormLabel variant="body2" color="black" pt="37px">
+                  Name
+                </FormLabel>
+                <Input
+                  type="text"
+                  w="453px"
+                  h="48px"
+                  placeholder="Enter First Name and Last Name"
+                  value={inputName}
+                  onChange={handleNameChange}
+                />
+                {!isErrorName ? (
+                  <FormHelperText>&nbsp;</FormHelperText>
+                ) : (
+                  <FormErrorMessage>
+                    Name must only contain alphabets and some special characters
+                    <br />
+                    (e.g., comma, dot, apostrophe, and hyphen)
+                  </FormErrorMessage>
+                )}
+              </FormControl>
+
               {/* //-------------------------- Input Date --------------------// */}
               <FormControl isInvalid={isErrorDate} isRequired>
                 <FormLabel variant="body2" color="black" pt="20px">
@@ -258,7 +274,7 @@ function RegisterPage() {
                 </Link>
               </Text>
             </Flex>
-          </FormControl>
+          </Formik>
         </Flex>
       </Flex>
     </Box>
