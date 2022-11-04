@@ -19,6 +19,7 @@ import ReviewNonSlider from "../components/ReviewNonSlider.js";
 import { SlideData } from "../data/SlideData.js";
 import { useNavigate } from "react-router-dom";
 
+
 function HomePage() {
   const navigate = useNavigate();
 
