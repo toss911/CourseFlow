@@ -18,10 +18,20 @@ import {
   InputGroup,
   Center,
 } from "@chakra-ui/react";
-import { cardData } from "../data/cardData.js";
+// import { cardData } from "../data/cardData.js";
+import useCourses from "../hooks/useCourses";
 
 
 function OurCourses() {
+
+  const [keywords, setKeywords] = useState("");
+  const [page, setPage] = useState(1);
+
+  const { getCourses, courses } = useCourses();
+
+  useEffect(()=>{
+    getCourses( { keywords, page } );
+  }, [keywords, page]);
 //   const [course,setCourses] = useState([]);
 //   const [loading,setLoading] = useState(false);
 //   const [currentPage,setCurrentPage] = useState(1);
@@ -36,6 +46,7 @@ function OurCourses() {
 // }
 //  fetchPost();
 // },[]);
+
   return (
     <Box>
       <Navbar />
@@ -48,7 +59,7 @@ function OurCourses() {
           </Heading>
           <Box mb="100px">
             <InputGroup w="357px">
-              <Input type="string" placeholder="Search..." pl="40px" />
+              <Input type="string" placeholder="Search..." pl="40px" value={keywords} onchange={(e)=>{setKeywords(e.target.value)}}/>
               <InputLeftElement
                 pointerEvents="none"
                 children={<SearchIcon color="#646D89" />}
@@ -65,14 +76,14 @@ function OurCourses() {
           flexWrap="wrap"
           w="70%"
         >
-          {cardData.map((card, key) => {
+          {courses.map((course, key) => {
             return (
               <CourseCard
-                courseTitle={card.title}
-                courseSummary={card.content}
-                courseNumLessons={card.lesson}
-                courseTime={card.time}
-                courseImg={card.Image}
+                courseTitle={course.name}
+                courseSummary={course.summary}
+                courseNumLessons={course.lessons_count}
+                courseTime={course.learning_time}
+                courseImg={course.cover_image_directory}
               />
             );
           })}
