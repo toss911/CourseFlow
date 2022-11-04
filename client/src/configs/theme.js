@@ -96,6 +96,30 @@ const components = {
       },
     },
   },
+  FormLabel: {
+    variants: {
+      body1: {
+        fontSize: "20px",
+        lineHeight: `${1.5 * 20}px`,
+        fontWeight: 400,
+      },
+      body2: {
+        fontSize: "16px",
+        lineHeight: `${1.5 * 16}px`,
+        fontWeight: 400,
+      },
+      body3: {
+        fontSize: "14px",
+        lineHeight: `${1.5 * 14}px`,
+        fontWeight: 400,
+      },
+      body4: {
+        fontSize: "12px",
+        lineHeight: `${1.5 * 12}px`,
+        fontWeight: 400,
+      },
+    },
+  },
   Button: {
     variants: {
       primary: {
@@ -197,6 +221,29 @@ const components = {
             borderColor: "gray.400",
             opacity: 1,
           },
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Link: {
+    variants: {
+      default: {
+        fontSize: "16px",
+        lineHeight: `${1.5 * 16}px`,
+        fontWeight: 700,
+        color: "blue.500",
+        _hover: {
+          color: "blue.400",
+          textDecoration: "none",
+        },
+        _active: {
+          color: "blue.600",
+        },
+        _disabled: {
+          color: "gray.500",
         },
       },
     },
