@@ -1,22 +1,11 @@
-import {
-  Center,
-  Box,
-  Image,
-  Text,
-  Heading,
-  Button,
-  Divider,
-  ListItem,
-  UnorderedList,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-} from '@chakra-ui/react';
+import { Box, Image, Text, Heading, Button, Divider } from '@chakra-ui/react';
 import { Navbar } from '../components/Navbar';
 import { NavbarLogin } from '../components/NavbarLogin ';
 import { Footer } from '../components/Footer';
+import { CourseCard } from '../components/CourseCard';
+import { PreFooter } from '../components/PreFooter';
+import { ModuleSample } from '../components/ModuleSample';
+import { PriceCard } from '../components/PriceCard';
 
 function CourseDetail() {
   return (
@@ -39,63 +28,13 @@ function CourseDetail() {
             w='739px'
           />
 
-          <Box
-            display='flex'
-            ml='24px'
-            mr='24px'
-            alignItems='start'
-            justifyContent='start'
-            border='10px'
-            p='5'
-            shadow='md'
-            borderWidth='1px'
-            flexDirection='column'
-            w='357px'
-            h='fit-content'
-            borderRadius='8px'
-            padding='24px'
-            gap='20px'
-            position='sticky'
-            top={0}
-            zIndex='docked'
-            overflowX='unset'
-            overflowY='unset'
-          >
-            <Text color='orange.500'>Course</Text>
-            <Text
-              fontSize='24px'
-              fontWeight='600'
-              lineHeight='125%'
-              color='black'
-            >
-              Service Design Essentials
-            </Text>
-            <Text variant='body2' w='309px'>
-              เนื้อหาภายในหลักสูตร Bootcamp ออนไลน์นี้
-              ไม่ได้แค่สอนการเขียนโปรแกรมเพียงอย่างเดียว
-              แต่จะครอบคลุมเนื้อหาครบด้านตั้งแต่พื้นฐาน Fundamentals
-            </Text>
-            <Text
-              fontSize='24px'
-              fontWeight='600'
-              lineHeight='125%'
-              color='gray.700'
-            >
-              THB 3,559.00
-            </Text>
-            <Divider />
-            <Box display='flex' flexDirection='column' gap='16px' w='309px'>
-              <Button variant='secondary'>Get In Desire Course</Button>
-              <Button variant='primary'>Subscribe This Course</Button>
-            </Box>
-          </Box>
+          <PriceCard />
         </Box>
 
         <Box display='flex' flexDirection='column' w='548px' gap='24px'>
           <Heading variants='headline2' color='black' mt='100px'>
             Course Detail
           </Heading>
-
           <Text variants='body2' w='739px' mt='10px'>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elementum
             aenean fermentum, velit vel, scelerisque morbi accumsan. Nec, tellus
@@ -118,190 +57,11 @@ function CourseDetail() {
             Quis eget vestibulum, faucibus malesuada eu. Et lectus molestie
             egestas faucibus auctor auctor.
           </Text>
-          <Heading mt='100px'>Module Samples</Heading>
-          <Accordion defaultIndex={[0]} allowMultiple w='739px'>
-            <AccordionItem>
-              <h2>
-                <AccordionButton display='flex' w='739px'>
-                  <Box
-                    flex='1'
-                    textAlign='left'
-                    fontSize='24px'
-                    fontWeight='500'
-                    display='flex'
-                    color='black'
-                  >
-                    <Text color='#646D89' display='flex'>
-                      01
-                    </Text>
-                    <Text ml='24px'>{'Introduction'}</Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel ml='13px' pb={4}>
-                <UnorderedList>
-                  <ListItem>Welcome to the Course </ListItem>
-                  <ListItem> Course Overview </ListItem>
-                  <ListItem>Getting to Know You</ListItem>
-                  <ListItem>ervice Design vs. UX vs. UI vs. Design</ListItem>
-                  <ListItem>
-                    Thinking 4 Levels of Service Design in an Organization{' '}
-                  </ListItem>
-                  <ListItem>
-                    Scope of Service Design Develop an Entirely New Service - U
-                    Drink I Drive
-                  </ListItem>
-                  <ListItem>
-                    Improving Existing Services - Credit Card{' '}
-                  </ListItem>
-                  <ListItem>Improving Existing Services - MK</ListItem>
-                  <ListItem>Levels of Impact</ListItem>
-                </UnorderedList>
-              </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-              <h2>
-                <AccordionButton w='739px'>
-                  <Box
-                    flex='1'
-                    textAlign='left'
-                    fontSize='24px'
-                    fontWeight='500'
-                    color='black'
-                    display='flex'
-                  >
-                    <Text color='#646D89'>02</Text>
-
-                    <Text ml='24px'>
-                      {'Service Design Theories and Principles'}
-                    </Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel ml='13px' pb={4}>
-                <UnorderedList>
-                  <ListItem>Lorem ipsum dolor sit amet</ListItem>
-                  <ListItem>Consectetur adipiscing elit</ListItem>
-                  <ListItem>Integer molestie lorem at massa</ListItem>
-                  <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-                </UnorderedList>
-              </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-              <h2>
-                <AccordionButton w='739px'>
-                  <Box
-                    flex='1'
-                    textAlign='left'
-                    fontSize='24px'
-                    fontWeight='500'
-                    display='flex'
-                    color='#646D89'
-                  >
-                    03
-                    <Text color='black' ml='24px'>
-                      {'Understanding Users and Finding Opportunities'}
-                    </Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel ml='13px' pb={4}>
-                <UnorderedList>
-                  <ListItem>Lorem ipsum dolor sit amet</ListItem>
-                  <ListItem>Consectetur adipiscing elit</ListItem>
-                  <ListItem>Integer molestie lorem at massa</ListItem>
-                  <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-                </UnorderedList>
-              </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-              <h2>
-                <AccordionButton w='739px'>
-                  <Box
-                    flex='1'
-                    textAlign='left'
-                    fontSize='24px'
-                    fontWeight='500'
-                    color='#646D89'
-                    display='flex'
-                  >
-                    04
-                    <Text color='black' ml='24px'>
-                      {'Identifying and Validating Opportunities for Design'}
-                    </Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel ml='13px' pb={4}>
-                <UnorderedList>
-                  <ListItem>Lorem ipsum dolor sit amet</ListItem>
-                  <ListItem>Consectetur adipiscing elit</ListItem>
-                  <ListItem>Integer molestie lorem at massa</ListItem>
-                  <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-                </UnorderedList>
-              </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-              <h2>
-                <AccordionButton w='739px'>
-                  <Box
-                    flex='1'
-                    textAlign='left'
-                    fontSize='24px'
-                    fontWeight='500'
-                    color='#646D89'
-                    display='flex'
-                  >
-                    05
-                    <Text color='black' ml='24px'>
-                      {'Prototyping'}
-                    </Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel ml='13px' pb={4}>
-                <UnorderedList>
-                  <ListItem>Lorem ipsum dolor sit amet</ListItem>
-                  <ListItem>Consectetur adipiscing elit</ListItem>
-                  <ListItem>Integer molestie lorem at massa</ListItem>
-                  <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-                </UnorderedList>
-              </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-              <h2>
-                <AccordionButton w='739px'>
-                  <Box
-                    flex='1'
-                    textAlign='left'
-                    fontSize='24px'
-                    fontWeight='500'
-                    color='#646D89'
-                    display='flex'
-                  >
-                    06
-                    <Text color='black' ml='24px'>
-                      {'Course Summary'}
-                    </Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel ml='13px' pb={4}>
-                <UnorderedList>
-                  <ListItem>Lorem ipsum dolor sit amet</ListItem>
-                  <ListItem>Consectetur adipiscing elit</ListItem>
-                  <ListItem>Integer molestie lorem at massa</ListItem>
-                  <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-                </UnorderedList>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
+          <Heading mt='100px' color='black' mb='20px'>
+            Module Samples
+          </Heading>
+          {/* //ModuleSample Below// */}
+          <ModuleSample />
         </Box>
       </Box>
       <Box
@@ -315,8 +75,9 @@ function CourseDetail() {
         <Heading variants='headline2' color='black' mt='121px'>
           Other Interesting Courses
         </Heading>
+        <CourseCard />
       </Box>
-
+      <PreFooter />
       <Footer />
     </>
   );
