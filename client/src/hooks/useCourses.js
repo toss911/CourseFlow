@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState(null);
+  const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
 
@@ -21,6 +22,7 @@ const useCourses = () => {
       );
 
       setCourses(results.data.data);
+      setTotalPages(results.data.total_pages);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
