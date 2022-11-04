@@ -1,11 +1,19 @@
-import { Box, Image, Text, Heading, Button, Divider } from '@chakra-ui/react';
-import { Navbar } from '../components/Navbar';
-import { NavbarLogin } from '../components/NavbarLogin ';
-import { Footer } from '../components/Footer';
-import { CourseCard } from '../components/CourseCard';
-import { PreFooter } from '../components/PreFooter';
-import { ModuleSample } from '../components/ModuleSample';
-import { PriceCard } from '../components/PriceCard';
+import {
+  Flex,
+  Box,
+  Image,
+  Text,
+  Heading,
+  Button,
+  Divider,
+} from "@chakra-ui/react";
+import { Navbar } from "../components/Navbar";
+import { NavbarLogin } from "../components/NavbarLogin ";
+import { Footer } from "../components/Footer";
+import { CourseCard } from "../components/CourseCard";
+import { PreFooter } from "../components/PreFooter";
+import { ModuleSample } from "../components/ModuleSample";
+import { PriceCard } from "../components/PriceCard";
 
 function CourseDetail() {
   return (
@@ -14,28 +22,27 @@ function CourseDetail() {
       {/* <NavbarLogin /> */}
 
       <Box
-        w='100vw'
-        mt='100px'
-        ml='160px'
-        display='flex'
-        flexDirection='column'
+        w="100vw"
+        mt="100px"
+        ml="160px"
+        display="flex"
+        flexDirection="column"
       >
-        <Box display='flex' flexDirection='row'>
+        <Flex flexDirection="row">
           <Image
-            src='/assets/CourseDetail/Course1.svg'
-            alt='Course picture'
-            h='460px'
-            w='739px'
+            src="/assets/CourseDetail/Course1.svg"
+            alt="Course picture"
+            h="460px"
+            w="739px"
           />
 
           <PriceCard />
-        </Box>
-
-        <Box display='flex' flexDirection='column' w='548px' gap='24px'>
-          <Heading variants='headline2' color='black' mt='100px'>
+        </Flex>
+        <Box display="flex" flexDirection="column" w="548px" gap="24px">
+          <Heading variants="headline2" color="black" mt="100px">
             Course Detail
           </Heading>
-          <Text variants='body2' w='739px' mt='10px'>
+          <Text variants="body2" w="739px" mt="10px">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elementum
             aenean fermentum, velit vel, scelerisque morbi accumsan. Nec, tellus
             leo id leo id felis egestas. Quam sit lorem quis vitae ut mus
@@ -57,7 +64,7 @@ function CourseDetail() {
             Quis eget vestibulum, faucibus malesuada eu. Et lectus molestie
             egestas faucibus auctor auctor.
           </Text>
-          <Heading mt='100px' color='black' mb='20px'>
+          <Heading mt="100px" color="black" mb="20px">
             Module Samples
           </Heading>
           {/* //ModuleSample Below// */}
@@ -65,14 +72,14 @@ function CourseDetail() {
         </Box>
       </Box>
       <Box
-        display='flex'
-        flexDirection='column'
-        alignItems='center'
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
         backgroundImage="url('/assets/CourseDetail/BG.svg')"
-        backgroundPosition='center'
-        backgroundRepeat='no-repeat'
+        backgroundPosition="center"
+        backgroundRepeat="no-repeat"
       >
-        <Heading variants='headline2' color='black' mt='121px'>
+        <Heading variants="headline2" color="black" mt="121px">
           Other Interesting Courses
         </Heading>
         <CourseCard />
