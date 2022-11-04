@@ -1,28 +1,20 @@
-import { Box, Image, Text, Heading, Button, Divider } from '@chakra-ui/react';
+import { Box, Image, Text, Flex, Button, Divider } from '@chakra-ui/react';
 
 export const PriceCard = () => {
   return (
     <Box
       display='flex'
+      flexDirection='column'
       ml='24px'
       mr='24px'
-      alignItems='start'
-      justifyContent='start'
       border='10px'
       p='5'
       shadow='md'
-      borderWidth='1px'
-      flexDirection='column'
-      w='357px'
-      h='fit-content'
       borderRadius='8px'
-      padding='24px'
+      w='fit-content'
+      h='fit-content'
       gap='20px'
       position='sticky'
-      top={0}
-      zIndex='docked'
-      overflowX='unset'
-      overflowY='unset'
     >
       <Text color='orange.500'>Course</Text>
       <Text fontSize='24px' fontWeight='600' lineHeight='125%' color='black'>
