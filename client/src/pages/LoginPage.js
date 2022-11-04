@@ -57,14 +57,14 @@ function Login() {
   return (
     <Box
       w="100vw"
-      h="100vh"
+      h="936px"
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
       bgImage="url('/assets/login-page/bg-login.svg')"
       backgroundSize="cover"
       backgroundPosition="center"
-      overflowY="hidden"
+      // overflowY="hidden"
     >
       <Navbar />
       <Flex
