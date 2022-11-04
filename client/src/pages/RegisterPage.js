@@ -127,7 +127,7 @@ function RegisterPage() {
           <Heading variant="headline2" color="blue.500">
             Register to start learning!
           </Heading>
-          <Formik>
+          <Formik onSubmit={handleSubmit}>
             {/* //------------------------- Input Name --------------------// */}
             <Flex flexDirection="column" justifyContent="flex-start">
               <FormControl isInvalid={isErrorName} isRequired>
