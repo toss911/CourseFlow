@@ -7,17 +7,20 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { AuthProvider } from "./contexts/authentication.js";
 import theme from "./configs/theme.js";
 import jwtInterceptor from "./utils/jwtInterceptors.js";
+import { BrowserRouter } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 jwtInterceptor();
 root.render(
   <React.StrictMode>
-    <ChakraProvider theme={theme}>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </ChakraProvider>
+    <BrowserRouter>
+      <ChakraProvider theme={theme}>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ChakraProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
