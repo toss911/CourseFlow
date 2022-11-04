@@ -211,7 +211,7 @@ const components = {
             color: "black",
             pr: "5%",
             borderColor: "purple",
-            backgroundImage: "url('/assets/WarningIcon.svg')",
+            backgroundImage: "url('/assets/misc/WarningIcon.svg')",
             backgroundPosition: "95% 52.5%",
             backgroundRepeat: "no-repeat",
           },

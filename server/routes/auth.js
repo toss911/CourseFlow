@@ -19,7 +19,6 @@ authRouter.post("/register", async (req, res) => {
     if (emailExist.rowCount !== 0) {
       return res.json({
         message: "This email already has an account.",
-        status: 404,
       });
     } else {
       const salt = await bcrypt.genSalt(10);
@@ -39,11 +38,10 @@ authRouter.post("/register", async (req, res) => {
 
       return res.json({
         message: "Registered successfully.",
-        status: 200,
       });
     }
   } catch (error) {
-    return res.status(500).json(error);
+    return res.sendStatus(500);
   }
 });
 
@@ -56,8 +54,8 @@ authRouter.post("/login", async (req, res) => {
     ]);
 
     if (user.rowCount === 0) {
-      return res.status(404).json({
-        message: "Invalid email or password",
+      return res.json({
+        message: "Couldn't find your account",
       });
     }
 
@@ -67,8 +65,8 @@ authRouter.post("/login", async (req, res) => {
     );
 
     if (!isValidPassword) {
-      return res.status(401).json({
-        message: "Invalid email or password",
+      return res.json({
+        message: "Wrong password. Please try again.",
       });
     }
 
@@ -91,7 +89,7 @@ authRouter.post("/login", async (req, res) => {
       token,
     });
   } catch (error) {
-    return res.json(error);
+    return res.sendStatus(500);
   }
 });
 
