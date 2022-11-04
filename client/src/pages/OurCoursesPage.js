@@ -27,12 +27,22 @@ function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
 
+  const handleSearchTextChange = (event) => {
+    setKeywords(event.target.value);
+  };
+
   const { getAllCourses, getCourses, courses, getCoursesbyId } = useCourses();
 
   useEffect(()=>{
 
+    // let timerId;
+
     if(keywords) {
-      getCourses( { keywords, page } );
+
+      getCourses( { keywords, page } )
+
+      // timerId = setTimeout(getCourses( { keywords, page } ), 1000);
+      
     }
     
     getAllCourses();
@@ -50,7 +60,7 @@ function OurCourses() {
           </Heading>
           <Box mb="100px">
             <InputGroup w="357px">
-              <Input type="string" placeholder="Search..." pl="40px" onChange={(e)=>{setKeywords(e.target.value)}} value={keywords}/>
+              <Input type="string" placeholder="Search..." pl="40px" onChange={handleSearchTextChange} value={keywords}/>
               <InputLeftElement
                 pointerEvents="none"
                 children={<SearchIcon color="#646D89" />}
