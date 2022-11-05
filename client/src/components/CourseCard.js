@@ -9,13 +9,14 @@ import {
     Link,
   } from "@chakra-ui/react";
 
+
   export function CourseCard(props) {
     return (
-          <Box h='475px' w='375px' boxShadow='shadow1' borderRadius ='8px' mx='24px' mt='24px'  overflow='hidden' mb ='24px'>
-              <Box>
-              <Image
+          <Box h='475px' w='357px' boxShadow='shadow1' borderRadius ='8px' mx='24px' mt='24px'  overflow='hidden' mb ='24px' _hover={{ background: "white", border:'solid', borderColor:'blue.200'}}>
+              <Box w='357px' h='240px'>
+              <Image w='357px'
               src={
-                "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                props.courseImg
               }/>
               </Box>
               <Box >

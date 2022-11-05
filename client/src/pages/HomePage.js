@@ -9,7 +9,6 @@ import {
   Heading,
   Button,
 } from "@chakra-ui/react";
-import { Navbar } from "../components/Navbar";
 import { NavbarLogin } from "../components/NavbarLogin ";
 import { Footer } from "../components/Footer";
 import { PreFooter } from "../components/PreFooter";
@@ -19,7 +18,6 @@ import ReviewNonSlider from "../components/ReviewNonSlider.js";
 import { SlideData } from "../data/SlideData.js";
 import { useNavigate } from "react-router-dom";
 
-
 function HomePage() {
   const navigate = useNavigate();
 
@@ -27,8 +25,7 @@ function HomePage() {
     <>
       {/* //Nav section */}
       {/* //Start Codind here [Sun] */}
-      <Navbar />
-      {/* <NavbarLogin /> */}
+      <NavbarLogin />
       {/* //-----------------------End Nav section-------------------------// */}
       {/* //Hero section */}
       {/* //Start Codind here [Sun] */}

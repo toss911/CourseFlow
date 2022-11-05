@@ -1,9 +1,12 @@
-import './App.css';
-import HomePage from './pages/HomePage.js';
-import Login from './pages/LoginPage.js';
-import RegisterPage from './pages/RegisterPage.js';
+
+import "./App.css";
+import HomePage from "./pages/HomePage.js";
+import Login from "./pages/LoginPage.js";
+import RegisterPage from "./pages/RegisterPage.js";
+import { Routes, Route } from "react-router-dom";
+import OurCourses from "./pages/OurCoursesPage";
 import CourseDetail from './pages/Coursedetail.js';
-import { Routes, Route } from 'react-router-dom';
+
 
 function App() {
   return (
@@ -14,6 +17,7 @@ function App() {
       <Route path='/coursedetail' element={<CourseDetail />} />
 
       {/* <Route path="/post/edit/:postId" element={<EditPostPage />} /> */}
+      <Route path="/courses" element={<OurCourses/>} />
     </Routes>
   );
 }

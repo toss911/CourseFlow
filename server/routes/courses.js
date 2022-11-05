@@ -7,7 +7,8 @@ coursesRouter.get("/", async (req, res) => {
   const keywords = req.query.keywords || "";
   const page = req.query.page || 1;
 
-  const PAGE_SIZE = 10;
+
+  const PAGE_SIZE = 12;
   const offset = (page - 1) * PAGE_SIZE;
 
   let query = "";
@@ -15,10 +16,12 @@ coursesRouter.get("/", async (req, res) => {
 
   if (keywords) {
     query = `select courses.course_id, courses.name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
+
+
         from lessons
         inner join courses
         on courses.course_id = lessons.course_id
-        where courses.name=$1
+        where courses.name ilike '%' || $1 || '%'
         group by courses.course_id
         order by courses.course_id asc
         limit $2
@@ -37,7 +40,10 @@ coursesRouter.get("/", async (req, res) => {
     values = [PAGE_SIZE, offset];
   }
 
-  const results = await pool.query(query, values);
+
+    const results = await pool.query(query, values);
+    
+
 
   return res.json({
     data: results.rows,
