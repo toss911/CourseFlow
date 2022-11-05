@@ -82,7 +82,7 @@ function OurCourses() {
             return (
               <CourseCard
                 key={key}
-                courseTitle={course.name}
+                courseTitle={course.course_name}
                 courseSummary={course.summary}
                 courseNumLessons={course.lessons_count}
                 courseTime={course.learning_time}

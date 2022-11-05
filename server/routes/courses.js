@@ -15,20 +15,18 @@ coursesRouter.get("/", async (req, res) => {
   let values = [];
 
   if (keywords) {
-    query = `select courses.course_id, courses.name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
-
-
+    query = `select courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
         from lessons
         inner join courses
         on courses.course_id = lessons.course_id
-        where courses.name ilike '%' || $1 || '%'
+        where courses.course_name ilike '%' || $1 || '%'
         group by courses.course_id
         order by courses.course_id asc
         limit $2
         offset $3`;
     values = [keywords, PAGE_SIZE, offset];
   } else {
-    query = `select courses.course_id, courses.name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
+    query = `select courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
         from lessons
         inner join courses
         on courses.course_id = lessons.course_id
