@@ -12,14 +12,10 @@ const useCourses = () => {
   const navigate = useNavigate();
 
   const getAllCourses = async (input) => {
-    
     try {
-      
       setIsError(false);
       setIsLoading(true);
-      const results = await axios.get(
-        `http://localhost:4000/courses`
-      );
+      const results = await axios.get(`http://localhost:4000/courses`);
 
       setCourses(results.data.data);
       setTotalPages(results.data.total_pages);
@@ -36,7 +32,6 @@ const useCourses = () => {
       const params = new URLSearchParams();
       params.append("keywords", keywords);
       // params.append("page", page);
-      console.log(params.toString());
       setIsError(false);
       setIsLoading(true);
       const results = await axios.get(
@@ -44,7 +39,6 @@ const useCourses = () => {
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
 
-      console.log(results.data.data)
       setCourses(results.data.data);
       setIsLoading(false);
     } catch (error) {
@@ -62,7 +56,7 @@ const useCourses = () => {
       );
       setCourse(result.data.data);
       setIsLoading(false);
-      navigate("/") // check again if the path is correct
+      navigate("/"); // check again if the path is correct
     } catch (error) {
       setIsError(true);
       setIsLoading(false);

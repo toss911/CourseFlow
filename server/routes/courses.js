@@ -4,9 +4,9 @@ import { pool } from "../utils/db.js";
 const coursesRouter = Router();
 
 coursesRouter.get("/", async (req, res) => {
-  const keywords = req.query.keywords || "";
+  let keywords = req.query.keywords || "";
   const page = req.query.page || 1;
-
+  keywords = "\\m" + keywords;
 
   const PAGE_SIZE = 12;
   const offset = (page - 1) * PAGE_SIZE;
@@ -19,7 +19,7 @@ coursesRouter.get("/", async (req, res) => {
         from lessons
         inner join courses
         on courses.course_id = lessons.course_id
-        where courses.course_name ilike '%' || $1 || '%'
+        where courses.course_name ~* $1
         group by courses.course_id
         order by courses.course_id asc
         limit $2
@@ -38,10 +38,7 @@ coursesRouter.get("/", async (req, res) => {
     values = [PAGE_SIZE, offset];
   }
 
-
-    const results = await pool.query(query, values);
-    
-
+  const results = await pool.query(query, values);
 
   return res.json({
     data: results.rows,
