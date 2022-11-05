@@ -33,6 +33,8 @@ function OurCourses() {
   const { getCourses, courses, getCoursesbyId, isLoading, setIsLoading } =
     useCourses();
 
+  const noCourse = typeof courses !== "undefined" && courses > 0;
+
   useEffect(() => {
     setIsLoading(true);
     const getData = setTimeout(() => {
@@ -77,9 +79,9 @@ function OurCourses() {
             emptyColor="gray.200"
             color="blue.500"
             size="xl"
-            mb="132px"
+            mb="187px"
           />
-        ) : (
+        ) : typeof courses !== "undefined" && courses.length > 0 ? (
           <Flex
             flexDirection="row"
             justifyContent="center"
@@ -103,6 +105,10 @@ function OurCourses() {
               );
             })}
           </Flex>
+        ) : (
+          <Text as="i" color="black" mb="187px">
+            Course not found
+          </Text>
         )}
       </Center>
       {/* <Pagination 
