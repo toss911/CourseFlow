@@ -19,7 +19,7 @@ coursesRouter.get("/", async (req, res) => {
         from lessons
         inner join courses
         on courses.course_id = lessons.course_id
-        where courses.name ilike '%' || $1 || '%'
+        where courses.course_name ilike '%' || $1 || '%'
         group by courses.course_id
         order by courses.course_id asc
         limit $2
