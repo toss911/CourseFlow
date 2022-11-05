@@ -20,15 +20,16 @@ const useCourses = () => {
       const params = new URLSearchParams();
       params.append("keywords", keywords);
       // params.append("page", page);
-      setContextState({ ...contextState, isError: false });
+      setIsError(false);
       const results = await axios.get(
         `http://localhost:4000/courses?${params.toString()}`
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
       setCourses(results.data.data);
-      setContextState({ ...contextState, isLoading: false });
+      setIsLoading(false);
     } catch (error) {
-      setContextState({ ...contextState, isError: true, isLoading: false });
+      setIsError(true);
+      setIsLoading(false);
     }
   };
 
@@ -53,6 +54,10 @@ const useCourses = () => {
     course,
     getCourses,
     getCoursesbyId,
+    isLoading,
+    setIsLoading,
+    isError,
+    setIsError,
   };
 };
 

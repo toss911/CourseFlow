@@ -21,25 +21,23 @@ import {
 } from "@chakra-ui/react";
 // import { cardData } from "../data/cardData.js";
 import useCourses from "../hooks/useCourses";
-import { useAuth } from "../contexts/authentication";
 
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
 
-  const { contextState, setContextState } = useAuth();
-
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
   };
 
-  const { getCourses, courses, getCoursesbyId } = useCourses();
+  const { getCourses, courses, getCoursesbyId, isLoading, setIsLoading } =
+    useCourses();
 
   useEffect(() => {
-    setContextState({ ...contextState, isLoading: true });
+    setIsLoading(true);
     const getData = setTimeout(() => {
       getCourses({ keywords, page });
-    }, 500);
+    }, 1000);
     return () => clearTimeout(getData);
   }, [keywords, page]);
 
@@ -72,14 +70,14 @@ function OurCourses() {
       </Box>
 
       <Center>
-        {contextState.isLoading ? (
+        {isLoading ? (
           <Spinner
             thickness="4px"
             speed="0.65s"
             emptyColor="gray.200"
             color="blue.500"
             size="xl"
-            mb="100px"
+            mb="132px"
           />
         ) : (
           <Flex
