@@ -1,20 +1,9 @@
-import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import {
-  Center,
-  Box,
-  Image,
-  Flex,
-  Text,
-  Heading,
-  Button,
-} from "@chakra-ui/react";
-import { NavbarLogin } from "../components/NavbarLogin ";
+import { Box, Image, Flex, Text, Heading, Button } from "@chakra-ui/react";
+import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer";
 import { PreFooter } from "../components/PreFooter";
-import { useState } from "react";
 import ReviewSlider from "../components/ReviewSlider.js";
-import ReviewNonSlider from "../components/ReviewNonSlider.js";
 import { SlideData } from "../data/SlideData.js";
 import { useNavigate } from "react-router-dom";
 
@@ -25,7 +14,7 @@ function HomePage() {
     <>
       {/* //Nav section */}
       {/* //Start Codind here [Sun] */}
-      <NavbarLogin />
+      <Navbar />
       {/* //-----------------------End Nav section-------------------------// */}
       {/* //Hero section */}
       {/* //Start Codind here [Sun] */}
