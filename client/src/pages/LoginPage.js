@@ -10,12 +10,12 @@ import {
   FormLabel,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { Navbar } from "../components/Navbar";
+import { Navbar } from "../components/Navbar.js";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 import { Field, Form, Formik } from "formik";
 
-function Login() {
+function LoginPage() {
   const { login } = useAuth();
 
   const handleSubmit = async (values, props) => {
@@ -151,4 +151,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginPage;
