@@ -5,9 +5,8 @@ import authRouter from "./routes/auth.js";
 import coursesRouter from "./routes/courses.js";
 import dotenv from "dotenv";
 
-
 async function init() {
-//   dotenv.config();
+  dotenv.config();
 
   const app = express();
   const port = 4000;
