@@ -1,6 +1,5 @@
 import {
   Box,
-  Image,
   Flex,
   Text,
   Heading,
@@ -10,45 +9,41 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  FormHelperText,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { useAuth } from "../contexts/authentication.js";
+import { Field, Form, Formik } from "formik";
 
 function Login() {
-  const [inputEmail, setInputEmail] = useState("");
-  const [inputPassword, setInputPassword] = useState("");
-  const [isErrorEmail, setIsErrorEmail] = useState(false);
-  const [isErrorPassword, setIsErrorPassword] = useState(false);
-
   const { login } = useAuth();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    login({
-      email: inputEmail,
-      password: inputPassword,
-    });
-  };
-
-  const handleEmailChange = (e) => {
-    setInputEmail(e.target.value);
-    if (e.target.value !== "") {
-      setIsErrorEmail(false);
-    } else {
-      setIsErrorEmail(true);
+  const handleSubmit = async (values, props) => {
+    const result = await login(values);
+    props.setSubmitting(false);
+    if (result) {
+      if (/account/g.test(result)) {
+        props.setFieldError("email", result);
+      } else {
+        props.setFieldError("password", result);
+      }
     }
   };
 
-  const handlePasswordChange = (e) => {
-    setInputPassword(e.target.value);
-    if (e.target.value !== "") {
-      setIsErrorPassword(false);
-    } else {
-      setIsErrorPassword(true);
+  const validateEmail = (value) => {
+    let error;
+    if (!value) {
+      error = "Email is required";
     }
+    return error;
+  };
+
+  const validatePassword = (value) => {
+    let error;
+    if (!value) {
+      error = "Password is required";
+    }
+    return error;
   };
 
   const navigate = useNavigate();
@@ -56,14 +51,13 @@ function Login() {
   return (
     <Box
       w="100vw"
-      h="936px"
+      h="1000px"
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
       bgImage="url('/assets/login-page/bg-login.svg')"
       backgroundSize="cover"
       backgroundPosition="center"
-      // overflowY="hidden"
     >
       <Navbar />
       <Flex
@@ -80,56 +74,68 @@ function Login() {
           <Heading variant="headline2" color="blue.500">
             Welcome Back!
           </Heading>
-          <form onSubmit={handleSubmit}>
-            <FormControl isInvalid={isErrorEmail}>
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting }) => (
               <Flex flexDirection="column" justifyContent="flex-start">
-                <FormLabel variant="body2" color="black" pt="37px">
-                  Email
-                </FormLabel>
-                <Input
-                  mt="4px"
-                  type="email"
-                  w="453px"
-                  h="48px"
-                  placeholder="Enter Email"
-                  value={inputEmail}
-                  onChange={handleEmailChange}
-                />
-                {!isErrorEmail ? (
-                  <FormHelperText></FormHelperText>
-                ) : (
-                  <FormErrorMessage>Email is required.</FormErrorMessage>
-                )}
-
-                <FormControl isInvalid={isErrorPassword}>
-                  <FormLabel variant="body2" color="black" pt="40px">
-                    Password
-                  </FormLabel>
-                  <Input
-                    mt="4px"
-                    type="password"
+                <Form>
+                  <Field name="email" validate={validateEmail}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={form.errors.email && form.touched.email}
+                      >
+                        <FormLabel variant="body2" color="black" pt="37px">
+                          Email
+                        </FormLabel>
+                        <Input
+                          mt="4px"
+                          type="email"
+                          w="453px"
+                          h="48px"
+                          placeholder="Enter Email"
+                          {...field}
+                        />
+                        <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name="password" validate={validatePassword}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={
+                          form.errors.password && form.touched.password
+                        }
+                      >
+                        <FormLabel variant="body2" color="black" pt="40px">
+                          Password
+                        </FormLabel>
+                        <Input
+                          mt="4px"
+                          type="password"
+                          w="453px"
+                          h="48px"
+                          placeholder="Enter Password"
+                          {...field}
+                        />
+                        <FormErrorMessage>
+                          {form.errors.password}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Button
+                    isLoading={isSubmitting}
+                    type="submit"
+                    variant="primary"
+                    mt="40px"
                     w="453px"
-                    h="48px"
-                    placeholder="Enter Password"
-                    value={inputPassword}
-                    onChange={handlePasswordChange}
-                  />
-                  {!isErrorPassword ? (
-                    <FormHelperText></FormHelperText>
-                  ) : (
-                    <FormErrorMessage>Password is required.</FormErrorMessage>
-                  )}
-                </FormControl>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  mt="40px"
-                  w="453px"
-                  h="60px"
-                >
-                  Log in
-                </Button>
-
+                    h="60px"
+                  >
+                    Log in
+                  </Button>
+                </Form>
                 <Text as="b" mt="44px">
                   Don't have an account?
                   <Link pl="12px" onClick={() => navigate("/register")}>
@@ -137,8 +143,8 @@ function Login() {
                   </Link>
                 </Text>
               </Flex>
-            </FormControl>
-          </form>
+            )}
+          </Formik>
         </Flex>
       </Flex>
     </Box>

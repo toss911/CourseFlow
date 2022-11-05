@@ -8,15 +8,12 @@ import {
   Button,
   Input,
   InputGroup,
-  InputRightElement,
   Link,
   FormControl,
   FormLabel,
   FormErrorMessage,
-  FormHelperText,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 import { Field, Form, Formik } from "formik";
@@ -26,8 +23,12 @@ function RegisterPage() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (values) => {
-    register(values);
+  const handleSubmit = async (values, props) => {
+    const result = await register(values);
+    props.setSubmitting(false);
+    if (result) {
+      props.setFieldError("email", result);
+    }
   };
 
   const validateName = (value) => {
@@ -254,6 +255,7 @@ function RegisterPage() {
                   </Field>
                   {/* //------------------------- Register Button --------------------// */}
                   <Button
+                    isLoading={props.isSubmitting}
                     variant="primary"
                     mt="40px"
                     w="453px"
