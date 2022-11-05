@@ -45,7 +45,6 @@ function AuthProvider(props) {
       alert(`ERROR: Please try again later`);
     }
   };
-  // localStorage.removeItem("token");
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -55,11 +54,11 @@ function AuthProvider(props) {
 
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
-  // if (isAuthenticated && !state.user) {
-  //   const token = localStorage.getItem("token");
-  //   const userDataFromToken = jwtDecode(token);
-  //   setState({ user: userDataFromToken });
-  // }
+  if (isAuthenticated && !state.user) {
+    const token = localStorage.getItem("token");
+    const userDataFromToken = jwtDecode(token);
+    setState({ user: userDataFromToken });
+  }
 
   return (
     <AuthContext.Provider
