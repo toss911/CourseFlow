@@ -4,22 +4,17 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
-  const [course, setCourse] = useState(null);
+  const [course, setCourse] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-
   const navigate = useNavigate();
 
   const getAllCourses = async (input) => {
-    
     try {
-      
       setIsError(false);
       setIsLoading(true);
-      const results = await axios.get(
-        `http://localhost:4000/courses`
-      );
+      const results = await axios.get(`http://localhost:4000/courses`);
 
       setCourses(results.data.data);
       setTotalPages(results.data.total_pages);
@@ -44,7 +39,7 @@ const useCourses = () => {
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
 
-      console.log(results.data.data)
+      console.log(results.data.data);
       setCourses(results.data.data);
       setIsLoading(false);
     } catch (error) {
@@ -60,9 +55,10 @@ const useCourses = () => {
       const result = await axios.get(
         `http://localhost:4000/courses/${courseId}`
       );
+
       setCourse(result.data.data);
       setIsLoading(false);
-      navigate("/") // check again if the path is correct
+      navigate("/"); // check again if the path is correct
     } catch (error) {
       setIsError(true);
       setIsLoading(false);

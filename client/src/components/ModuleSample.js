@@ -15,7 +15,7 @@ import {
   AccordionIcon,
 } from '@chakra-ui/react';
 
-export const ModuleSample = () => {
+export const ModuleSample = (props) => {
   return (
     <Accordion defaultIndex={[0]} allowMultiple w='739px'>
       <AccordionItem>
@@ -30,7 +30,7 @@ export const ModuleSample = () => {
               color='black'
             >
               <Text color='#646D89' display='flex'>
-                01
+                {props.courseNumber}
               </Text>
               <Text ml='24px'>{'Introduction'}</Text>
             </Box>

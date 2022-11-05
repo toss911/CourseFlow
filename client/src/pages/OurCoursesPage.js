@@ -21,9 +21,7 @@ import {
 // import { cardData } from "../data/cardData.js";
 import useCourses from "../hooks/useCourses";
 
-
 function OurCourses() {
-
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
 
@@ -32,19 +30,17 @@ function OurCourses() {
   };
 
   const { getAllCourses, getCourses, courses, getCoursesbyId } = useCourses();
+  console.log("courses: ", courses);
 
-  useEffect(()=>{
-
+  useEffect(() => {
     // let timerId;
 
-    if(keywords) {
-
-      getCourses( { keywords, page } )
+    if (keywords) {
+      getCourses({ keywords, page });
 
       // timerId = setTimeout(getCourses( { keywords, page } ), 1000);
-      
     }
-    
+
     getAllCourses();
   }, [keywords, page]);
 
@@ -60,7 +56,13 @@ function OurCourses() {
           </Heading>
           <Box mb="100px">
             <InputGroup w="357px">
-              <Input type="string" placeholder="Search..." pl="40px" onChange={handleSearchTextChange} value={keywords}/>
+              <Input
+                type="string"
+                placeholder="Search..."
+                pl="40px"
+                onChange={handleSearchTextChange}
+                value={keywords}
+              />
               <InputLeftElement
                 pointerEvents="none"
                 children={<SearchIcon color="#646D89" />}
@@ -81,25 +83,26 @@ function OurCourses() {
             return (
               <CourseCard
                 key={key}
-                courseTitle={course.name}
+                courseTitle={course.course_name}
                 courseSummary={course.summary}
                 courseNumLessons={course.lessons_count}
                 courseTime={course.learning_time}
                 courseImg={course.cover_image_directory}
-                onClick={()=> {getCoursesbyId(course.course_id)}}
+                onClick={() => {
+                  getCoursesbyId(course.course_id);
+                }}
               />
             );
           })}
         </Flex>
       </Center>
-       {/* <Pagination 
+      {/* <Pagination 
           ourCoursesPage={ourCoursesPage}
           totalCourse={cardData.length}
           paginate={paginate}
         />
       <PreFooter/> */}
       <Footer />
-     
     </Box>
   );
 }
