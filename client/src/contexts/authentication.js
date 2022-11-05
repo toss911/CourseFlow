@@ -6,7 +6,9 @@ import jwtDecode from "jwt-decode";
 const AuthContext = React.createContext();
 
 function AuthProvider(props) {
-  const [state, setState] = useState({
+  const [contextState, setContextState] = useState({
+    isLoading: false,
+    isError: false,
     user: null,
   });
 
@@ -36,7 +38,7 @@ function AuthProvider(props) {
         const token = result.data.token;
         localStorage.setItem("token", token);
         const userDataFromToken = jwtDecode(token);
-        setState({ user: userDataFromToken });
+        setContextState({ ...contextState, user: userDataFromToken });
         navigate("/");
       } else {
         return result.data.message;
@@ -48,21 +50,28 @@ function AuthProvider(props) {
 
   const logout = () => {
     localStorage.removeItem("token");
-    setState({ user: null });
+    setContextState({ ...contextState, user: null });
     navigate("/");
   };
 
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
-  if (isAuthenticated && !state.user) {
+  if (isAuthenticated && !contextState.user) {
     const token = localStorage.getItem("token");
     const userDataFromToken = jwtDecode(token);
-    setState({ user: userDataFromToken });
+    setContextState({ ...contextState, user: userDataFromToken });
   }
 
   return (
     <AuthContext.Provider
-      value={{ state, login, logout, register, isAuthenticated }}
+      value={{
+        contextState,
+        setContextState,
+        login,
+        logout,
+        register,
+        isAuthenticated,
+      }}
     >
       {props.children}
     </AuthContext.Provider>

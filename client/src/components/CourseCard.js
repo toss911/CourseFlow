@@ -6,7 +6,7 @@ import {
   Text,
   Heading,
   Divider,
-  Link,
+  Skeleton,
 } from "@chakra-ui/react";
 
 export function CourseCard(props) {

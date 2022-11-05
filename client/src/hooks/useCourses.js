@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/authentication";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -11,20 +12,7 @@ const useCourses = () => {
 
   const navigate = useNavigate();
 
-  const getAllCourses = async (input) => {
-    try {
-      setIsError(false);
-      setIsLoading(true);
-      const results = await axios.get(`http://localhost:4000/courses`);
-
-      setCourses(results.data.data);
-      setTotalPages(results.data.total_pages);
-      setIsLoading(false);
-    } catch (error) {
-      setIsError(true);
-      setIsLoading(false);
-    }
-  };
+  const { contextState, setContextState } = useAuth();
 
   const getCourses = async (input) => {
     const { keywords, page } = input;
@@ -32,18 +20,15 @@ const useCourses = () => {
       const params = new URLSearchParams();
       params.append("keywords", keywords);
       // params.append("page", page);
-      setIsError(false);
-      setIsLoading(true);
+      setContextState({ ...contextState, isError: false });
       const results = await axios.get(
         `http://localhost:4000/courses?${params.toString()}`
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
-
       setCourses(results.data.data);
-      setIsLoading(false);
+      setContextState({ ...contextState, isLoading: false });
     } catch (error) {
-      setIsError(true);
-      setIsLoading(false);
+      setContextState({ ...contextState, isError: true, isLoading: false });
     }
   };
 
@@ -67,10 +52,7 @@ const useCourses = () => {
     courses,
     course,
     getCourses,
-    getAllCourses,
     getCoursesbyId,
-    isError,
-    isLoading,
   };
 };
 

@@ -4,7 +4,7 @@ import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PreFooter } from "../components/PreFooter";
 import Pagination from "../components/Pagination";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Image,
@@ -17,30 +17,30 @@ import {
   InputLeftElement,
   InputGroup,
   Center,
+  Spinner,
 } from "@chakra-ui/react";
 // import { cardData } from "../data/cardData.js";
 import useCourses from "../hooks/useCourses";
+import { useAuth } from "../contexts/authentication";
 
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
 
+  const { contextState, setContextState } = useAuth();
+
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
   };
 
-  const { getAllCourses, getCourses, courses, getCoursesbyId } = useCourses();
+  const { getCourses, courses, getCoursesbyId } = useCourses();
 
   useEffect(() => {
-    // let timerId;
-
-    if (keywords) {
+    setContextState({ ...contextState, isLoading: true });
+    const getData = setTimeout(() => {
       getCourses({ keywords, page });
-
-      // timerId = setTimeout(getCourses( { keywords, page } ), 1000);
-    }
-
-    getAllCourses();
+    }, 500);
+    return () => clearTimeout(getData);
   }, [keywords, page]);
 
   return (
@@ -70,30 +70,42 @@ function OurCourses() {
           </Box>
         </Flex>
       </Box>
+
       <Center>
-        <Flex
-          flexDirection="row"
-          justifyContent="center"
-          mb="180px"
-          flexWrap="wrap"
-          w="100%"
-        >
-          {courses.map((course, key) => {
-            return (
-              <CourseCard
-                key={key}
-                courseTitle={course.course_name}
-                courseSummary={course.summary}
-                courseNumLessons={course.lessons_count}
-                courseTime={course.learning_time}
-                courseImg={course.cover_image_directory}
-                onClick={() => {
-                  getCoursesbyId(course.course_id);
-                }}
-              />
-            );
-          })}
-        </Flex>
+        {contextState.isLoading ? (
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+            mb="100px"
+          />
+        ) : (
+          <Flex
+            flexDirection="row"
+            justifyContent="center"
+            mb="180px"
+            flexWrap="wrap"
+            w="100%"
+          >
+            {courses.map((course, key) => {
+              return (
+                <CourseCard
+                  key={key}
+                  courseTitle={course.course_name}
+                  courseSummary={course.summary}
+                  courseNumLessons={course.lessons_count}
+                  courseTime={course.learning_time}
+                  courseImg={course.cover_image_directory}
+                  onClick={() => {
+                    getCoursesbyId(course.course_id);
+                  }}
+                />
+              );
+            })}
+          </Flex>
+        )}
       </Center>
       {/* <Pagination 
           ourCoursesPage={ourCoursesPage}

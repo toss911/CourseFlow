@@ -18,7 +18,7 @@ import { useAuth } from "../contexts/authentication";
 
 export const Navbar = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout, state } = useAuth();
+  const { isAuthenticated, logout, contextState } = useAuth();
 
   return (
     <Flex
@@ -59,7 +59,7 @@ export const Navbar = () => {
                     borderRadius="full"
                     objectFit="cover"
                   />
-                  <Text variant="body2">{state.user.full_name}</Text>
+                  <Text variant="body2">{contextState.user.full_name}</Text>
                   <TriangleDownIcon />
                 </HStack>
               </MenuButton>
