@@ -3,7 +3,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import authRouter from "./routes/auth.js";
 import coursesRouter from "./routes/courses.js";
+import userRouter from "./routes/user.js";
 import dotenv from "dotenv";
+
 
 async function init() {
   dotenv.config();
@@ -16,6 +18,7 @@ async function init() {
 
   app.use("/auth", authRouter);
   app.use("/courses", coursesRouter);
+  app.use("/user", userRouter);
 
   app.get("/", (req, res) => {
     res.send("Hello World!");
