@@ -33,7 +33,10 @@ export function PreFooter() {
             height="60px"
             width="240px"
             variant="secondary"
-            onClick={() => navigate("/courses")}
+            onClick={() => {
+              navigate("/courses");
+              window.scrollTo(0, 0);
+            }}
           >
             Check Out Our Course
           </Button>
