@@ -7,42 +7,42 @@ const authRouter = Router();
 
 // Register
 authRouter.post("/register", async (req, res) => {
-  // try {
-  const newUser = { ...req.body };
-  const inputEmail = newUser.email;
+  try {
+    const newUser = { ...req.body };
+    const inputEmail = newUser.email;
 
-  const emailExist = await pool.query(
-    `select email from users where email ilike $1 `,
-    [inputEmail]
-  );
-
-  if (emailExist.rowCount !== 0) {
-    return res.json({
-      message: "This email already has an account",
-    });
-  } else {
-    const salt = await bcrypt.genSalt(10);
-    newUser.password = await bcrypt.hash(newUser.password, salt);
-
-    await pool.query(
-      `insert into users (full_name, birthdate, education, email, password)
-      values ($1, $2, $3, $4, $5)`,
-      [
-        newUser.full_name,
-        newUser.birthdate,
-        newUser.education,
-        newUser.email,
-        newUser.password,
-      ]
+    const emailExist = await pool.query(
+      `select email from users where email ilike $1 `,
+      [inputEmail]
     );
 
-    return res.json({
-      message: "Registered successfully",
-    });
+    if (emailExist.rowCount !== 0) {
+      return res.json({
+        message: "This email already has an account",
+      });
+    } else {
+      const salt = await bcrypt.genSalt(10);
+      newUser.password = await bcrypt.hash(newUser.password, salt);
+
+      await pool.query(
+        `insert into users (full_name, birthdate, education, email, password)
+      values ($1, $2, $3, $4, $5)`,
+        [
+          newUser.full_name,
+          newUser.birthdate,
+          newUser.education,
+          newUser.email,
+          newUser.password,
+        ]
+      );
+
+      return res.json({
+        message: "Registered successfully",
+      });
+    }
+  } catch (error) {
+    return res.sendStatus(500);
   }
-  // } catch (error) {
-  //   return res.sendStatus(500);
-  // }
 });
 
 // Login
