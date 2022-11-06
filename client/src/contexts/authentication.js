@@ -21,8 +21,9 @@ function AuthProvider(props) {
         data
       );
       if (/success/g.test(result.data.message)) {
-        alert(`${result.data.message}`);
-        navigate("/login");
+        // alert(`${result.data.message}`);
+        // navigate("/login");
+        return true;
       } else {
         return result.data.message;
       }

@@ -1,7 +1,5 @@
 import {
-  Center,
   Box,
-  Image,
   Flex,
   Text,
   Heading,
@@ -12,22 +10,32 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Navbar } from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 import { Field, Form, Formik } from "formik";
 
 function RegisterPage() {
-  const { register } = useAuth();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { register } = useAuth(); // ใช้ isAuthenticated ในการแสดง modal
 
   const navigate = useNavigate();
 
   const handleSubmit = async (values, props) => {
     const result = await register(values);
     props.setSubmitting(false);
-    if (result) {
+    if (result !== true) {
       props.setFieldError("email", result);
+    } else {
+      onOpen();
     }
   };
 
@@ -62,7 +70,7 @@ function RegisterPage() {
     if (!value) {
       error = "Email is required";
     } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(value)) {
-      error = `Email should be in this form: "john@mail.com".`;
+      error = `Email should be in this form: "john@mail.com"`;
     }
     return error;
   };
@@ -276,6 +284,39 @@ function RegisterPage() {
           </Formik>
         </Flex>
       </Flex>
+      {/* <Button onClick={onOpen}>Open Modal</Button> */}
+      <Modal
+        // isCentered
+        isOpen={isOpen}
+        onClose={onClose}
+        onCloseComplete={() => navigate("/login")}
+        closeOnOverlayClick={false}
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader
+            bg="#2FAC8E"
+            color="white"
+            textAlign="center"
+            borderRadius="24px 24px 0px 0px"
+          >
+            <CheckCircleIcon mr="0.5em" />
+            Success
+          </ModalHeader>
+          <ModalBody textAlign="center" mt="1em" color="black">
+            Your account has been successfully created.
+            <Button
+              m="1em"
+              variant="success"
+              mr={3}
+              onClick={onClose}
+              borderRadius="12px"
+            >
+              Continue
+            </Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }

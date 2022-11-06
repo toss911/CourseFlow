@@ -18,7 +18,7 @@ authRouter.post("/register", async (req, res) => {
 
     if (emailExist.rowCount !== 0) {
       return res.json({
-        message: "This email already has an account.",
+        message: "This email already has an account",
       });
     } else {
       const salt = await bcrypt.genSalt(10);
@@ -37,7 +37,7 @@ authRouter.post("/register", async (req, res) => {
       );
 
       return res.json({
-        message: "Registered successfully.",
+        message: "Registered successfully",
       });
     }
   } catch (error) {
@@ -85,7 +85,7 @@ authRouter.post("/login", async (req, res) => {
     );
 
     return res.json({
-      message: "login succesfully",
+      message: "Login successfully",
       token,
     });
   } catch (error) {
