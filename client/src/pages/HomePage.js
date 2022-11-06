@@ -42,7 +42,10 @@ function HomePage() {
           <Button
             variant="primary"
             w="195px"
-            onClick={() => navigate("/courses")}
+            onClick={() => {
+              navigate("/courses");
+              window.scrollTo(0, 0);
+            }}
           >
             Explore Courses
           </Button>

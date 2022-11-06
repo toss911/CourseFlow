@@ -183,6 +183,23 @@ const components = {
           opacity: 1,
         },
       },
+      success: {
+        bg: "green",
+        color: "white",
+        boxShadow: "shadow1",
+        borderRadius: "12px",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          opacity: 0.5,
+        },
+        _active: {
+          opacity: 1,
+        },
+      },
     },
     defaultProps: {
       variant: "primary",

@@ -21,10 +21,13 @@ export function Footer() {
           <Text
             variant="body2"
             color="#C8CCDB"
-            onClick={() => navigate("/courses")}
+            onClick={() => {
+              navigate("/courses");
+              window.scrollTo(0, 0);
+            }}
             cursor="pointer"
           >
-            All Course
+            All Courses
           </Text>
           <Text variant="body2" color="#C8CCDB" pl="132px">
             Bundle Package
