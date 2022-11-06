@@ -4,7 +4,7 @@ import { pool } from "../utils/db.js";
 const userRouter = Router();
 
 // Get user's profile info
-userRouter.get("/view/:id", async (req, res) => {
+userRouter.get("/:id", async (req, res) => {
     const userId = req.params.id;
     const result = await pool.query("select * from users where user_id = $1", [userId])
     return res.json({
@@ -13,7 +13,7 @@ userRouter.get("/view/:id", async (req, res) => {
 });
 
 // Update user's profile 
-userRouter.put("/edit/:id", async (req, res) => {
+userRouter.put("/:id", async (req, res) => {
     const updatedUser = {
         ...req.body
     };
