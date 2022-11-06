@@ -3,8 +3,7 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PreFooter } from "../components/PreFooter";
-import Pagination from "../components/Pagination";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Image,
@@ -111,12 +110,24 @@ function OurCourses() {
           </Text>
         )}
       </Center>
-      {/* <Pagination 
-          ourCoursesPage={ourCoursesPage}
-          totalCourse={cardData.length}
-          paginate={paginate}
-        />
-      <PreFooter/> */}
+      <Flex flexDirection='column' alignItems='center' justifyContent='center' mb='5%'>
+      <Box className="pagination" >
+        {page > 1 ? (
+          <Link className="previous-button" onClick={() => setPage(page - 1)} mr='15px'>
+            Previous
+          </Link>
+        ) : null}
+
+        {page} / {totalPages}
+
+        {page !== totalPages ? (
+          <Link className="next-button" onClick={() => setPage(page + 1)} ml='15px'>
+            Next
+          </Link>
+        ) : null}
+      </Box>
+      </Flex>
+       <PreFooter/>
       <Footer />
     </Box>
   );
