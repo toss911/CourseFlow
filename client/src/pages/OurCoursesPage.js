@@ -3,7 +3,6 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PreFooter } from "../components/PreFooter";
-import Pagination from "../components/Pagination";
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -29,7 +28,7 @@ function OurCourses() {
     setKeywords(event.target.value);
   };
 
-  const { getAllCourses, getCourses, courses, getCoursesbyId } = useCourses();
+  const { getAllCourses, getCourses, courses, getCoursesbyId,totalPages } = useCourses();
 
   useEffect(() => {
     // let timerId;
@@ -74,9 +73,9 @@ function OurCourses() {
         <Flex
           flexDirection="row"
           justifyContent="center"
-          mb="180px"
+          mb="5%"
           flexWrap="wrap"
-          w="100%"
+          w="70%"
         >
           {courses.map((course, key) => {
             return (
@@ -95,12 +94,24 @@ function OurCourses() {
           })}
         </Flex>
       </Center>
-      {/* <Pagination 
-          ourCoursesPage={ourCoursesPage}
-          totalCourse={cardData.length}
-          paginate={paginate}
-        />
-      <PreFooter/> */}
+      <Flex flexDirection='column' alignItems='center' justifyContent='center' mb='5%'>
+      <Box className="pagination" >
+        {page > 1 ? (
+          <Link className="previous-button" onClick={() => setPage(page - 1)} mr='15px'>
+            Previous
+          </Link>
+        ) : null}
+
+        {page} / {totalPages}
+
+        {page !== totalPages ? (
+          <Link className="next-button" onClick={() => setPage(page + 1)} ml='15px'>
+            Next
+          </Link>
+        ) : null}
+      </Box>
+      </Flex>
+       <PreFooter/>
       <Footer />
     </Box>
   );

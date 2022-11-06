@@ -77,6 +77,7 @@ const useCourses = () => {
     getCoursesbyId,
     isError,
     isLoading,
+    totalPages,
   };
 };
 

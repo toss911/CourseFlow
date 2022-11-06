@@ -76,7 +76,7 @@ function RegisterPage() {
     }
     return error;
   };
-
+  
   return (
     <Box
       w="100vw"
