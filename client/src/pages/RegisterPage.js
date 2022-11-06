@@ -30,6 +30,7 @@ function RegisterPage() {
   const navigate = useNavigate();
 
   const handleSubmit = async (values, props) => {
+    console.log("values: ", values);
     const result = await register(values);
     props.setSubmitting(false);
     if (result !== true) {
@@ -116,8 +117,8 @@ function RegisterPage() {
           <Formik
             initialValues={{
               full_name: "",
-              birthdate: "",
-              education: "",
+              birthdate: undefined,
+              education: undefined,
               email: "",
               password: "",
             }}
@@ -159,12 +160,16 @@ function RegisterPage() {
                   {/* //-------------------------- Input Date --------------------// */}
                   <Field name="birthdate" validate={validateBirthdate}>
                     {({ field, form }) => (
+<<<<<<< Updated upstream
                       <FormControl
                         isInvalid={
                           form.errors.birthdate && form.touched.birthdate
                         }
                         isRequired
                       >
+=======
+                      <FormControl>
+>>>>>>> Stashed changes
                         <FormLabel variant="body2" color="black" pt="20px">
                           Date of Birth
                         </FormLabel>
@@ -184,21 +189,22 @@ function RegisterPage() {
                             }}
                           />
                         </InputGroup>
-                        <FormErrorMessage>
-                          {form.errors.birthdate}
-                        </FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>
                   {/* //---------------------- Input Educational --------------------// */}
                   <Field name="education" validate={validateEducation}>
                     {({ field, form }) => (
+<<<<<<< Updated upstream
                       <FormControl
                         isInvalid={
                           form.errors.education && form.touched.education
                         }
                         isRequired
                       >
+=======
+                      <FormControl>
+>>>>>>> Stashed changes
                         <FormLabel variant="body2" color="black" mt="20px">
                           Educational Background
                         </FormLabel>
@@ -209,9 +215,6 @@ function RegisterPage() {
                           placeholder="Enter Educational Background"
                           {...field}
                         />
-                        <FormErrorMessage>
-                          {form.errors.education}
-                        </FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>
