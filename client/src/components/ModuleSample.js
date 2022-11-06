@@ -59,26 +59,26 @@ export const ModuleSample = () => {
   }
   //console.log("uniqueLessonName: ", uniqueLessonName);
   // group lesson name for map sub_lesson name
-  for (let i = 0; i < uniqueLessonName.length; i++) {
-    let groupLessonName = course.filter(
-      (course) => course.lesson_name === uniqueLessonName[i]
-    );
-    return groupLessonName;
-  }
+  // for (let i = 0; i < uniqueLessonName.length; i++) {
+  //   let groupLessonName = course.filter(
+  //     (course) => course.lesson_name === uniqueLessonName[i]
+  //   );
+  //   return groupLessonName;
+  // }
 
   return (
     <Accordion defaultIndex={[0]} allowMultiple w="739px">
-      <AccordionItem>
-        {uniqueLessonName.map((name, key) => {
-          let numberLesson = null;
-          if (key < 10) {
-            numberLesson = "0" + (key + 1);
-          } else {
-            numberLesson = key + 1;
-          }
-          return (
+      {uniqueLessonName.map((name, key) => {
+        let numberLesson = null;
+        if (key < 10) {
+          numberLesson = "0" + (key + 1);
+        } else {
+          numberLesson = key + 1;
+        }
+        return (
+          <AccordionItem key={key}>
             <h2>
-              <AccordionButton key={key} display="flex" w="739px">
+              <AccordionButton display="flex" w="739px">
                 <Box
                   flex="1"
                   textAlign="left"
@@ -95,17 +95,18 @@ export const ModuleSample = () => {
                 <AccordionIcon />
               </AccordionButton>
             </h2>
-          );
-        })}
-        <AccordionPanel ml="13px" pb={4}>
-          <UnorderedList>
-            <ListItem>sub_lesson_name</ListItem>
-            <ListItem>sub_lesson_name</ListItem>
-            <ListItem>sub_lesson_name</ListItem>
-            <ListItem>sub_lesson_name</ListItem>
-          </UnorderedList>
-        </AccordionPanel>
-      </AccordionItem>
+
+            <AccordionPanel ml="13px" pb={4}>
+              <UnorderedList>
+                <ListItem>sub_lesson_name</ListItem>
+                <ListItem>sub_lesson_name</ListItem>
+                <ListItem>sub_lesson_name</ListItem>
+                <ListItem>sub_lesson_name</ListItem>
+              </UnorderedList>
+            </AccordionPanel>
+          </AccordionItem>
+        );
+      })}
     </Accordion>
   );
 };
