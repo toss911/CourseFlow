@@ -16,13 +16,18 @@ function AuthProvider(props) {
 
   const register = async (data) => {
     try {
+      let copiedData = Object.assign({}, data);
+      if (!copiedData.birthdate) {
+        copiedData.birthdate = null;
+      }
+      if (!copiedData.education) {
+        copiedData.education = null;
+      }
       const result = await axios.post(
         "http://localhost:4000/auth/register",
-        data
+        copiedData
       );
       if (/success/g.test(result.data.message)) {
-        // alert(`${result.data.message}`);
-        // navigate("/login");
         return true;
       } else {
         return result.data.message;

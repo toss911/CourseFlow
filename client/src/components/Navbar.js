@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Link,
   Flex,
   Image,
@@ -51,14 +52,7 @@ export const Navbar = () => {
             <Menu>
               <MenuButton bg="white" color="gray.800">
                 <HStack spacing="12px">
-                  <Image
-                    src="/assets/landing-page/Icon/Parn.png"
-                    alt="profile picture"
-                    w="40px"
-                    h="40px"
-                    borderRadius="full"
-                    objectFit="cover"
-                  />
+                  <Avatar src={contextState.user.avatar_directory} />
                   <Text variant="body2">{contextState.user.full_name}</Text>
                   <TriangleDownIcon />
                 </HStack>

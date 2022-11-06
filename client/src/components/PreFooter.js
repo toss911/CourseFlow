@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Image, Flex, Text, Button, Heading } from "@chakra-ui/react";
+import { Box, Image, Flex, Button, Heading } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 export function PreFooter() {
