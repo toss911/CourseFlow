@@ -41,7 +41,8 @@ function CourseDetail() {
   useEffect(() => {
     getCoursebyId();
   }, []);
-  console.log("course: ", course[0]);
+  //console.log("course: ", course[0]);
+
   return (
     <>
       <Navbar />
