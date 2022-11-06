@@ -20,7 +20,6 @@ import { useAuth } from "../contexts/authentication";
 export const Navbar = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout, contextState } = useAuth();
-  console.log("contextState: ", contextState);
 
   return (
     <Flex

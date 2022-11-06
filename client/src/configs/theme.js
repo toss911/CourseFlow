@@ -1,5 +1,4 @@
 import { extendTheme } from "@chakra-ui/react";
-import { WarningIcon } from "@chakra-ui/icons";
 
 const colors = {
   blue: {

@@ -5,7 +5,6 @@ import {
   Heading,
   Button,
   Input,
-  InputGroup,
   Link,
   FormControl,
   FormLabel,
@@ -22,10 +21,16 @@ import { Navbar } from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 import { Field, Form, Formik } from "formik";
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import CalendarIcon from "../components/CalendarIcon";
 
 function RegisterPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { register } = useAuth(); // ใช้ isAuthenticated ในการแสดง modal
+  const { register } = useAuth();
 
   const navigate = useNavigate();
 
@@ -69,6 +74,72 @@ function RegisterPage() {
     return error;
   };
 
+  // Theme for styling date picker
+  const theme = createTheme({
+    palette: {
+      color: {
+        gray: {
+          400: "#D6D9E4",
+          600: "#9AA1B9",
+          800: "#424C6B",
+        },
+        orange: {
+          500: "#F47E20",
+        },
+      },
+      text: {
+        primary: "#173A5E",
+        secondary: "#46505A",
+      },
+      action: {
+        active: "#001E3C",
+      },
+    },
+    components: {
+      MuiPickersCalendarHeader: {
+        styleOverrides: {
+          root: {
+            color: "#424C6B",
+          },
+          labelContainer: {
+            fontWeight: 600,
+            fontSize: "16px",
+          },
+        },
+      },
+      MuiPickersDay: {
+        styleOverrides: {
+          today: {
+            "&:not(.Mui-selected)": {
+              border: "1px solid #5483D0",
+            },
+          },
+          root: {
+            fontSize: "14px",
+            color: "#424C6B",
+            fontWeight: 500,
+          },
+        },
+      },
+      MuiTouchRipple: {
+        styleOverrides: {
+          root: {
+            fontSize: "30px",
+          },
+        },
+      },
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            fontSize: "14px",
+            fontWeight: 500,
+            "&&": { color: "#9AA1B9" },
+          },
+        },
+      },
+    },
+  });
+
   return (
     <Box
       w="100vw"
@@ -100,8 +171,8 @@ function RegisterPage() {
           <Formik
             initialValues={{
               full_name: "",
-              birthdate: undefined,
-              education: undefined,
+              birthdate: null,
+              education: "",
               email: "",
               password: "",
             }}
@@ -123,7 +194,7 @@ function RegisterPage() {
                         }
                         isRequired
                       >
-                        <FormLabel variant="body2" color="black" pt="37px">
+                        <FormLabel variant="body2" color="black" mt="37px">
                           Name
                         </FormLabel>
                         <Input
@@ -144,25 +215,84 @@ function RegisterPage() {
                   <Field name="birthdate">
                     {({ field, form }) => (
                       <FormControl>
-                        <FormLabel variant="body2" color="black" pt="20px">
-                          Date of Birth
-                        </FormLabel>
-                        <InputGroup>
-                          <Input
-                            color="#9AA1B9"
-                            type="date"
-                            w="453px"
-                            h="48px"
-                            placeholder="MM/DD/YYYY"
-                            {...field}
-                            sx={{
-                              "::-webkit-calendar-picker-indicator": {
-                                background:
-                                  "url('/assets/register-page/icons-calendar.svg')",
-                              },
-                            }}
-                          />
-                        </InputGroup>
+                        <label>
+                          <Text
+                            variant="body2"
+                            color="black"
+                            m="40px 12px 8px 0px"
+                          >
+                            Date of Birth
+                          </Text>
+                          <ThemeProvider theme={theme}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DatePicker
+                                inputFormat="DD/MM/YYYY"
+                                minDate="01/01/1900"
+                                disableFuture
+                                value={field.value}
+                                onChange={(newValue) => {
+                                  form.setFieldValue("birthdate", newValue);
+                                }}
+                                components={{
+                                  OpenPickerIcon: CalendarIcon,
+                                }}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    inputProps={{
+                                      ...params.inputProps,
+                                      placeholder: "DD/MM/YYYY",
+                                    }}
+                                    sx={{
+                                      "& .MuiInputBase-root": {
+                                        borderRadius: "8px",
+                                        backgroundColor: "white",
+                                        width: "453px",
+                                        height: "48px",
+                                        paddingRight: "15px",
+                                        color: "black",
+                                        "input:first-of-type": {
+                                          "&::placeholder": {
+                                            opacity: 1,
+                                            color: "color.gray.600",
+                                          },
+                                        },
+                                      },
+                                      "& .MuiInputBase-input": {
+                                        padding: "12px",
+                                      },
+                                      "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                          borderColor: "color.gray.400",
+                                        },
+                                        "&:hover fieldset": {
+                                          borderColor: "color.gray.400",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                          border: "solid 1px",
+                                          borderColor: "color.orange.500",
+                                        },
+                                      },
+                                    }}
+                                  />
+                                )}
+                              />
+                            </LocalizationProvider>
+                          </ThemeProvider>
+                        </label>
+                        {/* <Input
+                          color="gray.600"
+                          type="date"
+                          w="453px"
+                          h="48px"
+                          {...field}
+                          sx={{
+                            "::-webkit-calendar-picker-indicator": {
+                              background:
+                                "url('/assets/register-page/icons-calendar.svg')",
+                            },
+                          }}
+                        /> */}
                       </FormControl>
                     )}
                   </Field>
@@ -170,7 +300,7 @@ function RegisterPage() {
                   <Field name="education">
                     {({ field, form }) => (
                       <FormControl>
-                        <FormLabel variant="body2" color="black" mt="20px">
+                        <FormLabel variant="body2" color="black" mt="40px">
                           Educational Background
                         </FormLabel>
                         <Input
@@ -190,7 +320,7 @@ function RegisterPage() {
                         isInvalid={form.errors.email && form.touched.email}
                         isRequired
                       >
-                        <FormLabel variant="body2" color="black" pt="20px">
+                        <FormLabel variant="body2" color="black" mt="40px">
                           Email
                         </FormLabel>
                         <Input
@@ -213,7 +343,7 @@ function RegisterPage() {
                         }
                         isRequired
                       >
-                        <FormLabel variant="body2" color="black" pt="20px">
+                        <FormLabel variant="body2" color="black" mt="40px">
                           Password
                         </FormLabel>
                         <Input

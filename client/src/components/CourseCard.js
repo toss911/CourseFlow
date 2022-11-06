@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Image,
-  Flex,
-  Text,
-  Heading,
-  Divider,
-  Skeleton,
-} from "@chakra-ui/react";
+import { Box, Image, Flex, Text, Heading, Divider } from "@chakra-ui/react";
 
 export function CourseCard(props) {
   return (
