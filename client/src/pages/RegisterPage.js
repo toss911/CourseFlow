@@ -30,7 +30,6 @@ function RegisterPage() {
   const navigate = useNavigate();
 
   const handleSubmit = async (values, props) => {
-    console.log("values: ", values);
     const result = await register(values);
     props.setSubmitting(false);
     if (result !== true) {
@@ -46,22 +45,6 @@ function RegisterPage() {
       error = "Name is required";
     } else if (!/^[a-z ,.'-]+$/i.test(value)) {
       error = `Name must only contain alphabets and some special characters (e.g., comma, dot, apostrophe, and hyphen)`;
-    }
-    return error;
-  };
-
-  const validateBirthdate = (value) => {
-    let error;
-    if (!value) {
-      error = "Birthdate is required";
-    }
-    return error;
-  };
-
-  const validateEducation = (value) => {
-    let error;
-    if (!value) {
-      error = "Educational background is required";
     }
     return error;
   };
@@ -158,18 +141,9 @@ function RegisterPage() {
                   </Field>
 
                   {/* //-------------------------- Input Date --------------------// */}
-                  <Field name="birthdate" validate={validateBirthdate}>
+                  <Field name="birthdate">
                     {({ field, form }) => (
-<<<<<<< Updated upstream
-                      <FormControl
-                        isInvalid={
-                          form.errors.birthdate && form.touched.birthdate
-                        }
-                        isRequired
-                      >
-=======
                       <FormControl>
->>>>>>> Stashed changes
                         <FormLabel variant="body2" color="black" pt="20px">
                           Date of Birth
                         </FormLabel>
@@ -193,18 +167,9 @@ function RegisterPage() {
                     )}
                   </Field>
                   {/* //---------------------- Input Educational --------------------// */}
-                  <Field name="education" validate={validateEducation}>
+                  <Field name="education">
                     {({ field, form }) => (
-<<<<<<< Updated upstream
-                      <FormControl
-                        isInvalid={
-                          form.errors.education && form.touched.education
-                        }
-                        isRequired
-                      >
-=======
                       <FormControl>
->>>>>>> Stashed changes
                         <FormLabel variant="body2" color="black" mt="20px">
                           Educational Background
                         </FormLabel>
