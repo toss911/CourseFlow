@@ -59,7 +59,7 @@ const ReviewSlider = ({ slides }) => {
               top="0px"
               left="-385px"
             />
-            <Heading variant="headline3" color="blue.400" pt="66.79px">
+            <Heading variant="headline3" color="blue.500" pt="66.79px">
               {slide.name}
             </Heading>
             <Text
