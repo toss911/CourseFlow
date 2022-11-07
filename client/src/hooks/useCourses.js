@@ -9,8 +9,7 @@ const useCourses = () => {
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
   const navigate = useNavigate();
- const params = useParams
-
+  const params = useParams();
 
   const getCourses = async (input) => {
     const { keywords, page } = input;
@@ -35,14 +34,13 @@ const useCourses = () => {
     try {
       setIsError(false);
       setIsLoading(true);
-      navigate(`/courses/:${courseId}`);
+      //navigate(`/courses/:${courseId}`);
       const result = await axios.get(
         `http://localhost:4000/courses/${params.courseId}`
       );
-
       setCourse(result.data.data);
       setIsLoading(false);
-      navigate("/"); // check again if the path is correct
+      //navigate("/"); // check again if the path is correct
     } catch (error) {
       setIsError(true);
       setIsLoading(false);

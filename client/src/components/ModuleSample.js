@@ -1,11 +1,6 @@
 import {
-  Center,
   Box,
-  Image,
   Text,
-  Heading,
-  Button,
-  Divider,
   ListItem,
   UnorderedList,
   Accordion,
@@ -14,12 +9,10 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useCourses from "../hooks/useCourses";
 
 export const ModuleSample = () => {
-  const [isError, setIsError] = useState(null);
-  const [isLoading, setIsLoading] = useState(null);
   const { course, getCoursesbyId } = useCourses();
   console.log(" course: ", course);
 
@@ -72,8 +65,8 @@ export const ModuleSample = () => {
 
             <AccordionPanel ml="13px" pb={4}>
               <UnorderedList>
-                {allLessons[lessonName].map((subLessonName) => {
-                  return <ListItem>{subLessonName}</ListItem>;
+                {allLessons[lessonName].map((subLessonName, key) => {
+                  return <ListItem key={key}>{subLessonName}</ListItem>;
                 })}
               </UnorderedList>
             </AccordionPanel>
