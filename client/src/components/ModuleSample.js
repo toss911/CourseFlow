@@ -32,7 +32,6 @@ export const ModuleSample = () => {
         `http://localhost:4000/courses/${params.courseId}`
       );
       setCourse(result.data.data);
-      //console.log("result.data.data: ", result.data.data);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -43,10 +42,7 @@ export const ModuleSample = () => {
     getCoursebyId();
   }, []);
 
-  // convert object lesson_name to array lesson_name
-  let allLessons = [];
-
-  let uniqueLessonName = [];
+  let allLessons = {};
   for (let i = 0; i < course.length; i++) {
     if (course[i].lesson_name in allLessons) {
       allLessons[course[i].lesson_name].push(course[i].sub_lesson_name);
@@ -55,11 +51,12 @@ export const ModuleSample = () => {
       allLessons[course[i].lesson_name].push(course[i].sub_lesson_name);
     }
   }
+  //console.log("allLessons: ", Array.isArray(allLessons));
   console.log("allLessons: ", allLessons);
-
+  //console.log("course: ", course);
   return (
     <Accordion defaultIndex={[0]} allowMultiple w="739px">
-      {uniqueLessonName.map((name, key) => {
+      {Object.keys(allLessons).map((lessonName, key) => {
         let numberLesson = null;
         if (key < 10) {
           numberLesson = "0" + (key + 1);
@@ -82,28 +79,19 @@ export const ModuleSample = () => {
                   <Text color="#646D89" display="flex">
                     {numberLesson}
                   </Text>
-                  <Text ml="24px">{name}</Text>
+                  <Text ml="24px">{lessonName}</Text>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
             </h2>
 
-            {uniqueLessonName.map((lessonName, key) => {
-              course.filter((course) => {
-                if (lessonName === course.lesson_name) {
-                  return (
-                    <AccordionPanel key={key} ml="13px" pb={4}>
-                      <UnorderedList>
-                        <ListItem>{course.sub_lesson_name}</ListItem>
-                      </UnorderedList>
-                    </AccordionPanel>
-                  );
-                }
-              });
-
-              //course.lesson_name === uniqueLessonName[1];
-              //console.log("course.lesson_name: ", lesson_name);
-            })}
+            <AccordionPanel ml="13px" pb={4}>
+              <UnorderedList>
+                {allLessons[lessonName].map((subLessonName) => {
+                  return <ListItem>{subLessonName}</ListItem>;
+                })}
+              </UnorderedList>
+            </AccordionPanel>
           </AccordionItem>
         );
       })}
