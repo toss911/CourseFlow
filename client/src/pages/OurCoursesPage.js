@@ -25,6 +25,7 @@ import useCourses from "../hooks/useCourses";
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
+  const [coursesPerPage, setCoursesPerPage] = useState(2);
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
@@ -42,6 +43,14 @@ function OurCourses() {
     }, 1000);
     return () => clearTimeout(getData);
   }, [keywords, page]);
+
+  // Get current posts
+  const indexOfLastCourse = page * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  // Change page
+  const paginate = (pageNumber) => setPage(pageNumber);
 
   return (
     <Box>
@@ -89,7 +98,7 @@ function OurCourses() {
             flexWrap="wrap"
             w="100%"
           >
-            {courses.map((course, key) => {
+            {currentCourses.map((course, key) => {
               return (
                 <CourseCard
                   key={key}
@@ -117,6 +126,7 @@ function OurCourses() {
           paginate={paginate}
         />
       <PreFooter/> */}
+      <Pagination coursesPerPage={coursesPerPage} totalCourses={courses.length} m="20" paginate={paginate}/>
       <Footer />
     </Box>
   );

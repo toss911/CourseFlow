@@ -5,11 +5,7 @@ const coursesRouter = Router();
 
 coursesRouter.get("/", async (req, res) => {
   let keywords = req.query.keywords || "";
-  const page = req.query.page || 1;
   keywords = "\\m" + keywords;
-
-  const PAGE_SIZE = 12;
-  const offset = (page - 1) * PAGE_SIZE;
 
   const results = await pool.query(
     `select courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
@@ -19,9 +15,8 @@ coursesRouter.get("/", async (req, res) => {
   where courses.course_name ~* $1
   group by courses.course_id
   order by courses.course_id asc
-  limit $2
-  offset $3`,
-    [keywords, PAGE_SIZE, offset]
+  `,
+    [keywords]
   );
 
   return res.json({

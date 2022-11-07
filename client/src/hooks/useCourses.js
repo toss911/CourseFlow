@@ -23,6 +23,7 @@ const useCourses = () => {
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
       setCourses(results.data.data);
+      console.log(results)
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
