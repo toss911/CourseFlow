@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, List, ListItem } from "@chakra-ui/react";
+import { Flex, List, ListItem, Box, Button } from "@chakra-ui/react";
 const Pagination = ({ coursesPerPage, totalCourses, paginate }) => {
   const pageNumber = [];
 
@@ -8,21 +8,29 @@ const Pagination = ({ coursesPerPage, totalCourses, paginate }) => {
   }
   return (
     <div className="pagination">
-      
-        <List display="flex" gap="4px">
+      <List display="flex" gap="4px">
         {pageNumber.map((number) => (
-          <ListItem key={number} border="solid" borderRadius="full" borderColor="blue.200" p="1.5" pt="0" pb="0" textAlign="center" _hover={{
-            background: "blue.200",
-            border: "solid 1px",
-            borderColor: "blue.300",
-          }}>
-            <a onClick={()=> paginate(number)}  className="page-link">
+          <ListItem
+            key={number}
+            border="solid"
+            borderColor="blue.200"
+            p="1.5"
+            textAlign="center"
+            background="white"
+            _hover={{
+              background: "blue.200",
+              border: "solid 1px",
+              borderColor: "blue.200",
+            }}
+            _active={{ borderColor: "blue.400" }}
+            _focus={{ borderColor: "blue.200", background: "blue.400" }}
+          >
+            <a onClick={() => paginate(number)} className="page-link">
               {number}
             </a>
           </ListItem>
         ))}
-        </List>
-      
+      </List>
     </div>
   );
 };

@@ -25,7 +25,7 @@ import useCourses from "../hooks/useCourses";
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
-  const [coursesPerPage, setCoursesPerPage] = useState(2);
+  const [coursesPerPage, setCoursesPerPage] = useState(5);
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
@@ -126,7 +126,15 @@ function OurCourses() {
           paginate={paginate}
         />
       <PreFooter/> */}
-      <Pagination coursesPerPage={coursesPerPage} totalCourses={courses.length} m="20" paginate={paginate}/>
+      <Center mb="20">
+        <Pagination
+          coursesPerPage={coursesPerPage}
+          totalCourses={courses.length}
+          m="20"
+          paginate={paginate}
+        />
+      </Center>
+
       <Footer />
     </Box>
   );
