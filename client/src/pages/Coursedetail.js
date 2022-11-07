@@ -8,7 +8,6 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar";
-import { NavbarLogin } from "../components/NavbarLogin ";
 import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { PreFooter } from "../components/PreFooter";
@@ -16,7 +15,7 @@ import { ModuleSample } from "../components/ModuleSample";
 import { PriceCard } from "../components/PriceCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function CourseDetail() {
   const params = useParams();

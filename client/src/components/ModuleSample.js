@@ -15,18 +15,18 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
 import useCourses from "../hooks/useCourses";
 
 export const ModuleSample = () => {
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-  const {course , getCoursesbyId} = useCourses();
+  const { course, getCoursesbyId } = useCourses();
   console.log(" course: ", course);
+
   useEffect(() => {
     getCoursesbyId();
   }, []);
+
   let allLessons = {};
   for (let i = 0; i < course.length; i++) {
     if (course[i].lesson_name in allLessons) {
