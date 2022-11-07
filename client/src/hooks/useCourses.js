@@ -16,7 +16,7 @@ const useCourses = () => {
     try {
       const params = new URLSearchParams();
       params.append("keywords", keywords);
-      // params.append("page", page);
+      params.append("page", page);
       setIsError(false);
       const results = await axios.get(
         `http://localhost:4000/courses?${params.toString()}`
