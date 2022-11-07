@@ -48,10 +48,11 @@ function OurCourses() {
   const indexOfLastCourse = page * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const totalPages = Math.ceil(courses.length / coursesPerPage);
 
   // Change page
   const paginate = (pageNumber) => setPage(pageNumber);
-
+  
   return (
     <Box>
       <Navbar />
@@ -132,6 +133,7 @@ function OurCourses() {
           totalCourses={courses.length}
           m="20"
           paginate={paginate}
+          page={page}
         />
       </Center>
 
