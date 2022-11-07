@@ -6,7 +6,6 @@ export const PriceCard = () => {
       display='flex'
       flexDirection='column'
       ml='24px'
-      mr='24px'
       border='10px'
       p='5'
       shadow='md'
