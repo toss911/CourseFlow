@@ -17,31 +17,16 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import useCourses from "../hooks/useCourses";
 
 export const ModuleSample = () => {
-  const params = useParams();
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-  const [course, setCourse] = useState([]);
-
-  const getCoursebyId = async () => {
-    try {
-      setIsError(false);
-      setIsLoading(true);
-      const result = await axios.get(
-        `http://localhost:4000/courses/${params.courseId}`
-      );
-      setCourse(result.data.data);
-      setIsLoading(false);
-    } catch (error) {
-      setIsError(true);
-      setIsLoading(false);
-    }
-  };
+  const {course , getCoursesbyId} = useCourses();
+  console.log(" course: ", course);
   useEffect(() => {
-    getCoursebyId();
+    getCoursesbyId();
   }, []);
-
   let allLessons = {};
   for (let i = 0; i < course.length; i++) {
     if (course[i].lesson_name in allLessons) {
@@ -52,7 +37,7 @@ export const ModuleSample = () => {
     }
   }
   //console.log("allLessons: ", Array.isArray(allLessons));
-  console.log("allLessons: ", allLessons);
+  //console.log("allLessons: ", allLessons);
   //console.log("course: ", course);
   return (
     <Accordion defaultIndex={[0]} allowMultiple w="739px">

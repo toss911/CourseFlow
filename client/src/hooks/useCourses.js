@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -9,7 +9,7 @@ const useCourses = () => {
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
   const navigate = useNavigate();
-
+  const params = useParams();
   const getAllCourses = async (input) => {
     try {
       setIsError(false);
@@ -52,8 +52,9 @@ const useCourses = () => {
     try {
       setIsError(false);
       setIsLoading(true);
+      navigate(`/courses/:${courseId}`);
       const result = await axios.get(
-        `http://localhost:4000/courses/${courseId}`
+        `http://localhost:4000/courses/${params.courseId}`
       );
 
       setCourse(result.data.data);
