@@ -13,33 +13,17 @@ import { CourseCard } from "../components/CourseCard";
 import { PreFooter } from "../components/PreFooter";
 import { ModuleSample } from "../components/ModuleSample";
 import { PriceCard } from "../components/PriceCard";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import useCourses from "../hooks/useCourses";
 
 function CourseDetail() {
-  const params = useParams();
-  const [isError, setIsError] = useState(null);
-  const [isLoading, setIsLoading] = useState(null);
-  const [course, setCourse] = useState([]);
+  const { course, getCoursesbyId } = useCourses();
+  console.log(" course: ", course);
 
-  const getCoursebyId = async () => {
-    try {
-      setIsError(false);
-      setIsLoading(true);
-      const result = await axios.get(
-        `http://localhost:4000/courses/${params.courseId}`
-      );
-      setCourse(result.data.data);
-      setIsLoading(false);
-    } catch (error) {
-      setIsError(true);
-      setIsLoading(false);
-    }
-  };
   useEffect(() => {
-    getCoursebyId();
+    getCoursesbyId();
   }, []);
+
   //console.log("course: ", course[0]);
 
   return (
