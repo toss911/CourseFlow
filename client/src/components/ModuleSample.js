@@ -14,7 +14,7 @@ import useCourses from "../hooks/useCourses";
 
 export const ModuleSample = () => {
   const { course, getCoursesbyId } = useCourses();
-  console.log(" course: ", course);
+  //console.log(" course: ", course);
 
   useEffect(() => {
     getCoursesbyId();

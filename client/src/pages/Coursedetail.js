@@ -17,14 +17,13 @@ import { useEffect } from "react";
 import useCourses from "../hooks/useCourses";
 
 function CourseDetail() {
-  const { course, getCoursesbyId } = useCourses();
-  console.log(" course: ", course);
+  const { getCourses, courses, getCoursesbyId, course } = useCourses();
 
   useEffect(() => {
     getCoursesbyId();
   }, []);
 
-  //console.log("course: ", course[0]);
+  console.log("course: ", course);
 
   return (
     <>
@@ -32,12 +31,12 @@ function CourseDetail() {
       {/* <NavbarLogin /> */}
 
       <Box
-        w='100vw'
-        pt='100px'
-        pl='160px'
-        display='flex'
-        flexDirection='column'
-        position='relative'
+        w="100vw"
+        pt="100px"
+        pl="160px"
+        display="flex"
+        flexDirection="column"
+        position="relative"
       >
         <Flex flexDirection="row">
           <Image
@@ -87,19 +86,35 @@ function CourseDetail() {
         {/* //ModuleSample Below// */}
       </Box>
       <Box
-        display='flex'
-        flexDirection='column'
-        alignItems='center'
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
         backgroundImage="url('/assets/CourseDetail/BG.svg')"
-        backgroundPosition='center'
-        backgroundRepeat='no-repeat'
+        backgroundPosition="center"
+        backgroundRepeat="no-repeat"
       >
-        <Heading variants='headline2' color='black' mt='121px'>
+        <Heading variants="headline2" color="black" mt="121px">
           Other Interesting Courses
         </Heading>
-        <Box pb='50px'>
-          <CourseCard />
-        </Box>
+        <Flex pb="50px">
+          {course.map((course, key) => {
+            if (key < 3) {
+              return (
+                <CourseCard
+                  key={key}
+                  courseTitle={course.course_name}
+                  courseSummary={course.summary}
+                  courseNumLessons={course.lessons_count}
+                  courseTime={course.learning_time}
+                  courseImg={course.cover_image_directory}
+                  onClick={() => {
+                    getCoursesbyId(course.course_id);
+                  }}
+                />
+              );
+            }
+          })}
+        </Flex>
       </Box>
       <PreFooter />
       <Footer />
