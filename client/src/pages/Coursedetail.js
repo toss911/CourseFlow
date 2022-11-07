@@ -8,7 +8,7 @@ import {
   Divider,
 } from '@chakra-ui/react';
 import { Navbar } from '../components/Navbar';
-import { NavbarLogin } from '../components/NavbarLogin ';
+// import { NavbarLogin } from '../components/NavbarLogin ';
 import { Footer } from '../components/Footer';
 import { CourseCard } from '../components/CourseCard';
 import { PreFooter } from '../components/PreFooter';
