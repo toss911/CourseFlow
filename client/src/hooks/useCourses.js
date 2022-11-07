@@ -9,8 +9,8 @@ const useCourses = () => {
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
   const navigate = useNavigate();
+ const params = useParams
 
-  const { contextState, setContextState } = useAuth();
 
   const getCourses = async (input) => {
     const { keywords, page } = input;
