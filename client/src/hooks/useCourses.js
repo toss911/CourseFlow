@@ -1,15 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/authentication";
+import { useNavigate, useParams } from "react-router-dom";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
-  const [course, setCourse] = useState(null);
+  const [course, setCourse] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-
   const navigate = useNavigate();
 
   const { contextState, setContextState } = useAuth();
@@ -37,9 +35,11 @@ const useCourses = () => {
     try {
       setIsError(false);
       setIsLoading(true);
+      navigate(`/courses/:${courseId}`);
       const result = await axios.get(
-        `http://localhost:4000/courses/${courseId}`
+        `http://localhost:4000/courses/${params.courseId}`
       );
+
       setCourse(result.data.data);
       setIsLoading(false);
       navigate("/"); // check again if the path is correct
