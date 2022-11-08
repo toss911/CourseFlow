@@ -1,12 +1,5 @@
-import {
-  Flex,
-  Box,
-  Image,
-  Text,
-  Heading,
-  Button,
-  Divider,
-} from '@chakra-ui/react';
+import { Flex, Box, Image, Text, Heading, Link } from '@chakra-ui/react';
+import { ArrowBackIcon } from '@chakra-ui/icons';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CourseCard } from '../components/CourseCard';
@@ -15,6 +8,7 @@ import { ModuleSample } from '../components/ModuleSample';
 import { PriceCard } from '../components/PriceCard';
 import { useEffect } from 'react';
 import useCourses from '../hooks/useCourses';
+import { useNavigate } from 'react-router-dom';
 
 function CourseDetail() {
   const { getCoursesbyId, course, category } = useCourses();
@@ -25,14 +19,24 @@ function CourseDetail() {
   console.log('category: ', category);
   //console.log("course: ", course);
 
+  const navigate = useNavigate();
+
   return (
     <>
       <Navbar />
       {/* <NavbarLogin /> */}
+      <Box display='flex' pl='160px'>
+        <Text as='b' mt='59px' color='blue.500' fontSize='16px'>
+          <Link pl='12px' gap='10px' onClick={() => navigate('/OurCourses')}>
+            <ArrowBackIcon color='blue.500' />
+            Back
+          </Link>
+        </Text>
+      </Box>
 
       <Box
         w='100vw'
-        pt='100px'
+        pt='15px'
         pl='160px'
         display='flex'
         flexDirection='column'
