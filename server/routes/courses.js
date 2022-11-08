@@ -49,7 +49,7 @@ coursesRouter.get("/:courseId", async (req, res) => {
   const files = await pool.query(
     `SELECT *
     FROM files
-        where file_id=$1
+        where course_id=$1
         `,
     [courseId]
   );
