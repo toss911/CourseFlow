@@ -1,4 +1,4 @@
-import { Box, Image, Text, Heading, Button, Divider } from "@chakra-ui/react";
+import { Box, Image, Text, Heading, Button, Divider } from '@chakra-ui/react';
 
 export const PriceCard = (props) => {
   return (
@@ -15,20 +15,20 @@ export const PriceCard = (props) => {
       gap='20px'
       position='sticky'
     >
-      <Text color="orange.500">Courses</Text>
-      <Text fontSize="24px" fontWeight="600" lineHeight="125%" color="black">
+      <Text color='orange.500'>Courses</Text>
+      <Text fontSize='24px' fontWeight='600' lineHeight='125%' color='black'>
         {props.courseName}
       </Text>
-      <Text variant="body2" w="309px">
+      <Text variant='body2' w='309px'>
         {props.courseContent}
       </Text>
-      <Text fontSize="24px" fontWeight="600" lineHeight="125%" color="gray.700">
+      <Text fontSize='24px' fontWeight='600' lineHeight='125%' color='gray.700'>
         THB {props.coursePrice}
       </Text>
-      <Divider />
-      <Box display="flex" flexDirection="column" gap="16px" w="309px">
-        <Button variant="secondary">Get In Desire Course</Button>
-        <Button variant="primary">Subscribe This Course</Button>
+      <Divider borderColor='gray.300' />
+      <Box display='flex' flexDirection='column' gap='16px' w='309px'>
+        <Button variant='secondary'>Get In Desire Course</Button>
+        <Button variant='primary'>Subscribe This Course</Button>
       </Box>
     </Box>
   );
