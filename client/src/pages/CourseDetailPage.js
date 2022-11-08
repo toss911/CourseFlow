@@ -13,7 +13,6 @@ import {
   UnorderedList,
   ListItem,
 } from "@chakra-ui/react";
-
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
@@ -48,7 +47,6 @@ function CourseDetail() {
   return (
     <>
       <Navbar />
-      {/* <NavbarLogin /> */}
       <Box display="flex" pl="160px">
         <Text mt="59px" mb="5px" color="blue.500" fontSize="16px">
           <Link pl="12px" onClick={() => navigate("/courses")}>
@@ -71,16 +69,9 @@ function CourseDetail() {
           alt="Course picture"
           h="460px"
           w="739px"
-          display="flex"
           position="absolute"
         />
-        <Box
-          display="flex"
-          top="0"
-          position="sticky"
-          pr="160px"
-          alignSelf="end"
-        >
+        <Box position="sticky" top="0px" ml="739px">
           {course.map((course, key) => {
             if (key === 0) {
               return (
