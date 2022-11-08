@@ -3,7 +3,10 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PreFooter } from "../components/PreFooter";
-import Pagination from "../components/Pagination";
+// import AntPaginate from "../components/Pagination.js";
+import { Pagination } from 'antd';
+import "antd/dist/antd.css";
+// import Pagination from "../components/Pagination";
 import { useEffect, useState, useCallback } from "react";
 import {
   Box,
@@ -48,7 +51,7 @@ function OurCourses() {
   const indexOfLastCourse = page * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
-  const totalPages = Math.ceil(courses.length / coursesPerPage);
+
 
   // Change page
   const paginate = (pageNumber) => setPage(pageNumber);
@@ -128,13 +131,12 @@ function OurCourses() {
         />
       <PreFooter/> */}
       <Center mb="20">
-        <Pagination
-          coursesPerPage={coursesPerPage}
+        {/* <AntPaginate coursesPerPage={coursesPerPage}
           totalCourses={courses.length}
-          m="20"
           paginate={paginate}
-          page={page}
-        />
+          page={page} ></AntPaginate> */}
+          
+        <Pagination total={courses.length} current={page} pageSize={coursesPerPage} onChange={paginate}/>
       </Center>
 
       <Footer />
