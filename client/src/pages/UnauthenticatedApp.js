@@ -4,6 +4,7 @@ import LoginPage from "./LoginPage.js";
 import RegisterPage from "./RegisterPage.js";
 import OurCourses from "./OurCoursesPage.js";
 import CourseDetail from "./Coursedetail.js";
+
 function UnauthenticatedApp() {
   return (
     <Routes>
