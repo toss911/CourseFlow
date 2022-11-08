@@ -43,8 +43,20 @@ coursesRouter.get("/:courseId", async (req, res) => {
         where courses.course_id=$1`,
     [courseId]
   );
+  const nameCategory = results.rows[0].category;
+
+  const filterCategory = await pool.query(
+    `SELECT *
+    FROM courses
+        where category=$1
+        limit 3`,
+    [nameCategory]
+  );
+
   return res.json({
     data: results.rows,
+
+    dataCategory: filterCategory.rows,
   });
 });
 
