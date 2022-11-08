@@ -54,7 +54,9 @@ function OurCourses() {
 
 
   // Change page
-  const paginate = (pageNumber) => setPage(pageNumber);
+  const paginate = (pageNumber) => {setPage(pageNumber)
+    window.scrollTo(0, 150);
+  };
   
   return (
     <Box>
