@@ -17,13 +17,13 @@ import { useEffect } from "react";
 import useCourses from "../hooks/useCourses";
 
 function CourseDetail() {
-  const { getCourses, courses, getCoursesbyId, course } = useCourses();
+  const { getCoursesbyId, course, category } = useCourses();
 
   useEffect(() => {
     getCoursesbyId();
   }, []);
-
-  console.log("course: ", course);
+  console.log("category: ", category);
+  //console.log("course: ", course);
 
   return (
     <>
@@ -97,16 +97,16 @@ function CourseDetail() {
           Other Interesting Courses
         </Heading>
         <Flex pb="50px">
-          {course.map((course, key) => {
+          {category.map((category, key) => {
             if (key < 3) {
               return (
                 <CourseCard
                   key={key}
-                  courseTitle={course.course_name}
-                  courseSummary={course.summary}
-                  courseNumLessons={course.lessons_count}
-                  courseTime={course.learning_time}
-                  courseImg={course.cover_image_directory}
+                  courseTitle={category.course_name}
+                  courseSummary={category.summary}
+                  courseNumLessons={category.lessons_count}
+                  courseTime={category.learning_time}
+                  courseImg={category.cover_image_directory}
                   onClick={() => {
                     getCoursesbyId(course.course_id);
                   }}

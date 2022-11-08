@@ -55,7 +55,6 @@ coursesRouter.get("/:courseId", async (req, res) => {
 
   return res.json({
     data: results.rows,
-
     dataCategory: filterCategory.rows,
   });
 });

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState([]);
+  const [category, setCategory] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
@@ -39,6 +40,8 @@ const useCourses = () => {
         `http://localhost:4000/courses/${params.courseId}`
       );
       setCourse(result.data.data);
+      setCategory(result.data.dataCategory);
+      console.log("result.data.dataCategory: ", result.data.dataCategory);
       setIsLoading(false);
       //navigate("/"); // check again if the path is correct
     } catch (error) {
@@ -50,6 +53,7 @@ const useCourses = () => {
   return {
     courses,
     course,
+    category,
     getCourses,
     getCoursesbyId,
     isLoading,
