@@ -267,6 +267,42 @@ const components = {
       variant: "default",
     },
   },
+  Badge: {
+    variants: {
+      submitted: {
+        color: "#0A7B60",
+        backgroundColor: "#DDF9EF",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
+      },
+      overdue: {
+        color: "#9B2FAC",
+        backgroundColor: "#FAE7F4",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
+      },
+      pending: {
+        color: "#996500",
+        backgroundColor: "#FFFBDB",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
+      },
+      "in-progress": {
+        color: "#3557CF",
+        backgroundColor: "#EBF0FF",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
+      },
+    },
+  },
 };
 
 const theme = extendTheme({ colors, shadows, fonts, components });
