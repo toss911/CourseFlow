@@ -8,9 +8,10 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-} from "@chakra-ui/react";
-import { useEffect } from "react";
-import useCourses from "../hooks/useCourses";
+  Heading,
+} from '@chakra-ui/react';
+import { useEffect } from 'react';
+import useCourses from '../hooks/useCourses';
 
 export const ModuleSample = () => {
   const { course, getCoursesbyId } = useCourses();
@@ -33,11 +34,11 @@ export const ModuleSample = () => {
   //console.log("allLessons: ", allLessons);
   //console.log("course: ", course);
   return (
-    <Accordion defaultIndex={[0]} allowMultiple w="739px">
+    <Accordion defaultIndex={[0]} allowMultiple w='739px'>
       {Object.keys(allLessons).map((lessonName, key) => {
         let numberLesson = null;
         if (key < 10) {
-          numberLesson = "0" + (key + 1);
+          numberLesson = '0' + (key + 1);
         } else {
           numberLesson = key + 1;
         }
@@ -45,28 +46,32 @@ export const ModuleSample = () => {
         return (
           <AccordionItem key={key}>
             <h2>
-              <AccordionButton display="flex" w="739px">
-                <Box
-                  flex="1"
-                  textAlign="left"
-                  fontSize="24px"
-                  fontWeight="500"
-                  display="flex"
-                  color="black"
-                >
-                  <Text color="#646D89" display="flex">
+              <AccordionButton display='flex' w='739px'>
+                <Box flex='1' textAlign='left' display='flex' color='black'>
+                  <Heading color='gray.700' display='flex' variant='headline3'>
                     {numberLesson}
-                  </Text>
-                  <Text ml="24px">{lessonName}</Text>
+                  </Heading>
+                  <Heading ml='24px' variant='headline3'>
+                    {lessonName}
+                  </Heading>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
             </h2>
 
-            <AccordionPanel ml="13px" pb={4}>
+            <AccordionPanel ml='13px' pb={4}>
               <UnorderedList>
                 {allLessons[lessonName].map((subLessonName, key) => {
-                  return <ListItem key={key}>{subLessonName}</ListItem>;
+                  return (
+                    <ListItem
+                      fontWeight='400'
+                      color='gray.700'
+                      fontSize='16px'
+                      key={key}
+                    >
+                      {subLessonName}
+                    </ListItem>
+                  );
                 })}
               </UnorderedList>
             </AccordionPanel>
