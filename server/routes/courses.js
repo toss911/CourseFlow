@@ -42,6 +42,7 @@ coursesRouter.get("/:courseId", async (req, res) => {
     `SELECT *
     FROM courses
         WHERE category = $1 AND course_id != $2
+        ORDER BY random()
         limit 3`,
     [nameCategory, courseId]
   );

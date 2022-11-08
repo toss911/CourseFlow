@@ -19,7 +19,10 @@ export function CourseCard(props) {
         border: "solid 1px",
         borderColor: "blue.200",
       }}
-      onClick={() => navigate(`/courses/${props.courseId}`)}
+      onClick={() => {
+        navigate(`/courses/${props.courseId}`);
+        window.scrollTo(0, 0);
+      }}
       cursor="pointer"
     >
       <Box w="357px" h="240px">
