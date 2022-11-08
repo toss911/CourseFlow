@@ -8,18 +8,17 @@ import { ModuleSample } from "../components/ModuleSample";
 import { PriceCard } from "../components/PriceCard";
 import { useEffect } from "react";
 import useCourses from "../hooks/useCourses";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function CourseDetail() {
   const { getCoursesbyId, course, category } = useCourses();
 
+  const navigate = useNavigate();
+  const { courseId } = useParams();
+
   useEffect(() => {
     getCoursesbyId();
-  }, []);
-  console.log("category: ", category);
-  //console.log("course: ", course);
-
-  const navigate = useNavigate();
+  }, [courseId]);
 
   return (
     <>
@@ -107,25 +106,29 @@ function CourseDetail() {
         <Heading variant="headline2" color="black" mt="121px">
           Other Interesting Courses
         </Heading>
-        <Flex pb="50px">
-          {category.map((category, key) => {
-            if (key < 3) {
-              return (
-                <CourseCard
-                  key={key}
-                  courseTitle={category.course_name}
-                  courseSummary={category.summary}
-                  courseNumLessons={category.lessons_count}
-                  courseTime={category.learning_time}
-                  courseImg={category.cover_image_directory}
-                  onClick={() => {
-                    getCoursesbyId(course.course_id);
-                  }}
-                />
-              );
-            }
-          })}
-        </Flex>
+        {typeof category !== "undefined" && category.length > 0 ? (
+          <Flex pb="50px">
+            {category.map((category, key) => {
+              if (key < 3) {
+                return (
+                  <CourseCard
+                    key={key}
+                    courseTitle={category.course_name}
+                    courseSummary={category.summary}
+                    courseNumLessons={category.lessons_count}
+                    courseTime={category.learning_time}
+                    courseImg={category.cover_image_directory}
+                    courseId={category.course_id}
+                  />
+                );
+              }
+            })}
+          </Flex>
+        ) : (
+          <Text as="i" color="black" mt="187px" mb="187px">
+            No relevant course
+          </Text>
+        )}
       </Box>
       <PreFooter />
       <Footer />

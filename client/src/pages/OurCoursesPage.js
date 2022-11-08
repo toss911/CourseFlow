@@ -133,18 +133,7 @@ function OurCourses() {
           </Text>
         )}
       </Center>
-      {/* <Pagination 
-          ourCoursesPage={ourCoursesPage}
-          totalCourse={cardData.length}
-          paginate={paginate}
-        />
-      <PreFooter/> */}
       <Center mb="20">
-        {/* <AntPaginate coursesPerPage={coursesPerPage}
-          totalCourses={courses.length}
-          paginate={paginate}
-          page={page} ></AntPaginate> */}
-
         <Pagination
           total={courses.length}
           current={page}

@@ -3,7 +3,7 @@ import HomePage from "./HomePage.js";
 import LoginPage from "./LoginPage.js";
 import RegisterPage from "./RegisterPage.js";
 import OurCourses from "./OurCoursesPage.js";
-import CourseDetail from "./Coursedetail.js";
+import CourseDetail from "./CourseDetailPage.js";
 
 function UnauthenticatedApp() {
   return (

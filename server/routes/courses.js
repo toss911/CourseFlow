@@ -41,9 +41,9 @@ coursesRouter.get("/:courseId", async (req, res) => {
   const filterCategory = await pool.query(
     `SELECT *
     FROM courses
-        where category=$1
+        WHERE category = $1 AND course_id != $2
         limit 3`,
-    [nameCategory]
+    [nameCategory, courseId]
   );
 
   const files = await pool.query(

@@ -24,7 +24,6 @@ const useCourses = () => {
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
       setCourses(results.data.data);
-      console.log(results)
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -36,15 +35,12 @@ const useCourses = () => {
     try {
       setIsError(false);
       setIsLoading(true);
-      //navigate(`/courses/:${courseId}`);
       const result = await axios.get(
         `http://localhost:4000/courses/${params.courseId}`
       );
       setCourse(result.data.data);
       setCategory(result.data.dataCategory);
-      console.log("result.data.dataCategory: ", result.data.dataCategory);
       setIsLoading(false);
-      //navigate("/"); // check again if the path is correct
     } catch (error) {
       setIsError(true);
       setIsLoading(false);
