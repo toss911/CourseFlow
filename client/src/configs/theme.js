@@ -183,7 +183,8 @@ const components = {
         },
       },
       success: {
-        bg: "green",
+        bg: "blue.500",
+        borderColor: "blue.500",
         color: "white",
         boxShadow: "shadow1",
         borderRadius: "12px",

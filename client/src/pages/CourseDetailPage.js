@@ -21,17 +21,17 @@ import { PreFooter } from "../components/PreFooter";
 import { PriceCard } from "../components/PriceCard";
 import { useEffect } from "react";
 import useCourses from "../hooks/useCourses";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function CourseDetail() {
   const { getCoursesbyId, course, category } = useCourses();
 
   const navigate = useNavigate();
-  const { courseId } = useParams();
+  const location = useLocation();
 
   useEffect(() => {
     getCoursesbyId();
-  }, [courseId]);
+  }, [location]);
 
   // Stored data for mapping in module samples section
   let allLessons = {};
