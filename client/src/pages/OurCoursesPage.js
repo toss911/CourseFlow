@@ -24,11 +24,14 @@ import {
 } from "@chakra-ui/react";
 // import { cardData } from "../data/cardData.js";
 import useCourses from "../hooks/useCourses";
+import { useNavigate } from "react-router-dom";
 
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
   const [coursesPerPage, setCoursesPerPage] = useState(12);
+
+  const navigate = useNavigate();
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
@@ -119,9 +122,7 @@ function OurCourses() {
                   courseNumLessons={course.lessons_count}
                   courseTime={course.learning_time}
                   courseImg={course.cover_image_directory}
-                  onClick={() => {
-                    getCoursesbyId(course.course_id);
-                  }}
+                  courseId={course.course_id}
                 />
               );
             })}
