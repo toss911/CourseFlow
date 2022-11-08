@@ -10,6 +10,7 @@ function AuthProvider(props) {
     isLoading: false,
     isError: false,
     user: null,
+    previosUrl: null,
   });
 
   const navigate = useNavigate();

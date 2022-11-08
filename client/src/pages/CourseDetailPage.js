@@ -22,9 +22,12 @@ import { PriceCard } from "../components/PriceCard";
 import { useEffect } from "react";
 import useCourses from "../hooks/useCourses";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/authentication.js";
 
 function CourseDetail() {
   const { getCoursesbyId, course, category } = useCourses();
+
+  const { isAuthenticated, setContextState, contextState } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,41 +74,38 @@ function CourseDetail() {
           w="739px"
           position="absolute"
         />
-        <Box position="sticky" top="0px" ml="739px">
-          {course.map((course, key) => {
-            if (key === 0) {
-              return (
-                <PriceCard
-                  key={key}
-                  courseName={course.course_name}
-                  courseContent={course.summary}
-                  coursePrice={course.price}
-                />
-              );
-            }
-          })}
-        </Box>
 
         {course.map((course, key) => {
           if (key === 0) {
             return (
-              <Box
-                key={key}
-                display="flex"
-                flexDirection="column"
-                w="548px"
-                gap="24px"
-              >
-                <Heading variant="headline2" color="black" mt="150px">
-                  Course Detail
-                </Heading>
-                <Text variants="body2" w="739px" mt="10px">
-                  {course.detail}
-                </Text>
-              </Box>
+              <>
+                <Box position="sticky" top="0px" ml="739px">
+                  <PriceCard
+                    key={key}
+                    courseName={course.course_name}
+                    courseContent={course.summary}
+                    coursePrice={course.price}
+                  />
+                </Box>
+                <Box
+                  key={key}
+                  display="flex"
+                  flexDirection="column"
+                  w="548px"
+                  gap="24px"
+                >
+                  <Heading variant="headline2" color="black" mt="150px">
+                    Course Detail
+                  </Heading>
+                  <Text variants="body2" w="739px" mt="10px">
+                    {course.detail}
+                  </Text>
+                </Box>
+              </>
             );
           }
         })}
+
         <Heading mt="100px" color="black" mb="20px" variant="headline2">
           Module Samples
         </Heading>
@@ -191,7 +191,7 @@ function CourseDetail() {
           </Text>
         )}
       </Box>
-      <PreFooter />
+      {!isAuthenticated ? <PreFooter /> : null}
       <Footer />
     </>
   );
