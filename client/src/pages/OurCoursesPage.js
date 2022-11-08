@@ -1,9 +1,9 @@
-import { Navbar } from "../components/Navbar.js";
-import { Footer } from "../components/Footer";
-import { CourseCard } from "../components/CourseCard";
-import { SearchIcon } from "@chakra-ui/icons";
-import { PreFooter } from "../components/PreFooter";
-import { useEffect, useState } from "react";
+import { Navbar } from '../components/Navbar.js';
+import { Footer } from '../components/Footer';
+import { CourseCard } from '../components/CourseCard';
+import { SearchIcon } from '@chakra-ui/icons';
+import { PreFooter } from '../components/PreFooter';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Image,
@@ -17,12 +17,12 @@ import {
   InputGroup,
   Center,
   Spinner,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 // import { cardData } from "../data/cardData.js";
-import useCourses from "../hooks/useCourses";
+import useCourses from '../hooks/useCourses';
 
 function OurCourses() {
-  const [keywords, setKeywords] = useState("");
+  const [keywords, setKeywords] = useState('');
   const [page, setPage] = useState(1);
 
   const handleSearchTextChange = (event) => {
@@ -38,7 +38,7 @@ function OurCourses() {
     totalPages,
   } = useCourses();
 
-  const noCourse = typeof courses !== "undefined" && courses > 0;
+  const noCourse = typeof courses !== 'undefined' && courses > 0;
 
   useEffect(() => {
     setIsLoading(true);
@@ -52,24 +52,24 @@ function OurCourses() {
     <Box>
       <Navbar />
       <Box>
-        <Image w="100%" src="/assets/courseCard/bgOc.svg" position="relative" />
+        <Image w='100%' src='/assets/courseCard/bgOc.svg' position='relative' />
 
-        <Flex flexDirection="column" alignItems="center" mt="-100">
-          <Heading variant="headline2" mb="60px">
+        <Flex flexDirection='column' alignItems='center' mt='-100'>
+          <Heading variant='headline2' mb='60px'>
             Our Courses
           </Heading>
-          <Box mb="100px">
-            <InputGroup w="357px">
+          <Box mb='100px'>
+            <InputGroup w='357px'>
               <Input
-                type="string"
-                placeholder="Search..."
-                pl="40px"
+                type='string'
+                placeholder='Search...'
+                pl='40px'
                 onChange={handleSearchTextChange}
                 value={keywords}
               />
               <InputLeftElement
-                pointerEvents="none"
-                children={<SearchIcon color="#646D89" />}
+                pointerEvents='none'
+                children={<SearchIcon color='#646D89' />}
               />
             </InputGroup>
           </Box>
@@ -79,20 +79,20 @@ function OurCourses() {
       <Center>
         {isLoading ? (
           <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-            mb="187px"
+            thickness='4px'
+            speed='0.65s'
+            emptyColor='gray.200'
+            color='blue.500'
+            size='xl'
+            mb='187px'
           />
-        ) : typeof courses !== "undefined" && courses.length > 0 ? (
+        ) : typeof courses !== 'undefined' && courses.length > 0 ? (
           <Flex
-            flexDirection="row"
-            justifyContent="center"
-            mb="180px"
-            flexWrap="wrap"
-            w="100%"
+            flexDirection='row'
+            justifyContent='center'
+            mb='180px'
+            flexWrap='wrap'
+            w='100%'
           >
             {courses.map((course, key) => {
               return (
@@ -111,23 +111,23 @@ function OurCourses() {
             })}
           </Flex>
         ) : (
-          <Text as="i" color="black" mb="187px">
+          <Text as='i' color='black' mb='187px'>
             Course not found
           </Text>
         )}
       </Center>
       <Flex
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        mb="5%"
+        flexDirection='column'
+        alignItems='center'
+        justifyContent='center'
+        mb='5%'
       >
-        <Box className="pagination">
+        <Box className='pagination'>
           {page > 1 ? (
             <Link
-              className="previous-button"
+              className='previous-button'
               onClick={() => setPage(page - 1)}
-              mr="15px"
+              mr='15px'
             >
               Previous
             </Link>
@@ -135,9 +135,9 @@ function OurCourses() {
           {page} / {totalPages}
           {page !== totalPages ? (
             <Link
-              className="next-button"
+              className='next-button'
               onClick={() => setPage(page + 1)}
-              ml="15px"
+              ml='15px'
             >
               Next
             </Link>

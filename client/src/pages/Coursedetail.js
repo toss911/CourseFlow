@@ -26,9 +26,9 @@ function CourseDetail() {
       <Navbar />
       {/* <NavbarLogin /> */}
       <Box display='flex' pl='160px'>
-        <Text as='b' mt='59px' color='blue.500' fontSize='16px'>
-          <Link pl='12px' gap='10px' onClick={() => navigate('/OurCourses')}>
-            <ArrowBackIcon color='blue.500' />
+        <Text mt='59px' mb='5px' color='blue.500' fontSize='16px'>
+          <Link pl='12px' onClick={() => navigate('/courses')}>
+            <ArrowBackIcon mr='10px' color='blue.500' />
             Back
           </Link>
         </Text>
