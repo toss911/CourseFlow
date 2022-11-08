@@ -29,8 +29,14 @@ function OurCourses() {
     setKeywords(event.target.value);
   };
 
-  const { getCourses, courses, getCoursesbyId, isLoading, setIsLoading } =
-    useCourses();
+  const {
+    getCourses,
+    courses,
+    getCoursesbyId,
+    isLoading,
+    setIsLoading,
+    totalPages,
+  } = useCourses();
 
   const noCourse = typeof courses !== "undefined" && courses > 0;
 
@@ -110,24 +116,35 @@ function OurCourses() {
           </Text>
         )}
       </Center>
-      <Flex flexDirection='column' alignItems='center' justifyContent='center' mb='5%'>
-      <Box className="pagination" >
-        {page > 1 ? (
-          <Link className="previous-button" onClick={() => setPage(page - 1)} mr='15px'>
-            Previous
-          </Link>
-        ) : null}
-
-        {page} / {totalPages}
-
-        {page !== totalPages ? (
-          <Link className="next-button" onClick={() => setPage(page + 1)} ml='15px'>
-            Next
-          </Link>
-        ) : null}
-      </Box>
+      <Flex
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        mb="5%"
+      >
+        <Box className="pagination">
+          {page > 1 ? (
+            <Link
+              className="previous-button"
+              onClick={() => setPage(page - 1)}
+              mr="15px"
+            >
+              Previous
+            </Link>
+          ) : null}
+          {page} / {totalPages}
+          {page !== totalPages ? (
+            <Link
+              className="next-button"
+              onClick={() => setPage(page + 1)}
+              ml="15px"
+            >
+              Next
+            </Link>
+          ) : null}
+        </Box>
       </Flex>
-       <PreFooter/>
+      <PreFooter />
       <Footer />
     </Box>
   );

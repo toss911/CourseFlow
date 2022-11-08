@@ -34,8 +34,6 @@ coursesRouter.get("/:courseId", async (req, res) => {
   const results = await pool.query(
     `SELECT *
     FROM courses
-        INNER JOIN files 
-        ON courses.course_id = files.course_id
         INNER JOIN lessons 
         ON courses.course_id = lessons.course_id
         INNER JOIN sub_lessons 
@@ -53,9 +51,17 @@ coursesRouter.get("/:courseId", async (req, res) => {
     [nameCategory]
   );
 
+  const files = await pool.query(
+    `SELECT *
+    FROM files
+        where file_id=$1
+        `,
+    [courseId]
+  );
   return res.json({
     data: results.rows,
     dataCategory: filterCategory.rows,
+    dataFiles: files.rows,
   });
 });
 
