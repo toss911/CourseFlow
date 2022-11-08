@@ -1,22 +1,13 @@
-<<<<<<< HEAD
-import { Navbar } from '../components/Navbar.js';
-import { Footer } from '../components/Footer';
-import { CourseCard } from '../components/CourseCard';
-import { SearchIcon } from '@chakra-ui/icons';
-import { PreFooter } from '../components/PreFooter';
-import { useEffect, useState } from 'react';
-=======
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PreFooter } from "../components/PreFooter";
 // import AntPaginate from "../components/Pagination.js";
-import { Pagination } from 'antd';
+import { Pagination } from "antd";
 import "antd/dist/antd.css";
 // import Pagination from "../components/Pagination";
 import { useEffect, useState, useCallback } from "react";
->>>>>>> fix-sprint-1
 import {
   Box,
   Image,
@@ -30,14 +21,14 @@ import {
   InputGroup,
   Center,
   Spinner,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 // import { cardData } from "../data/cardData.js";
-import useCourses from '../hooks/useCourses';
+import useCourses from "../hooks/useCourses";
 
 function OurCourses() {
-  const [keywords, setKeywords] = useState('');
+  const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
-  const [coursesPerPage, setCoursesPerPage] = useState(5);
+  const [coursesPerPage, setCoursesPerPage] = useState(12);
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
@@ -52,7 +43,7 @@ function OurCourses() {
     totalPages,
   } = useCourses();
 
-  const noCourse = typeof courses !== 'undefined' && courses > 0;
+  const noCourse = typeof courses !== "undefined" && courses > 0;
 
   useEffect(() => {
     setIsLoading(true);
@@ -67,34 +58,34 @@ function OurCourses() {
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
 
-
   // Change page
-  const paginate = (pageNumber) => {setPage(pageNumber)
+  const paginate = (pageNumber) => {
+    setPage(pageNumber);
     window.scrollTo(0, 150);
   };
-  
+
   return (
     <Box>
       <Navbar />
       <Box>
-        <Image w='100%' src='/assets/courseCard/bgOc.svg' position='relative' />
+        <Image w="100%" src="/assets/courseCard/bgOc.svg" position="relative" />
 
-        <Flex flexDirection='column' alignItems='center' mt='-100'>
-          <Heading variant='headline2' mb='60px'>
+        <Flex flexDirection="column" alignItems="center" mt="-100">
+          <Heading variant="headline2" mb="60px">
             Our Courses
           </Heading>
-          <Box mb='100px'>
-            <InputGroup w='357px'>
+          <Box mb="100px">
+            <InputGroup w="357px">
               <Input
-                type='string'
-                placeholder='Search...'
-                pl='40px'
+                type="string"
+                placeholder="Search..."
+                pl="40px"
                 onChange={handleSearchTextChange}
                 value={keywords}
               />
               <InputLeftElement
-                pointerEvents='none'
-                children={<SearchIcon color='#646D89' />}
+                pointerEvents="none"
+                children={<SearchIcon color="#646D89" />}
               />
             </InputGroup>
           </Box>
@@ -104,20 +95,20 @@ function OurCourses() {
       <Center>
         {isLoading ? (
           <Spinner
-            thickness='4px'
-            speed='0.65s'
-            emptyColor='gray.200'
-            color='blue.500'
-            size='xl'
-            mb='187px'
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+            mb="187px"
           />
-        ) : typeof courses !== 'undefined' && courses.length > 0 ? (
+        ) : typeof courses !== "undefined" && courses.length > 0 ? (
           <Flex
-            flexDirection='row'
-            justifyContent='center'
-            mb='180px'
-            flexWrap='wrap'
-            w='100%'
+            flexDirection="row"
+            justifyContent="center"
+            mb="180px"
+            flexWrap="wrap"
+            w="100%"
           >
             {currentCourses.map((course, key) => {
               return (
@@ -136,42 +127,11 @@ function OurCourses() {
             })}
           </Flex>
         ) : (
-          <Text as='i' color='black' mb='187px'>
+          <Text as="i" color="black" mb="187px">
             Course not found
           </Text>
         )}
       </Center>
-<<<<<<< HEAD
-      <Flex
-        flexDirection='column'
-        alignItems='center'
-        justifyContent='center'
-        mb='5%'
-      >
-        <Box className='pagination'>
-          {page > 1 ? (
-            <Link
-              className='previous-button'
-              onClick={() => setPage(page - 1)}
-              mr='15px'
-            >
-              Previous
-            </Link>
-          ) : null}
-          {page} / {totalPages}
-          {page !== totalPages ? (
-            <Link
-              className='next-button'
-              onClick={() => setPage(page + 1)}
-              ml='15px'
-            >
-              Next
-            </Link>
-          ) : null}
-        </Box>
-      </Flex>
-      <PreFooter />
-=======
       {/* <Pagination 
           ourCoursesPage={ourCoursesPage}
           totalCourse={cardData.length}
@@ -183,11 +143,15 @@ function OurCourses() {
           totalCourses={courses.length}
           paginate={paginate}
           page={page} ></AntPaginate> */}
-          
-        <Pagination total={courses.length} current={page} pageSize={coursesPerPage} onChange={paginate}/>
+
+        <Pagination
+          total={courses.length}
+          current={page}
+          pageSize={coursesPerPage}
+          onChange={paginate}
+        />
       </Center>
 
->>>>>>> fix-sprint-1
       <Footer />
     </Box>
   );
