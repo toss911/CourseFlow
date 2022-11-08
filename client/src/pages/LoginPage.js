@@ -66,12 +66,8 @@ function LoginPage() {
         justifyContent="center"
         alignItems="center"
       >
-        <Flex
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Heading variant="headline2" color="blue.500">
+        <Flex flexDirection="column" alignItems="start" justifyContent="center">
+          <Heading variant="headline2" color="#22269E">
             Welcome Back!
           </Heading>
           <Formik
@@ -86,7 +82,12 @@ function LoginPage() {
                       <FormControl
                         isInvalid={form.errors.email && form.touched.email}
                       >
-                        <FormLabel variant="body2" color="black" pt="37px">
+                        <FormLabel
+                          variant="body2"
+                          color="black"
+                          pt="37px"
+                          mb="0"
+                        >
                           Email
                         </FormLabel>
                         <Input
@@ -108,7 +109,12 @@ function LoginPage() {
                           form.errors.password && form.touched.password
                         }
                       >
-                        <FormLabel variant="body2" color="black" pt="40px">
+                        <FormLabel
+                          variant="body2"
+                          color="black"
+                          pt="40px"
+                          mb="0px"
+                        >
                           Password
                         </FormLabel>
                         <Input

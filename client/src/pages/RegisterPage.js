@@ -96,6 +96,25 @@ function RegisterPage() {
       },
     },
     components: {
+      MuiCalendarPicker: {
+        styleOverrides: {
+          root: {
+            width: "258px",
+            height: "300px",
+            margin: 0,
+            overflowY: "hidden",
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            width: "258px",
+            height: "300px",
+            boxShadow: "2px 2px 12px rgba(64, 50, 133, 0.12)",
+          },
+        },
+      },
       MuiPickersCalendarHeader: {
         styleOverrides: {
           root: {
@@ -103,7 +122,7 @@ function RegisterPage() {
           },
           labelContainer: {
             fontWeight: 600,
-            fontSize: "16px",
+            fontSize: "14px",
           },
         },
       },
@@ -118,6 +137,8 @@ function RegisterPage() {
             fontSize: "14px",
             color: "#424C6B",
             fontWeight: 500,
+            width: "32px",
+            height: "32px",
           },
         },
       },
@@ -133,7 +154,39 @@ function RegisterPage() {
           root: {
             fontSize: "14px",
             fontWeight: 500,
-            "&&": { color: "#9AA1B9" },
+            "&&": { color: "#9AA1B9", width: "32px", height: "32px" },
+          },
+        },
+      },
+      MuiDayPicker: {
+        styleOverrides: {
+          header: {
+            width: "256px",
+          },
+          slideTransition: {
+            width: "256px",
+          },
+        },
+      },
+      MuiPickersArrowSwitcher: {
+        styleOverrides: {
+          spacer: {
+            width: "6px",
+          },
+        },
+      },
+      PrivatePickersYear: {
+        styleOverrides: {
+          button: {
+            fontSize: "14px",
+            color: "#424C6B",
+            "&:disabled": {
+              color: "rgba(0, 0, 0, 0.38)",
+              "&:hover": {
+                backgroundColor: "white",
+                cursor: "context-menu",
+              },
+            },
           },
         },
       },
@@ -236,6 +289,9 @@ function RegisterPage() {
                                 components={{
                                   OpenPickerIcon: CalendarIcon,
                                 }}
+                                PopperProps={{
+                                  placement: "bottom-end",
+                                }}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
@@ -249,7 +305,6 @@ function RegisterPage() {
                                         backgroundColor: "white",
                                         width: "453px",
                                         height: "48px",
-                                        paddingRight: "15px",
                                         color: "black",
                                         "input:first-of-type": {
                                           "&::placeholder": {
@@ -259,9 +314,10 @@ function RegisterPage() {
                                         },
                                       },
                                       "& .MuiInputBase-input": {
-                                        padding: "12px",
+                                        padding: "12px 0 12px 12px",
                                       },
                                       "& .MuiOutlinedInput-root": {
+                                        paddingRight: "20px",
                                         "& fieldset": {
                                           borderColor: "color.gray.400",
                                         },
@@ -280,19 +336,6 @@ function RegisterPage() {
                             </LocalizationProvider>
                           </ThemeProvider>
                         </label>
-                        {/* <Input
-                          color="gray.600"
-                          type="date"
-                          w="453px"
-                          h="48px"
-                          {...field}
-                          sx={{
-                            "::-webkit-calendar-picker-indicator": {
-                              background:
-                                "url('/assets/register-page/icons-calendar.svg')",
-                            },
-                          }}
-                        /> */}
                       </FormControl>
                     )}
                   </Field>
