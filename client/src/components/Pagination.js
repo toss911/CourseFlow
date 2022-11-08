@@ -1,19 +1,14 @@
-import React from "react";
-const Pagination = ({ ourCoursesPage, totalCourse}) => {
-    const pageNumber =[];
+// import React from "react";
+// import { Flex, List, ListItem, Box, Button } from "@chakra-ui/react";
+// import { Pagination } from 'antd';
 
-    for(let i = 1; i <= Math.ceil(totalCourse / ourCoursesPage); i++){
-        pageNumber.push(i);
-    }
-    return(
-        <nav className="pagination">
-        {pageNumber.map(number =>(
-            <li key={number} className ='page-item'>
-                <a href ='!#' className='page-link'>{number}</a>
-            </li>
-        ))}
-        </nav>
-    )
-}
+// const AntPaginate = ( {coursesPerPage,
+//     totalCourses,
+//     paginate,
+//     page} ) => {
+//     return (
+//         <Pagination total={totalCourses} current={page} pageSize={coursesPerPage} onChange={paginate} />
+//     )
+// }
 
-export default Pagination;
+// export default AntPaginate;

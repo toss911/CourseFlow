@@ -1,31 +1,29 @@
 import { useState } from "react";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/authentication";
+import { useNavigate, useParams } from "react-router-dom";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
-  const [course, setCourse] = useState(null);
+  const [course, setCourse] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-
   const navigate = useNavigate();
-
-  const { contextState, setContextState } = useAuth();
+  const params = useParams();
 
   const getCourses = async (input) => {
     const { keywords, page } = input;
     try {
       const params = new URLSearchParams();
       params.append("keywords", keywords);
-      // params.append("page", page);
+      params.append("page", page);
       setIsError(false);
       const results = await axios.get(
         `http://localhost:4000/courses?${params.toString()}`
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
       setCourses(results.data.data);
+      console.log(results)
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -37,12 +35,13 @@ const useCourses = () => {
     try {
       setIsError(false);
       setIsLoading(true);
+      //navigate(`/courses/:${courseId}`);
       const result = await axios.get(
-        `http://localhost:4000/courses/${courseId}`
+        `http://localhost:4000/courses/${params.courseId}`
       );
       setCourse(result.data.data);
       setIsLoading(false);
-      navigate("/"); // check again if the path is correct
+      //navigate("/"); // check again if the path is correct
     } catch (error) {
       setIsError(true);
       setIsLoading(false);

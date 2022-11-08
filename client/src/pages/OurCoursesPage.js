@@ -3,7 +3,10 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PreFooter } from "../components/PreFooter";
-import Pagination from "../components/Pagination";
+// import AntPaginate from "../components/Pagination.js";
+import { Pagination } from 'antd';
+import "antd/dist/antd.css";
+// import Pagination from "../components/Pagination";
 import { useEffect, useState, useCallback } from "react";
 import {
   Box,
@@ -25,6 +28,7 @@ import useCourses from "../hooks/useCourses";
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
+  const [coursesPerPage, setCoursesPerPage] = useState(5);
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
@@ -43,6 +47,17 @@ function OurCourses() {
     return () => clearTimeout(getData);
   }, [keywords, page]);
 
+  // Get current posts
+  const indexOfLastCourse = page * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+
+  // Change page
+  const paginate = (pageNumber) => {setPage(pageNumber)
+    window.scrollTo(0, 150);
+  };
+  
   return (
     <Box>
       <Navbar />
@@ -89,7 +104,7 @@ function OurCourses() {
             flexWrap="wrap"
             w="100%"
           >
-            {courses.map((course, key) => {
+            {currentCourses.map((course, key) => {
               return (
                 <CourseCard
                   key={key}
@@ -117,6 +132,15 @@ function OurCourses() {
           paginate={paginate}
         />
       <PreFooter/> */}
+      <Center mb="20">
+        {/* <AntPaginate coursesPerPage={coursesPerPage}
+          totalCourses={courses.length}
+          paginate={paginate}
+          page={page} ></AntPaginate> */}
+          
+        <Pagination total={courses.length} current={page} pageSize={coursesPerPage} onChange={paginate}/>
+      </Center>
+
       <Footer />
     </Box>
   );
