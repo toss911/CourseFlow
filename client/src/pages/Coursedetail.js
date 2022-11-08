@@ -1,14 +1,14 @@
-import { Flex, Box, Image, Text, Heading, Link } from '@chakra-ui/react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
-import { CourseCard } from '../components/CourseCard';
-import { PreFooter } from '../components/PreFooter';
-import { ModuleSample } from '../components/ModuleSample';
-import { PriceCard } from '../components/PriceCard';
-import { useEffect } from 'react';
-import useCourses from '../hooks/useCourses';
-import { useNavigate } from 'react-router-dom';
+import { Flex, Box, Image, Text, Heading, Link } from "@chakra-ui/react";
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import { Navbar } from "../components/Navbar";
+import { Footer } from "../components/Footer";
+import { CourseCard } from "../components/CourseCard";
+import { PreFooter } from "../components/PreFooter";
+import { ModuleSample } from "../components/ModuleSample";
+import { PriceCard } from "../components/PriceCard";
+import { useEffect } from "react";
+import useCourses from "../hooks/useCourses";
+import { useNavigate } from "react-router-dom";
 
 function CourseDetail() {
   const { getCoursesbyId, course, category } = useCourses();
@@ -16,7 +16,7 @@ function CourseDetail() {
   useEffect(() => {
     getCoursesbyId();
   }, []);
-  console.log('category: ', category);
+  console.log("category: ", category);
   //console.log("course: ", course);
 
   const navigate = useNavigate();
@@ -25,37 +25,37 @@ function CourseDetail() {
     <>
       <Navbar />
       {/* <NavbarLogin /> */}
-      <Box display='flex' pl='160px'>
-        <Text mt='59px' mb='5px' color='blue.500' fontSize='16px'>
-          <Link pl='12px' onClick={() => navigate('/courses')}>
-            <ArrowBackIcon mr='10px' color='blue.500' />
+      <Box display="flex" pl="160px">
+        <Text mt="59px" mb="5px" color="blue.500" fontSize="16px">
+          <Link pl="12px" onClick={() => navigate("/courses")}>
+            <ArrowBackIcon mr="10px" color="blue.500" />
             Back
           </Link>
         </Text>
       </Box>
 
       <Box
-        w='100vw'
-        pt='15px'
-        pl='160px'
-        display='flex'
-        flexDirection='column'
-        position='relative'
+        w="100vw"
+        pt="15px"
+        pl="160px"
+        display="flex"
+        flexDirection="column"
+        position="relative"
       >
         <Image
-          src='/assets/CourseDetail/Course1.svg'
-          alt='Course picture'
-          h='460px'
-          w='739px'
-          display='flex'
-          position='absolute'
+          src="/assets/CourseDetail/Course1.svg"
+          alt="Course picture"
+          h="460px"
+          w="739px"
+          display="flex"
+          position="absolute"
         />
         <Box
-          display='flex'
-          top='0'
-          position='sticky'
-          pr='160px'
-          alignSelf='end'
+          display="flex"
+          top="0"
+          position="sticky"
+          pr="160px"
+          alignSelf="end"
         >
           {course.map((course, key) => {
             if (key === 0) {
@@ -76,38 +76,38 @@ function CourseDetail() {
             return (
               <Box
                 key={key}
-                display='flex'
-                flexDirection='column'
-                w='548px'
-                gap='24px'
+                display="flex"
+                flexDirection="column"
+                w="548px"
+                gap="24px"
               >
-                <Heading variant='headline2' color='black' mt='100px'>
+                <Heading variant="headline2" color="black" mt="150px">
                   Course Detail
                 </Heading>
-                <Text variants='body2' w='739px' mt='10px'>
+                <Text variants="body2" w="739px" mt="10px">
                   {course.detail}
                 </Text>
               </Box>
             );
           }
         })}
-        <Heading mt='100px' color='black' mb='20px' variant='headline2'>
+        <Heading mt="100px" color="black" mb="20px" variant="headline2">
           Module Samples
         </Heading>
         <ModuleSample />
         {/* //ModuleSample Below// */}
       </Box>
       <Box
-        display='flex'
-        flexDirection='column'
-        alignItems='center'
-        backgroundColor='gray.100'
-        mt='169px'
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        backgroundColor="gray.100"
+        mt="169px"
       >
-        <Heading variant='headline2' color='black' mt='121px'>
+        <Heading variant="headline2" color="black" mt="121px">
           Other Interesting Courses
         </Heading>
-        <Flex pb='50px'>
+        <Flex pb="50px">
           {category.map((category, key) => {
             if (key < 3) {
               return (

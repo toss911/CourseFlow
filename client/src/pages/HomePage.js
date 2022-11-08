@@ -304,7 +304,7 @@ function HomePage() {
       <Flex mt="105px" flexDirection="column" align="center" justify="center">
         <Flex position="relative">
           <Heading w="100%" variant="headline2" color="black">
-            Our Professional Intructor
+            Our Professional Instructor
           </Heading>
           <Image
             src="/assets/landing-page/instructor/triangle.svg"
