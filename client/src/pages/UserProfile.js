@@ -24,14 +24,20 @@ import "../index.css";
 import { Upload } from "antd";
 import ImgCrop from "antd-img-crop";
 import { useAuth } from "../contexts/authentication";
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import CalendarIcon from "../components/CalendarIcon";
 
 function UserProfile() {
-
   // --------------------------------------------States--------------------------------------------//
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
   const [userCurrInfo, setUserCurrInfo] = useState([]);
   const [avatar, setAvatar] = useState({});
+  console.log("userCurrInfo: ", userCurrInfo);
 
   // --------------------------------------------Ant Design functions--------------------------------------------//
   const [fileList, setFileList] = useState([{}]);
@@ -54,18 +60,18 @@ function UserProfile() {
   };
 
   // --------------------------------------------End of Ant Design functions--------------------------------------------//
-  
+
   // --------------------------------------------Other Functions--------------------------------------------//
-  
+
   // GET user's profile information to display on page
   const getProfile = async () => {
     try {
-        const result = await axios.get(`http://localhost:4000/user/${userId}`)
-        setUserCurrInfo(result.data.data);
+      const result = await axios.get(`http://localhost:4000/user/${userId}`);
+      setUserCurrInfo(result.data.data);
     } catch (err) {
-        alert(`ERROR: Please try again later`);
-    } 
-}
+      alert(`ERROR: Please try again later`);
+    }
+  };
   // UPDATE user's profile information
   const updateProfile = async (userId, updatedData) => {
     try {
@@ -98,7 +104,8 @@ function UserProfile() {
       props.setFieldError("email", "This email already has an account");
     }
 
-  }
+    await updateProfile(userId, formData);
+  };
 
   // --------------------------------------------End of other functions--------------------------------------------//
 
@@ -107,29 +114,13 @@ function UserProfile() {
   }, []);
 
   // ------------------------------------------validation------------------------------------------------//
-  
+
   const validateName = (value) => {
     let error;
     if (!value) {
       error = "Name is required";
     } else if (!/^[a-z ,.'-]+$/i.test(value)) {
       error = `Name must only contain alphabets and some special characters (e.g., comma, dot, apostrophe, and hyphen)`;
-    }
-    return error;
-  };
-
-  const validateBirthdate = (value) => {
-    let error;
-    if (!value) {
-      error = "Birthdate is required";
-    }
-    return error;
-  };
-
-  const validateEducation = (value) => {
-    let error;
-    if (!value) {
-      error = "Educational background is required";
     }
     return error;
   };
@@ -145,6 +136,125 @@ function UserProfile() {
   };
 
   // ------------------------------------------End of validation------------------------------------------------//
+
+  // ----------------- Calendar Styling -------------------//
+  const theme = createTheme({
+    palette: {
+      color: {
+        gray: {
+          400: "#D6D9E4",
+          600: "#9AA1B9",
+          800: "#424C6B",
+        },
+        orange: {
+          500: "#F47E20",
+        },
+      },
+      text: {
+        primary: "#173A5E",
+        secondary: "#46505A",
+      },
+      action: {
+        active: "#001E3C",
+      },
+    },
+    components: {
+      MuiCalendarPicker: {
+        styleOverrides: {
+          root: {
+            width: "258px",
+            height: "300px",
+            margin: 0,
+            overflowY: "hidden",
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            width: "258px",
+            height: "300px",
+            boxShadow: "2px 2px 12px rgba(64, 50, 133, 0.12)",
+          },
+        },
+      },
+      MuiPickersCalendarHeader: {
+        styleOverrides: {
+          root: {
+            color: "#424C6B",
+          },
+          labelContainer: {
+            fontWeight: 600,
+            fontSize: "14px",
+          },
+        },
+      },
+      MuiPickersDay: {
+        styleOverrides: {
+          today: {
+            "&:not(.Mui-selected)": {
+              border: "1px solid #5483D0",
+            },
+          },
+          root: {
+            fontSize: "14px",
+            color: "#424C6B",
+            fontWeight: 500,
+            width: "32px",
+            height: "32px",
+          },
+        },
+      },
+      MuiTouchRipple: {
+        styleOverrides: {
+          root: {
+            fontSize: "30px",
+          },
+        },
+      },
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            fontSize: "14px",
+            fontWeight: 500,
+            "&&": { color: "#9AA1B9", width: "32px", height: "32px" },
+          },
+        },
+      },
+      MuiDayPicker: {
+        styleOverrides: {
+          header: {
+            width: "256px",
+          },
+          slideTransition: {
+            width: "256px",
+          },
+        },
+      },
+      MuiPickersArrowSwitcher: {
+        styleOverrides: {
+          spacer: {
+            width: "6px",
+          },
+        },
+      },
+      PrivatePickersYear: {
+        styleOverrides: {
+          button: {
+            fontSize: "14px",
+            color: "#424C6B",
+            "&:disabled": {
+              color: "rgba(0, 0, 0, 0.38)",
+              "&:hover": {
+                backgroundColor: "white",
+                cursor: "context-menu",
+              },
+            },
+          },
+        },
+      },
+    },
+  });
 
   return (
     <Box>
@@ -191,12 +301,13 @@ function UserProfile() {
             >
               <Formik
                 initialValues={{
-                  full_name: "",
-                  birthdate: "",
-                  education: "",
-                  email: "",
+                  full_name: userCurrInfo.full_name,
+                  birthdate: userCurrInfo.birthdate || null,
+                  education: userCurrInfo.education,
+                  email: userCurrInfo.email,
                   avatar: {},
                 }}
+                enableReinitialize
                 onSubmit={handleSubmit}
               >
                 {(props) => (
@@ -222,7 +333,7 @@ function UserProfile() {
                               type="text"
                               w="453px"
                               h="48px"
-                              placeholder={userCurrInfo.full_name}
+                              placeholder="Enter First Name and Last Name"
                               {...field}
                             />
                             <FormErrorMessage>
@@ -233,61 +344,96 @@ function UserProfile() {
                       </Field>
 
                       {/* //-------------------------- Input Date --------------------// */}
-                      <Field name="birthdate" validate={validateBirthdate}>
+                      <Field name="birthdate">
                         {({ field, form }) => (
-                          <FormControl
-                            isInvalid={
-                              form.errors.birthdate && form.touched.birthdate
-                            }
-                            isRequired
-                          >
-                            <FormLabel variant="body2" color="black" pt="20px">
-                              Date of Birth
-                            </FormLabel>
-                            <InputGroup>
-                              <Input
-                                color="#9AA1B9"
-                                type="date"
-                                w="453px"
-                                h="48px"
-                                placeholder={userCurrInfo.birthdate}
-                                {...field}
-                                sx={{
-                                  "::-webkit-calendar-picker-indicator": {
-                                    background:
-                                      "url('/assets/register-page/icons-calendar.svg')",
-                                  },
-                                }}
-                              />
-                            </InputGroup>
-                            <FormErrorMessage>
-                              {form.errors.birthdate}
-                            </FormErrorMessage>
+                          <FormControl>
+                            <label>
+                              <Text
+                                variant="body2"
+                                color="black"
+                                m="40px 12px 8px 0px"
+                              >
+                                Date of Birth
+                              </Text>
+                              <ThemeProvider theme={theme}>
+                                <LocalizationProvider
+                                  dateAdapter={AdapterDayjs}
+                                >
+                                  <DatePicker
+                                    inputFormat="DD/MM/YYYY"
+                                    minDate="01/01/1900"
+                                    disableFuture
+                                    value={field.value}
+                                    onChange={(newValue) => {
+                                      form.setFieldValue("birthdate", newValue);
+                                    }}
+                                    components={{
+                                      OpenPickerIcon: CalendarIcon,
+                                    }}
+                                    PopperProps={{
+                                      placement: "bottom-end",
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        inputProps={{
+                                          ...params.inputProps,
+                                          placeholder: "DD/MM/YYYY",
+                                        }}
+                                        sx={{
+                                          "& .MuiInputBase-root": {
+                                            borderRadius: "8px",
+                                            backgroundColor: "white",
+                                            width: "453px",
+                                            height: "48px",
+                                            color: "black",
+                                            "input:first-of-type": {
+                                              "&::placeholder": {
+                                                opacity: 1,
+                                                color: "color.gray.600",
+                                              },
+                                            },
+                                          },
+                                          "& .MuiInputBase-input": {
+                                            padding: "12px 0 12px 12px",
+                                          },
+                                          "& .MuiOutlinedInput-root": {
+                                            paddingRight: "20px",
+                                            "& fieldset": {
+                                              borderColor: "color.gray.400",
+                                            },
+                                            "&:hover fieldset": {
+                                              borderColor: "color.gray.400",
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                              border: "solid 1px",
+                                              borderColor: "color.orange.500",
+                                            },
+                                          },
+                                        }}
+                                      />
+                                    )}
+                                  />
+                                </LocalizationProvider>
+                              </ThemeProvider>
+                            </label>
                           </FormControl>
                         )}
                       </Field>
                       {/* //---------------------- Input Educational --------------------// */}
-                      <Field name="education" validate={validateEducation}>
+                      <Field name="education">
                         {({ field, form }) => (
-                          <FormControl
-                            isInvalid={
-                              form.errors.education && form.touched.education
-                            }
-                            isRequired
-                          >
-                            <FormLabel variant="body2" color="black" mt="20px">
+                          <FormControl>
+                            <FormLabel variant="body2" color="black" mt="40px">
                               Educational Background
                             </FormLabel>
                             <Input
                               type="text"
                               w="453px"
                               h="48px"
-                              placeholder={userCurrInfo.education}
+                              placeholder="Enter Educational Background"
                               {...field}
                             />
-                            <FormErrorMessage>
-                              {form.errors.education}
-                            </FormErrorMessage>
                           </FormControl>
                         )}
                       </Field>
@@ -305,7 +451,7 @@ function UserProfile() {
                               type="email"
                               w="453px"
                               h="48px"
-                              placeholder={userCurrInfo.email}
+                              placeholder="Enter Email"
                               {...field}
                             />
                             <FormErrorMessage>
