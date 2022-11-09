@@ -21,17 +21,20 @@ import { PreFooter } from "../components/PreFooter";
 import { PriceCard } from "../components/PriceCard";
 import { useEffect } from "react";
 import useCourses from "../hooks/useCourses";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/authentication.js";
 
 function CourseDetail() {
   const { getCoursesbyId, course, category } = useCourses();
 
+  const { isAuthenticated, setContextState, contextState } = useAuth();
   const navigate = useNavigate();
-  const { courseId } = useParams();
+  const location = useLocation();
 
   useEffect(() => {
     getCoursesbyId();
-  }, [courseId]);
+    setContextState({ ...contextState, previousUrl: location.pathname });
+  }, [location]);
 
   // Stored data for mapping in module samples section
   let allLessons = {};
@@ -71,41 +74,27 @@ function CourseDetail() {
           w="739px"
           position="absolute"
         />
-        <Box position="sticky" top="0px" ml="739px">
-          {course.map((course, key) => {
-            if (key === 0) {
-              return (
-                <PriceCard
-                  key={key}
-                  courseName={course.course_name}
-                  courseContent={course.summary}
-                  coursePrice={course.price}
-                />
-              );
-            }
-          })}
-        </Box>
 
-        {course.map((course, key) => {
-          if (key === 0) {
-            return (
-              <Box
-                key={key}
-                display="flex"
-                flexDirection="column"
-                w="548px"
-                gap="24px"
-              >
-                <Heading variant="headline2" color="black" mt="150px">
-                  Course Detail
-                </Heading>
-                <Text variants="body2" w="739px" mt="10px">
-                  {course.detail}
-                </Text>
-              </Box>
-            );
-          }
-        })}
+        {typeof course !== "undefined" && course.length > 0 ? (
+          <>
+            <Box position="sticky" top="0px" ml="739px">
+              <PriceCard
+                courseName={course[0].course_name}
+                courseContent={course[0].summary}
+                coursePrice={course[0].price}
+              />
+            </Box>
+            <Box display="flex" flexDirection="column" w="548px" gap="24px">
+              <Heading variant="headline2" color="black" mt="150px">
+                Course Detail
+              </Heading>
+              <Text variants="body2" w="739px" mt="10px">
+                {course[0].detail}
+              </Text>
+            </Box>
+          </>
+        ) : null}
+
         <Heading mt="100px" color="black" mb="20px" variant="headline2">
           Module Samples
         </Heading>
@@ -191,7 +180,7 @@ function CourseDetail() {
           </Text>
         )}
       </Box>
-      <PreFooter />
+      {!isAuthenticated ? <PreFooter /> : null}
       <Footer />
     </>
   );

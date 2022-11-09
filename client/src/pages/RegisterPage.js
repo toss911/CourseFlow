@@ -425,9 +425,8 @@ function RegisterPage() {
           </Formik>
         </Flex>
       </Flex>
-      {/* <Button onClick={onOpen}>Open Modal</Button> */}
       <Modal
-        // isCentered
+        isCentered
         isOpen={isOpen}
         onClose={onClose}
         onCloseComplete={() => navigate("/login")}
@@ -436,23 +435,18 @@ function RegisterPage() {
         <ModalOverlay />
         <ModalContent borderRadius="24px">
           <ModalHeader
-            bg="#2FAC8E"
+            bg="blue.500"
             color="white"
             textAlign="center"
             borderRadius="24px 24px 0px 0px"
+            fontSize="1.5rem"
           >
             <CheckCircleIcon mr="0.5em" />
             Success
           </ModalHeader>
-          <ModalBody textAlign="center" mt="1em" color="black">
+          <ModalBody textAlign="center" mt="1em" color="black" fontSize="1rem">
             Your account has been successfully created.
-            <Button
-              m="1em"
-              variant="success"
-              mr={3}
-              onClick={onClose}
-              borderRadius="12px"
-            >
+            <Button m="1em" variant="success" mr={3} onClick={onClose}>
               Continue
             </Button>
           </ModalBody>
