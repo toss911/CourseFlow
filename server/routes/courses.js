@@ -55,23 +55,42 @@ coursesRouter.get("/:courseId", async (req, res) => {
     [courseId]
   );
 
-  const subscriptions = await pool.query(
-    `SELECT *
-    FROM users
-        INNER JOIN subscriptions
-        ON users.user_id = subscriptions.user_id
-        INNER JOIN courses
-        ON subscriptions.course_id = courses.course_id
-        where course_id=$1
-        `,
-    [courseId]
-  );
   return res.json({
     data: results.rows,
     dataCategory: filterCategory.rows,
     dataFiles: files.rows,
-    dataSubscriptions: subscriptions.rows,
   });
+});
+
+coursesRouter.post("/:courseId", async (req, res) => {
+  try {
+    const newSubscription = {
+      ...req.body,
+    };
+    const subscriptions = await pool.query(
+      `SELECT *
+    FROM subscriptions
+        where course_id=$1 and user_id=$2
+        `,
+      [courseId, newSubscription.user_id]
+    );
+    await pool.query(
+      `
+        insert into subscriptions(user_id,course_id,status) values($1,$2,$3)`,
+      [
+        newSubscription.user_id,
+        newSubscription.course_id,
+        newSubscription.status,
+      ]
+    );
+
+    return res.json({
+      message: "Subscription successfully",
+      dataSubscription: subscriptions.rows,
+    });
+  } catch (error) {
+    return error;
+  }
 });
 
 export default coursesRouter;
