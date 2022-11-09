@@ -84,17 +84,19 @@ function UserProfile() {
   };
 
   // handleSubmit function
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, props) => {
     const formData = new FormData();
-
-    // values.avatar = fileList;
     formData.append("full_name", values.full_name);
     formData.append("birthdate", values.birthdate);
     formData.append("education", values.education);
     formData.append("email", values.email);
     formData.append("avatar", fileList[0].originFileObj);
   
-    await updateProfile(userId, formData);
+    const result = await updateProfile(userId, formData);
+    console.log(result);
+    if (result == undefined) {
+      props.setFieldError("email", "This email already has an account");
+    }
 
   }
 
