@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./HomePage.js";
 import OurCourses from "./OurCoursesPage.js";
-import CourseDetail from "./Coursedetail.js";
+import CourseDetail from "./CourseDetailPage.js";
 import UserProfile from "./UserProfile.js";
 
 function AuthenticatedApp() {

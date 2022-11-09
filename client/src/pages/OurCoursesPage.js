@@ -2,12 +2,9 @@ import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
-import { PreFooter } from "../components/PreFooter";
-// import AntPaginate from "../components/Pagination.js";
 import { Pagination } from "antd";
 import "antd/dist/antd.css";
-// import Pagination from "../components/Pagination";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Image,
@@ -22,16 +19,12 @@ import {
   Center,
   Spinner,
 } from "@chakra-ui/react";
-// import { cardData } from "../data/cardData.js";
 import useCourses from "../hooks/useCourses";
-import { useNavigate } from "react-router-dom";
 
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
   const [coursesPerPage, setCoursesPerPage] = useState(12);
-
-  const navigate = useNavigate();
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
@@ -133,18 +126,7 @@ function OurCourses() {
           </Text>
         )}
       </Center>
-      {/* <Pagination 
-          ourCoursesPage={ourCoursesPage}
-          totalCourse={cardData.length}
-          paginate={paginate}
-        />
-      <PreFooter/> */}
       <Center mb="20">
-        {/* <AntPaginate coursesPerPage={coursesPerPage}
-          totalCourses={courses.length}
-          paginate={paginate}
-          page={page} ></AntPaginate> */}
-
         <Pagination
           total={courses.length}
           current={page}

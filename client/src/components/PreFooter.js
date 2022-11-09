@@ -26,7 +26,7 @@ export function PreFooter() {
           top="125px"
           left="161px"
         >
-          <Heading variant="headline2" pb="44px">
+          <Heading variant="headline2" pb="44px" color="white">
             Interested in Becoming <br />a Software Developer?
           </Heading>
           <Button

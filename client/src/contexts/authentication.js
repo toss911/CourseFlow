@@ -10,7 +10,9 @@ function AuthProvider(props) {
     isLoading: false,
     isError: false,
     user: null,
+    previousUrl: null,
   });
+  console.log("contextState: ", contextState);
 
   const navigate = useNavigate();
 
@@ -45,7 +47,11 @@ function AuthProvider(props) {
         localStorage.setItem("token", token);
         const userDataFromToken = jwtDecode(token);
         setContextState({ ...contextState, user: userDataFromToken });
-        navigate("/");
+        if (contextState.previousUrl) {
+          navigate(contextState.previousUrl);
+        } else {
+          navigate("/");
+        }
       } else {
         return result.data.message;
       }
