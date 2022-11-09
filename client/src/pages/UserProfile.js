@@ -92,15 +92,8 @@ function UserProfile() {
     formData.append("birthdate", values.birthdate);
     formData.append("education", values.education);
     formData.append("email", values.email);
-
-    const uniqueId = Date.now();
-    setAvatar({...avatar, [uniqueId]: fileList[0]});
-    formData.append("avatar", JSON.stringify(avatar));
-    console.log(avatar);
-    // formData.append("avatar", fileList);
-    console.log(formData.get("full_name"));
-    console.log(formData.get("avatar"));
-    console.log(fileList);
+    formData.append("avatar", fileList[0].originFileObj);
+  
     await updateProfile(userId, formData);
 
   }
