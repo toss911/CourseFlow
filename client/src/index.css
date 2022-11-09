@@ -7,3 +7,28 @@
 html {
   overflow-x: hidden;
 }
+
+/* .upload-list-inline .ant-upload-list-item {
+  width: 150px;
+  height: 400px;
+} */
+
+/* .ant-upload-list-picture-card .ant-upload-list-item {
+  width: 250%;
+  margin: 0;
+}
+
+
+/* .ant-upload-list-picture-card-container {
+  display: inline-block;
+  width: 300px;
+  height: 500px;
+  margin: 0 8px 8px 0;
+  vertical-align: top;
+} */
+
+/* .ant-upload-list-picture-card .ant-upload-list-item {
+  height: 250%;
+  margin: 0;
+}  */
+
