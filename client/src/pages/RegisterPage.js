@@ -446,13 +446,7 @@ function RegisterPage() {
           </ModalHeader>
           <ModalBody textAlign="center" mt="1em" color="black" fontSize="1rem">
             Your account has been successfully created.
-            <Button
-              m="1em"
-              variant="success"
-              mr={3}
-              onClick={onClose}
-              borderRadius="12px"
-            >
+            <Button m="1em" variant="success" mr={3} onClick={onClose}>
               Continue
             </Button>
           </ModalBody>
