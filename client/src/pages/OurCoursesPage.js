@@ -11,9 +11,7 @@ import {
   Flex,
   Text,
   Heading,
-  Button,
   Input,
-  Link,
   InputLeftElement,
   InputGroup,
   Center,
@@ -30,16 +28,7 @@ function OurCourses() {
     setKeywords(event.target.value);
   };
 
-  const {
-    getCourses,
-    courses,
-    getCoursesbyId,
-    isLoading,
-    setIsLoading,
-    totalPages,
-  } = useCourses();
-
-  const noCourse = typeof courses !== "undefined" && courses > 0;
+  const { getCourses, courses, isLoading, setIsLoading } = useCourses();
 
   useEffect(() => {
     setIsLoading(true);

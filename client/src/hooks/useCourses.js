@@ -31,7 +31,7 @@ const useCourses = () => {
     }
   };
 
-  const getCoursesbyId = async (courseId) => {
+  const getCoursesbyId = async () => {
     try {
       setIsError(false);
       setIsLoading(true);

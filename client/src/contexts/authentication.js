@@ -12,7 +12,6 @@ function AuthProvider(props) {
     user: null,
     previousUrl: null,
   });
-  console.log("contextState: ", contextState);
 
   const navigate = useNavigate();
 
