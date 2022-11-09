@@ -1,6 +1,5 @@
 import {
   Box,
-  Center,
   Text,
   Button,
   Divider,
@@ -11,9 +10,8 @@ import {
   ModalHeader,
   ModalBody,
   useDisclosure,
-  Spinner,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -21,13 +19,7 @@ import axios from "axios";
 export const PriceCard = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuthenticated, contextState } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-
-  // subscribeStatus: true => already subscribed, false => no
-  // addStatus: true => already added, false => no
-  const [subscribeStatus, setSubscribeStatus] = useState(null);
-  const [addStatus, setAddStatus] = useState(null);
 
   const navigate = useNavigate();
 
@@ -35,7 +27,7 @@ export const PriceCard = (props) => {
     setIsButtonLoading(true);
     // if "addStatus" is true => remove from desired course
     // if "addStatus" is false => add to desired course
-    if (!addStatus) {
+    if (!props.addStatus) {
       const result = await axios.post(
         `http://localhost:4000/courses/${props.courseId}`,
         {
@@ -45,7 +37,7 @@ export const PriceCard = (props) => {
       );
       if (/successfully added/g.test(result.data.message)) {
         // setAddStatus from false to true
-        setAddStatus(!addStatus);
+        props.setAddStatus(!props.addStatus);
       }
     } else {
       const result = await axios.post(
@@ -57,7 +49,7 @@ export const PriceCard = (props) => {
       );
       if (/successfully deleted/g.test(result.data.message)) {
         // setAddStatus from true to false
-        setAddStatus(!addStatus);
+        props.setAddStatus(!props.addStatus);
       }
     }
     setIsButtonLoading(false);
@@ -65,7 +57,7 @@ export const PriceCard = (props) => {
 
   const handleSubscribe = async () => {
     setIsButtonLoading(true);
-    if (!subscribeStatus) {
+    if (!props.subscribeStatus) {
       const result = await axios.post(
         `http://localhost:4000/courses/${props.courseId}`,
         {
@@ -75,38 +67,12 @@ export const PriceCard = (props) => {
       );
       if (/successfully subscribed/g.test(result.data.message)) {
         // setSubscribeStatus from false to true
-        setSubscribeStatus(!subscribeStatus);
+        props.setSubscribeStatus(!props.subscribeStatus);
         onClose();
       }
     }
     setIsButtonLoading(false);
   };
-
-  // getData function is for querying subscription/desired courses of a user
-  const getData = async () => {
-    setIsLoading(true);
-    const result = await axios.post(
-      `http://localhost:4000/courses/${props.courseId}`,
-      {
-        user_id: contextState.user.user_id,
-      }
-    );
-    if (result.data.subscribeStatus) {
-      setSubscribeStatus(true);
-    } else {
-      setSubscribeStatus(false);
-    }
-    if (result.data.desireStatus) {
-      setAddStatus(true);
-    } else {
-      setAddStatus(false);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   return (
     <Box
@@ -135,17 +101,7 @@ export const PriceCard = (props) => {
       </Text>
       <Divider borderColor="gray.300" />
       <Box display="flex" flexDirection="column" gap="16px" w="309px">
-        {isLoading ? (
-          <Center>
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="xl"
-            />
-          </Center>
-        ) : subscribeStatus ? (
+        {props.subscribeStatus ? (
           <Button
             variant="primary"
             onClick={() => navigate(`/learning/${props.courseId}`)}
@@ -165,7 +121,7 @@ export const PriceCard = (props) => {
                 }
               }}
             >
-              {addStatus
+              {props.addStatus
                 ? `Remove from Desired Course`
                 : `Get In Desire Course`}
             </Button>

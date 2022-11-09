@@ -19,16 +19,16 @@ import {
 } from "@chakra-ui/react";
 import useCourses from "../hooks/useCourses";
 
+const coursesPerPage = 12;
+
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
-  const [coursesPerPage, setCoursesPerPage] = useState(12);
+  const { getCourses, courses, isLoading, setIsLoading } = useCourses();
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
   };
-
-  const { getCourses, courses, isLoading, setIsLoading } = useCourses();
 
   useEffect(() => {
     setIsLoading(true);

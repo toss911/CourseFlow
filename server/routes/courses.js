@@ -31,38 +31,65 @@ coursesRouter.get("/", async (req, res) => {
 coursesRouter.get("/:courseId", async (req, res) => {
   try {
     const courseId = req.params.courseId;
-    const results = await pool.query(
-      `SELECT *
-        FROM courses
-        INNER JOIN lessons 
-        ON courses.course_id = lessons.course_id
-        INNER JOIN sub_lessons 
-        ON lessons.lesson_id = sub_lessons.lesson_id
-        where courses.course_id=$1`,
+    let course_data = await pool.query(
+      `
+      SELECT *
+      FROM courses
+      WHERE course_id = $1`,
       [courseId]
     );
-    const nameCategory = results.rows[0].category;
+    course_data = course_data.rows[0];
+
+    const lessons = await pool.query(
+      `
+      SELECT lessons.lesson_name, sub_lessons.sub_lesson_name
+      FROM courses
+      INNER JOIN lessons 
+      ON courses.course_id = lessons.course_id
+      INNER JOIN sub_lessons 
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      WHERE courses.course_id=$1`,
+      [courseId]
+    );
+
+    course_data.lessons = {};
+    lessons.rows.map((lesson) => {
+      if (lesson.lesson_name in course_data.lessons) {
+        course_data.lessons[lesson.lesson_name].push(lesson.sub_lesson_name);
+      } else {
+        course_data.lessons[lesson.lesson_name] = [];
+        course_data.lessons[lesson.lesson_name].push(lesson.sub_lesson_name);
+      }
+    });
 
     const filterCategory = await pool.query(
-      `SELECT *
-        FROM courses
-        WHERE category = $1 AND course_id != $2
-        ORDER BY random()
-        limit 3`,
-      [nameCategory, courseId]
+      `
+      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id) as lessons_count
+      FROM courses
+      INNER JOIN lessons
+      ON courses.course_id = lessons.course_id
+      WHERE courses.category = $1 AND courses.course_id != $2
+      GROUP BY courses.course_id
+      ORDER BY random()
+      limit 3`,
+      [course_data.category, courseId]
     );
 
     const files = await pool.query(
-      `SELECT *
-        FROM files
-        where course_id=$1`,
+      `
+      SELECT file_name, size, directory
+      FROM files
+      where course_id=$1`,
       [courseId]
     );
+    course_data.files = [];
+    files.rows.map((file) => {
+      course_data.files.push(file);
+    });
 
     return res.json({
-      data: results.rows,
-      dataCategory: filterCategory.rows,
-      dataFiles: files.rows,
+      data: JSON.stringify(course_data),
+      dataCategory: JSON.stringify(filterCategory.rows),
     });
   } catch (error) {
     return res.sendStatus(500);

@@ -4,23 +4,21 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
-  const [course, setCourse] = useState([]);
+  const [course, setCourse] = useState({});
   const [category, setCategory] = useState([]);
-  const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-  const navigate = useNavigate();
   const params = useParams();
 
   const getCourses = async (input) => {
-    const { keywords, page } = input;
     try {
-      const params = new URLSearchParams();
-      params.append("keywords", keywords);
-      params.append("page", page);
+      const { keywords, page } = input;
+      const query = new URLSearchParams();
+      query.append("keywords", keywords);
+      query.append("page", page);
       setIsError(false);
       const results = await axios.get(
-        `http://localhost:4000/courses?${params.toString()}`
+        `http://localhost:4000/courses?${query.toString()}`
         // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
       setCourses(results.data.data);
@@ -31,16 +29,37 @@ const useCourses = () => {
     }
   };
 
-  const getCoursesbyId = async () => {
+  const getCourseById = async (data) => {
     try {
       setIsError(false);
       setIsLoading(true);
-      const result = await axios.get(
+
+      //*---- Query course data ----*//
+      const courseData = await axios.get(
         `http://localhost:4000/courses/${params.courseId}`
       );
-      setCourse(result.data.data);
-      setCategory(result.data.dataCategory);
+      setCourse(JSON.parse(courseData.data.data));
+      setCategory(JSON.parse(courseData.data.dataCategory));
+
+      //*---- Query subscription or desired course data ----*//
+      const status = {
+        subscribe: false,
+        desire: false,
+      };
+      if (data) {
+        const statusData = await axios.post(
+          `http://localhost:4000/courses/${params.courseId}`,
+          data
+        );
+        if (statusData.data.subscribeStatus) {
+          status.subscribe = true;
+        }
+        if (statusData.data.desireStatus) {
+          status.desire = true;
+        }
+      }
       setIsLoading(false);
+      return status;
     } catch (error) {
       setIsError(true);
       setIsLoading(false);
@@ -52,7 +71,7 @@ const useCourses = () => {
     course,
     category,
     getCourses,
-    getCoursesbyId,
+    getCourseById,
     isLoading,
     setIsLoading,
     isError,

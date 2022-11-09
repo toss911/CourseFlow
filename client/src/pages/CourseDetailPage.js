@@ -20,32 +20,36 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { PreFooter } from "../components/PreFooter";
 import { PriceCard } from "../components/PriceCard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useCourses from "../hooks/useCourses";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 
 function CourseDetail() {
-  const { getCoursesbyId, course, category, isLoading } = useCourses();
+  // subscribeStatus: true => already subscribed course
+  const [subscribeStatus, setSubscribeStatus] = useState(false);
+  // addStatus: true => already added course
+  const [addStatus, setAddStatus] = useState(false);
+  const { getCourseById, course, category, isLoading } = useCourses();
   const { isAuthenticated, setContextState, contextState } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    getCoursesbyId();
+    let data;
+    if (isAuthenticated) {
+      data = { user_id: contextState.user.user_id };
+    }
+    async function fetchData() {
+      const result = await getCourseById(data);
+      setSubscribeStatus(result.subscribe);
+      setAddStatus(result.desire);
+    }
+    fetchData();
+
+    // To remember the lastest URL that non-user visited
     setContextState({ ...contextState, previousUrl: location.pathname });
   }, [location]);
-
-  // Stored data for mapping in module samples section
-  let allLessons = {};
-  for (let i = 0; i < course.length; i++) {
-    if (course[i].lesson_name in allLessons) {
-      allLessons[course[i].lesson_name].push(course[i].sub_lesson_name);
-    } else {
-      allLessons[course[i].lesson_name] = [];
-      allLessons[course[i].lesson_name].push(course[i].sub_lesson_name);
-    }
-  }
 
   return (
     <>
@@ -76,22 +80,26 @@ function CourseDetail() {
             position="absolute"
           />
 
-          {typeof course !== "undefined" && course.length > 0 ? (
+          {Object.keys(course).length !== 0 ? (
             <>
               <Box position="sticky" top="0px" ml="739px">
                 <PriceCard
-                  courseId={course[0].course_id}
-                  courseName={course[0].course_name}
-                  courseContent={course[0].summary}
-                  coursePrice={course[0].price}
+                  courseId={course.course_id}
+                  courseName={course.course_name}
+                  courseContent={course.summary}
+                  coursePrice={course.price}
+                  subscribeStatus={subscribeStatus}
+                  setSubscribeStatus={setSubscribeStatus}
+                  addStatus={addStatus}
+                  setAddStatus={setAddStatus}
                 />
               </Box>
               <Box display="flex" flexDirection="column" w="548px" gap="24px">
                 <Heading variant="headline2" color="black" mt="150px">
                   Course Detail
                 </Heading>
-                <Text variants="body2" w="739px" mt="10px">
-                  {course[0].detail}
+                <Text variant="body2" w="739px" mt="10px">
+                  {course.detail}
                 </Text>
               </Box>
             </>
@@ -101,58 +109,62 @@ function CourseDetail() {
             Module Samples
           </Heading>
           <Accordion defaultIndex={[0]} allowMultiple w="739px">
-            {Object.keys(allLessons).map((lessonName, key) => {
-              let numberLesson = null;
-              if (key < 10) {
-                numberLesson = "0" + (key + 1);
-              } else {
-                numberLesson = key + 1;
-              }
+            {Object.keys(course).length === 0
+              ? null
+              : Object.keys(course.lessons).map((lessonName, key) => {
+                  let numberLesson = null;
+                  if (key < 10) {
+                    numberLesson = "0" + (key + 1);
+                  } else {
+                    numberLesson = key + 1;
+                  }
 
-              return (
-                <AccordionItem key={key}>
-                  <h2>
-                    <AccordionButton display="flex" w="739px">
-                      <Box
-                        flex="1"
-                        textAlign="left"
-                        display="flex"
-                        color="black"
-                      >
-                        <Heading
-                          color="gray.700"
-                          display="flex"
-                          variant="headline3"
-                        >
-                          {numberLesson}
-                        </Heading>
-                        <Heading ml="24px" variant="headline3">
-                          {lessonName}
-                        </Heading>
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                  </h2>
-
-                  <AccordionPanel ml="13px" pb={4}>
-                    <UnorderedList>
-                      {allLessons[lessonName].map((subLessonName, key) => {
-                        return (
-                          <ListItem
-                            fontWeight="400"
-                            color="gray.700"
-                            fontSize="16px"
-                            key={key}
+                  return (
+                    <AccordionItem key={key}>
+                      <h2>
+                        <AccordionButton display="flex" w="739px">
+                          <Box
+                            flex="1"
+                            textAlign="left"
+                            display="flex"
+                            color="black"
                           >
-                            {subLessonName}
-                          </ListItem>
-                        );
-                      })}
-                    </UnorderedList>
-                  </AccordionPanel>
-                </AccordionItem>
-              );
-            })}
+                            <Heading
+                              color="gray.700"
+                              display="flex"
+                              variant="headline3"
+                            >
+                              {numberLesson}
+                            </Heading>
+                            <Heading ml="24px" variant="headline3">
+                              {lessonName}
+                            </Heading>
+                          </Box>
+                          <AccordionIcon />
+                        </AccordionButton>
+                      </h2>
+
+                      <AccordionPanel ml="13px" pb={4}>
+                        <UnorderedList>
+                          {course.lessons[lessonName].map(
+                            (subLessonName, key) => {
+                              return (
+                                <ListItem
+                                  fontWeight="400"
+                                  color="gray.700"
+                                  fontSize="16px"
+                                  key={key}
+                                >
+                                  {subLessonName}
+                                </ListItem>
+                              );
+                            }
+                          )}
+                        </UnorderedList>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  );
+                })}
           </Accordion>
         </Box>
         <Box
@@ -171,12 +183,12 @@ function CourseDetail() {
                 return (
                   <CourseCard
                     key={key}
+                    courseId={category.course_id}
                     courseTitle={category.course_name}
                     courseSummary={category.summary}
                     courseNumLessons={category.lessons_count}
                     courseTime={category.learning_time}
                     courseImg={category.cover_image_directory}
-                    courseId={category.course_id}
                   />
                 );
               })}
