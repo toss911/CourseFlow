@@ -1,4 +1,5 @@
 import { Footer } from "../components/Footer";
+import axios from "axios";
 import {
   Center,
   Box,
@@ -16,18 +17,23 @@ import {
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/authentication.js";
 import { Field, Form, Formik } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "antd/dist/antd.less";
-import "../index.css"
+import "../index.css";
 import { Upload } from "antd";
 import ImgCrop from "antd-img-crop";
+import { useAuth } from "../contexts/authentication";
 
 function UserProfile() {
-  const { register } = useAuth();
-  const navigate = useNavigate();
 
+  // --------------------------------------------States--------------------------------------------//
+  const { contextState } = useAuth();
+  const userId = contextState.user.user_id;
+  const [userCurrInfo, setUserCurrInfo] = useState([]);
+  const [avatar, setAvatar] = useState({});
+
+  // --------------------------------------------Ant Design functions--------------------------------------------//
   const [fileList, setFileList] = useState([{}]);
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -47,14 +53,66 @@ function UserProfile() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const handleSubmit = async (values, props) => {
-    const result = await register(values);
-    props.setSubmitting(false);
-    if (result) {
-      props.setFieldError("email", result);
+  // --------------------------------------------End of Ant Design functions--------------------------------------------//
+  
+  // --------------------------------------------Other Functions--------------------------------------------//
+  
+  // GET user's profile information to display on page
+  const getProfile = async () => {
+    try {
+        const result = await axios.get(`http://localhost:4000/user/${userId}`)
+        setUserCurrInfo(result.data.data);
+    } catch (err) {
+        alert(`ERROR: Please try again later`);
+    } 
+}
+  // UPDATE user's profile information
+  const updateProfile = async (userId, updatedData) => {
+    try {
+      const result = await axios.put(
+        `http://localhost:4000/user/${userId}`,
+        updatedData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      // navigate("/") // Navigate the user back to the prev page the user was on.
+      return result;
+    } catch (err) {
+      alert(`ERROR: Please try again later`);
     }
   };
-// ------------------------------------------validat------------------------------------------------
+
+  // handleSubmit function
+  const handleSubmit = async (values) => {
+    const formData = new FormData();
+
+    // values.avatar = fileList;
+    formData.append("full_name", values.full_name);
+    formData.append("birthdate", values.birthdate);
+    formData.append("education", values.education);
+    formData.append("email", values.email);
+
+    const uniqueId = Date.now();
+    setAvatar({...avatar, [uniqueId]: fileList[0]});
+    formData.append("avatar", JSON.stringify(avatar));
+    console.log(avatar);
+    // formData.append("avatar", fileList);
+    console.log(formData.get("full_name"));
+    console.log(formData.get("avatar"));
+    console.log(fileList);
+    await updateProfile(userId, formData);
+
+  }
+
+  // --------------------------------------------End of other functions--------------------------------------------//
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  // ------------------------------------------validation------------------------------------------------//
+  
   const validateName = (value) => {
     let error;
     if (!value) {
@@ -91,6 +149,8 @@ function UserProfile() {
     return error;
   };
 
+  // ------------------------------------------End of validation------------------------------------------------//
+
   return (
     <Box>
       <Navbar />
@@ -101,7 +161,7 @@ function UserProfile() {
       </Flex>
       <Image src="/assets/profile-page/profileBg.svg" w="100%" />
 
-      <Flex mt="-10%" justifyContent='space-between' pr='20%' pl='35%'>
+      <Flex mt="-10%" justifyContent="space-between" pr="20%" pl="35%">
         {/* <Image
           src="assets/profile-page/photo.png"
           w="358px"
@@ -109,18 +169,18 @@ function UserProfile() {
           mr="119px"
         /> */}
 
-        <ImgCrop rotate  >
-      <Upload
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-        listType="picture-card"
-        fileList={fileList}
-        onChange={onChange}
-        onPreview={onPreview}
-       >
-        {fileList.length < 1 && '+ Upload'}
-      </Upload>
-    </ImgCrop>
         <Flex>
+          <ImgCrop rotate>
+            <Upload
+              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              listType="picture-card"
+              fileList={fileList}
+              onChange={onChange}
+              onPreview={onPreview}
+            >
+              {fileList.length < 5 && "+ Upload"}
+            </Upload>
+          </ImgCrop>
           <Flex
             pt="10%"
             pb="10%"
@@ -140,7 +200,7 @@ function UserProfile() {
                   birthdate: "",
                   education: "",
                   email: "",
-                  password: "",
+                  avatar: {},
                 }}
                 onSubmit={handleSubmit}
               >
@@ -167,7 +227,7 @@ function UserProfile() {
                               type="text"
                               w="453px"
                               h="48px"
-                              placeholder="Enter First Name and Last Name"
+                              placeholder={userCurrInfo.full_name}
                               {...field}
                             />
                             <FormErrorMessage>
@@ -195,7 +255,7 @@ function UserProfile() {
                                 type="date"
                                 w="453px"
                                 h="48px"
-                                placeholder="MM/DD/YYYY"
+                                placeholder={userCurrInfo.birthdate}
                                 {...field}
                                 sx={{
                                   "::-webkit-calendar-picker-indicator": {
@@ -227,7 +287,7 @@ function UserProfile() {
                               type="text"
                               w="453px"
                               h="48px"
-                              placeholder="Enter Educational Background"
+                              placeholder={userCurrInfo.education}
                               {...field}
                             />
                             <FormErrorMessage>
@@ -250,7 +310,7 @@ function UserProfile() {
                               type="email"
                               w="453px"
                               h="48px"
-                              placeholder="Enter Email"
+                              placeholder={userCurrInfo.email}
                               {...field}
                             />
                             <FormErrorMessage>
