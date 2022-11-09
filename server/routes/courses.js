@@ -54,10 +54,23 @@ coursesRouter.get("/:courseId", async (req, res) => {
         `,
     [courseId]
   );
+
+  const subscriptions = await pool.query(
+    `SELECT *
+    FROM users
+        INNER JOIN subscriptions
+        ON users.user_id = subscriptions.user_id
+        INNER JOIN courses
+        ON subscriptions.course_id = courses.course_id
+        where course_id=$1
+        `,
+    [courseId]
+  );
   return res.json({
     data: results.rows,
     dataCategory: filterCategory.rows,
     dataFiles: files.rows,
+    dataSubscriptions: subscriptions.rows,
   });
 });
 
