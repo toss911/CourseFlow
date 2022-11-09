@@ -1,10 +1,37 @@
-import { Box, Text, Button, Divider } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Button,
+  Divider,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
+} from "@chakra-ui/react";
+import { useState } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import { useNavigate } from "react-router-dom";
 
 export const PriceCard = (props) => {
+  const [modalMsg, setModalMsg] = useState({});
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  const handleAddCourse = () => {
+    onOpen();
+  };
+
+  const handleSubscribe = () => {
+    setModalMsg({
+      detail: `Do you want to subscribe ${props.courseName} Course?`,
+      cancelButton: `No, I am not`,
+      confirmButton: `Yes, I want to subscribe`,
+    });
+    onOpen();
+  };
 
   return (
     <Box
@@ -28,7 +55,8 @@ export const PriceCard = (props) => {
         {props.courseContent}
       </Text>
       <Text fontSize="24px" fontWeight="600" lineHeight="125%" color="gray.700">
-        THB {props.coursePrice}
+        THB{" "}
+        {props.coursePrice.toLocaleString("en", { minimumFractionDigits: 2 })}
       </Text>
       <Divider borderColor="gray.300" />
       <Box display="flex" flexDirection="column" gap="16px" w="309px">
@@ -39,6 +67,7 @@ export const PriceCard = (props) => {
               navigate("/login");
             } else {
               // สร้าง Request ไปหา Server
+              handleAddCourse();
             }
           }}
         >
@@ -51,12 +80,44 @@ export const PriceCard = (props) => {
               navigate("/login");
             } else {
               // สร้าง Request ไปหา Server
+              handleSubscribe();
             }
           }}
         >
           Subscribe This Course
         </Button>
       </Box>
+      <Modal
+        isCentered
+        isOpen={isOpen}
+        onClose={onClose}
+        onCloseComplete={() => navigate("/login")}
+        closeOnOverlayClick={false}
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader
+            bg="blue.500"
+            color="white"
+            textAlign="center"
+            borderRadius="24px 24px 0px 0px"
+            fontSize="1.5rem"
+          >
+            Confirmation
+          </ModalHeader>
+          <ModalBody textAlign="center" mt="1em" color="black" fontSize="1rem">
+            Do you sure to subscribe
+            <Box mt="24px">
+              <Button variant="secondary" mr={3} onClick={onClose}>
+                No, I don't
+              </Button>
+              <Button variant="primary" mr={3} onClick={onClose}>
+                Yes, I want to subscribe
+              </Button>
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
