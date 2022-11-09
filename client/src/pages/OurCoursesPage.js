@@ -111,7 +111,7 @@ function OurCourses() {
             justifyContent="center"
             mb="180px"
             flexWrap="wrap"
-            w="100%"
+            w="70%"
           >
             {currentCourses.map((course, key) => {
               return (
