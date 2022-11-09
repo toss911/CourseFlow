@@ -7,7 +7,7 @@ const userRouter = Router();
 const multerUpload = multer({ dest: "uploads/" });
 const avatarUpload = multerUpload.fields([{ name: "avatar", maxCount: 1 }]);
 
-// ----------------------------GET current user's profile info---------------------------- // 
+// ----------------------------GET current user's profile info---------------------------- //
 userRouter.get("/:id", async (req, res) => {
   const userId = req.params.id;
   const result = await pool.query("select * from users where user_id = $1", [
@@ -18,9 +18,8 @@ userRouter.get("/:id", async (req, res) => {
   });
 });
 
-// ----------------------------Update user's profile---------------------------- // 
+// ----------------------------Update user's profile---------------------------- //
 userRouter.put("/:id", avatarUpload, async (req, res) => {
-
   // console.log(req.files);
   const userId = req.params.id;
 
@@ -31,24 +30,29 @@ userRouter.put("/:id", avatarUpload, async (req, res) => {
     email: req.body.email,
   };
 
+  if (updatedUser.birthdate === "null") {
+    updatedUser.birthdate = null;
+  }
+
   const avatarUrl = await cloudinaryUpload(req.files);
   updatedUser["avatars"] = avatarUrl;
   console.log(updatedUser);
 
   // Keeping updated user's info in our database
-  await pool.query(`update users set full_name=$1, birthdate=$2, education=$3, email=$4, avatar_directory=$5 where user_id=$6`,
-  [
-    updatedUser.fullName,
-    updatedUser.birthdate,
-    updatedUser.education,
-    updatedUser.email,
-    updatedUser.avatars,
-    userId
-
-  ])
+  await pool.query(
+    `update users set full_name=$1, birthdate=$2, education=$3, email=$4, avatar_directory=$5 where user_id=$6`,
+    [
+      updatedUser.fullName,
+      updatedUser.birthdate,
+      updatedUser.education,
+      updatedUser.email,
+      updatedUser.avatars,
+      userId,
+    ]
+  );
 
   return res.json({
-    message: "Your profile has been updated successfully."
+    message: "Your profile has been updated successfully.",
   });
 });
 
