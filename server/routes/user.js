@@ -34,6 +34,10 @@ userRouter.put("/:id", avatarUpload, async (req, res) => {
     updatedUser.birthdate = null;
   }
 
+  if (updatedUser.education === "null") {
+    updatedUser.education = null;
+  }
+
   const avatarUrl = await cloudinaryUpload(req.files);
   updatedUser["avatars"] = avatarUrl;
   console.log(updatedUser);
