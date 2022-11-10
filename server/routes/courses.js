@@ -77,9 +77,11 @@ coursesRouter.get("/:courseId", async (req, res) => {
 
     const files = await pool.query(
       `
-      SELECT file_name, size, directory
+      SELECT file_name, size, directory, type
       FROM files
-      where course_id=$1`,
+      WHERE course_id=$1
+      ORDER BY type ASC, file_name ASC`,
+
       [courseId]
     );
     course_data.files = [];
