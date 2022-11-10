@@ -32,5 +32,22 @@ userRouter.put("/:id", async (req, res) => {
     });
 });
 
+userRouter.get("/courses/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const results = await pool.query(`select * from subscriptions where user_id = $1`, [userId])
+    return res.json({
+      data: results.rows
+    });
+  } catch (error) {
+    return res.json({
+      message: "cannot get data"
+    })
+    
+  };
+  
+});
+
 
 export default userRouter;
