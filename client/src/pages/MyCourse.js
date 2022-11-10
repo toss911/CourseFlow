@@ -19,13 +19,9 @@ import { useAuth } from "../contexts/authentication.js";
 import { PriceCard } from "../components/PriceCard";
 
 function MyCourse() {
-  const [keywords, setKeywords] = useState("");
-  const [page, setPage] = useState(1);
-  const [coursesPerPage, setCoursesPerPage] = useState(4);
 
-  const handleSearchTextChange = (event) => {
-    setKeywords(event.target.value);
-  };
+  const { contextState } = useAuth();
+  const userId = contextState.user.user_id 
 
   const {
     getCourses,
@@ -34,6 +30,8 @@ function MyCourse() {
     isLoading,
     setIsLoading,
     totalPages,
+    getUserCourses,
+    userCourses
   } = useCourses();
 
   const noCourse = typeof courses !== "undefined" && courses > 0;
@@ -41,15 +39,13 @@ function MyCourse() {
   useEffect(() => {
     setIsLoading(true);
     const getData = setTimeout(() => {
-      getCourses({ keywords, page });
+      getUserCourses(userId);
     }, 1000);
     return () => clearTimeout(getData);
-  }, [keywords, page]);
+  }, []);
 
-  // Get current posts
-  const indexOfLastCourse = page * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+  console.log(userCourses);
+
 
   return (
     <Box>
@@ -113,7 +109,7 @@ function MyCourse() {
           flexWrap="wrap"
           gap="0px"
         >
-          {currentCourses.map((course, key) => {
+          {userCourses.map((course, key) => {
             return (
               <CourseCard
                 key={key}

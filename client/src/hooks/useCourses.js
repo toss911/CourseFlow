@@ -6,11 +6,11 @@ const useCourses = () => {
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState([]);
   const [category, setCategory] = useState([]);
-  const [totalPages, setTotalPages] = useState(0);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
   const navigate = useNavigate();
   const params = useParams();
+  const [userCourses, setUserCourses] = useState([]);
 
   const getCourses = async (input) => {
     const { keywords, page } = input;
@@ -31,7 +31,7 @@ const useCourses = () => {
     }
   };
 
-  const getCoursesbyId = async (courseId) => {
+  const getCoursesbyId = async () => {
     try {
       setIsError(false);
       setIsLoading(true);
@@ -40,6 +40,19 @@ const useCourses = () => {
       );
       setCourse(result.data.data);
       setCategory(result.data.dataCategory);
+      setIsLoading(false);
+    } catch (error) {
+      setIsError(true);
+      setIsLoading(false);
+    }
+  };
+
+  const getUserCourses = async (userId) => {
+  try {
+      setIsError(false);
+      setIsLoading(true);
+      const results = await axios.get(`http://localhost:4000/user/courses/${userId}`);
+      setUserCourses(results.data.data);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -57,6 +70,8 @@ const useCourses = () => {
     setIsLoading,
     isError,
     setIsError,
+    getUserCourses,
+    userCourses
   };
 };
 
