@@ -59,7 +59,15 @@ function LearningPage() {
             >
               <Text variant="body1">Assignment</Text>
               <Spacer />
-              <Text fontSize="16px" fontWeight="500" mt="3px">
+              <Text
+                bg="#FFFBDB"
+                color="#996500"
+                fontSize="16px"
+                fontWeight="500"
+                mt="3px"
+                p="4px 8px"
+                borderRadius="4px"
+              >
                 Pending
               </Text>
             </Flex>
@@ -80,10 +88,26 @@ function LearningPage() {
               borderColor="gray.400"
               borderRadius="8px"
               _focus={{ borderColor: "gray.100" }}
-            ></Textarea>
-            <Button mt="25px" mb="24px" width="210px" height="60px">
-              Send Assignment
-            </Button>
+            />
+            <Flex
+              flexDirection="row"
+              alignItems="start"
+              justifyContent="center"
+              width="691px"
+              mt="25px"
+              mb="24px"
+            >
+              <Button width="210px" height="60px">
+                Send Assignment
+              </Button>
+              <Button ml="20px" width="100px" height="60px">
+                Save
+              </Button>
+              <Spacer />
+              <Text pt="20px" color="gray.700">
+                Answer within 2 days
+              </Text>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
