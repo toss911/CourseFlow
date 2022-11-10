@@ -34,7 +34,6 @@ userRouter.put("/:id", avatarUpload, async (req, res) => {
     if (req.files === null) {
       updatedUser["avatars"] = null;
     } else {
-      
       const avatarUrl = await cloudinaryUpload(req.files);
       updatedUser["avatars"] = avatarUrl;
       console.log(updatedUser);

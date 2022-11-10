@@ -14,7 +14,14 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure
 } from "@chakra-ui/react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Navbar } from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { Field, Form, Formik } from "formik";
@@ -37,6 +44,8 @@ function UserProfile() {
   const userId = contextState.user.user_id;
   const [userCurrInfo, setUserCurrInfo] = useState([]);
   const [avatar, setAvatar] = useState({});
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
   
 
   // --------------------------------------------Ant Design functions--------------------------------------------//
@@ -105,6 +114,8 @@ function UserProfile() {
     const msg = result.data.message;
     if (/taken/i.test(msg)) {
       props.setFieldError("email", msg);
+    } else {
+      onOpen();
     }
   };
 
@@ -479,6 +490,33 @@ function UserProfile() {
           </Flex>
         </Flex>
       </Flex>
+      <Modal
+        isCentered
+        isOpen={isOpen}
+        onClose={onClose}
+        onCloseComplete={() => navigate("/courses")}
+        closeOnOverlayClick={false}
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader
+            bg="blue.500"
+            color="white"
+            textAlign="center"
+            borderRadius="24px 24px 0px 0px"
+            fontSize="1.5rem"
+          >
+            <CheckCircleIcon mr="0.5em" />
+            Success
+          </ModalHeader>
+          <ModalBody textAlign="center" mt="1em" color="black" fontSize="1rem">
+            Your profile has been updated successfully.
+            <Button m="1em" variant="success" mr={3} onClick={onClose}>
+              Continue Learning
+            </Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <Footer />
     </Box>
   );
