@@ -1,10 +1,10 @@
-import { Navbar } from "../components/Navbar.js";
-import { Footer } from "../components/Footer";
-import { CourseCard } from "../components/CourseCard";
-import { SearchIcon } from "@chakra-ui/icons";
-import { Pagination } from "antd";
-import "antd/dist/antd.css";
-import { useEffect, useState } from "react";
+import { Navbar } from '../components/Navbar.js';
+import { Footer } from '../components/Footer';
+import { CourseCard } from '../components/CourseCard';
+import { SearchIcon } from '@chakra-ui/icons';
+import { Pagination } from 'antd';
+import 'antd/dist/antd.css';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Image,
@@ -16,13 +16,13 @@ import {
   InputGroup,
   Center,
   Spinner,
-} from "@chakra-ui/react";
-import useCourses from "../hooks/useCourses";
+} from '@chakra-ui/react';
+import useCourses from '../hooks/useCourses';
 
 const coursesPerPage = 12;
 
 function OurCourses() {
-  const [keywords, setKeywords] = useState("");
+  const [keywords, setKeywords] = useState('');
   const [page, setPage] = useState(1);
   const { getCourses, courses, isLoading, setIsLoading } = useCourses();
 
@@ -53,24 +53,24 @@ function OurCourses() {
     <Box>
       <Navbar />
       <Box>
-        <Image w="100%" src="/assets/courseCard/bgOc.svg" position="relative" />
+        <Image w='100%' src='/assets/courseCard/bgOc.svg' position='relative' />
 
-        <Flex flexDirection="column" alignItems="center" mt="-100">
-          <Heading variant="headline2" mb="60px">
+        <Flex flexDirection='column' alignItems='center' mt='-100'>
+          <Heading variant='headline2' mb='60px'>
             Our Courses
           </Heading>
-          <Box mb="100px">
-            <InputGroup w="357px">
+          <Box mb='100px'>
+            <InputGroup w='357px'>
               <Input
-                type="string"
-                placeholder="Search..."
-                pl="40px"
+                type='string'
+                placeholder='Search...'
+                pl='40px'
                 onChange={handleSearchTextChange}
                 value={keywords}
               />
               <InputLeftElement
-                pointerEvents="none"
-                children={<SearchIcon color="#646D89" />}
+                pointerEvents='none'
+                children={<SearchIcon color='#646D89' />}
               />
             </InputGroup>
           </Box>
@@ -80,20 +80,20 @@ function OurCourses() {
       <Center>
         {isLoading ? (
           <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-            mb="187px"
+            thickness='4px'
+            speed='0.65s'
+            emptyColor='gray.200'
+            color='blue.500'
+            size='xl'
+            mb='187px'
           />
-        ) : typeof courses !== "undefined" && courses.length > 0 ? (
+        ) : typeof courses !== 'undefined' && courses.length > 0 ? (
           <Flex
-            flexDirection="row"
-            justifyContent="center"
-            mb="180px"
-            flexWrap="wrap"
-            w="100%"
+            flexDirection='row'
+            justifyContent='center'
+            mb='180px'
+            flexWrap='wrap'
+            w='100%'
           >
             {currentCourses.map((course, key) => {
               return (
@@ -110,12 +110,12 @@ function OurCourses() {
             })}
           </Flex>
         ) : (
-          <Text as="i" color="black" mb="187px">
+          <Text as='i' color='black' mb='187px'>
             Course not found
           </Text>
         )}
       </Center>
-      <Center mb="20">
+      <Center mb='20'>
         <Pagination
           total={courses.length}
           current={page}

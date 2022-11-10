@@ -46,7 +46,9 @@ export function UserCourseCard(props) {
           borderWidth='16px'
           alignItems='start'
         >
-          <Text variant='body2'>Course Inprogress</Text>
+          <Text textAlign='start' variant='body2'>
+            Course Inprogress
+          </Text>
           <Heading variant='headline3'>10</Heading>
         </Flex>
         <Flex
@@ -60,7 +62,7 @@ export function UserCourseCard(props) {
           gap='24px'
           borderWidth='16px'
         >
-          <Text variant='body2' w='110px'>
+          <Text textAlign='start' variant='body2' w='110px'>
             Course Complete
           </Text>
           <Heading variant='headline3'>0</Heading>

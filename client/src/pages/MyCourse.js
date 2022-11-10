@@ -19,27 +19,38 @@ import { useAuth } from '../contexts/authentication.js';
 import { PriceCard } from '../components/PriceCard';
 
 function MyCourse() {
-  //   const { getCoursesbyId, course, category } = useCourses();
+  const [keywords, setKeywords] = useState('');
+  const [page, setPage] = useState(1);
+  const [coursesPerPage, setCoursesPerPage] = useState(4);
 
-  //   const { isAuthenticated, setContextState, contextState } = useAuth();
-  //   const navigate = useNavigate();
-  //   const location = useLocation();
+  const handleSearchTextChange = (event) => {
+    setKeywords(event.target.value);
+  };
 
-  //   useEffect(() => {
-  //     getCoursesbyId();
-  //     setContextState({ ...contextState, previousUrl: location.pathname });
-  //   }, [location]);
+  const {
+    getCourses,
+    courses,
+    getCoursesbyId,
+    isLoading,
+    setIsLoading,
+    totalPages,
+  } = useCourses();
 
-  //   // Stored data for mapping in module samples section
-  //   let allLessons = {};
-  //   for (let i = 0; i < course.length; i++) {
-  //     if (course[i].lesson_name in allLessons) {
-  //       allLessons[course[i].lesson_name].push(course[i].sub_lesson_name);
-  //     } else {
-  //       allLessons[course[i].lesson_name] = [];
-  //       allLessons[course[i].lesson_name].push(course[i].sub_lesson_name);
-  //     }
-  //   }
+  const noCourse = typeof courses !== 'undefined' && courses > 0;
+
+  useEffect(() => {
+    setIsLoading(true);
+    const getData = setTimeout(() => {
+      getCourses({ keywords, page });
+    }, 1000);
+    return () => clearTimeout(getData);
+  }, [keywords, page]);
+
+  // Get current posts
+  const indexOfLastCourse = page * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+
   return (
     <Box>
       <Navbar />
@@ -50,10 +61,11 @@ function MyCourse() {
         flexWrap='wrap'
         align='center'
         w='vw'
+        h='fit-content'
         mt='100px'
         gap='60px'
       >
-        <Heading>My Course</Heading>
+        <Heading variant='headline2'>My Course</Heading>
         <Stack
           direction='row'
           flexWrap='wrap'
@@ -78,66 +90,42 @@ function MyCourse() {
           </Button>
         </Stack>
       </Container>
+
       {/* // Cards Start Here // */}
 
       <Box
         display='flex'
         flexWrap='wrap'
-        justifyContent='center'
+        justifyContent='flex-start'
         m='40px 160px 200px 160px '
+        w='100%'
       >
-        <Box>
-          <Box display='flex' top='0px' position='sticky'>
+        <Box position='relative' alignItems='start'>
+          <Box top='0px' position='sticky'>
             <UserCourseCard />
           </Box>
         </Box>
-        {/* <Center>
-          {isLoading ? (
-            <Spinner
-              thickness='4px'
-              speed='0.65s'
-              emptyColor='gray.200'
-              color='blue.500'
-              size='xl'
-              mb='187px'
-            />
-          ) : typeof courses !== 'undefined' && courses.length > 0 ? (
-            <Flex
-              flexDirection='row'
-              justifyContent='center'
-              mb='180px'
-              flexWrap='wrap'
-              w='100%'
-            >
-              {currentCourses.map((course, key) => {
-                return (
-                  <CourseCard
-                    key={key}
-                    courseTitle={course.course_name}
-                    courseSummary={course.summary}
-                    courseNumLessons={course.lessons_count}
-                    courseTime={course.learning_time}
-                    courseImg={course.cover_image_directory}
-                    courseId={course.course_id}
-                  />
-                );
-              })}
-            </Flex>
-          ) : (
-            <Text as='i' color='black' mb='187px'>
-              Course not found
-            </Text>
-          )} */}
-        {/* </Center> */}
+
         <Box
-          w='740px'
-          flexDirection='row'
-          justifyContent='center'
+          w='850px'
+          display='flex'
+          justifyContent='start'
           flexWrap='wrap'
+          gap='0px'
         >
-          <CourseCard />
-          <CourseCard />
-          <CourseCard />
+          {currentCourses.map((course, key) => {
+            return (
+              <CourseCard
+                key={key}
+                courseTitle={course.course_name}
+                courseSummary={course.summary}
+                courseNumLessons={course.lessons_count}
+                courseTime={course.learning_time}
+                courseImg={course.cover_image_directory}
+                courseId={course.course_id}
+              />
+            );
+          })}
         </Box>
       </Box>
       <Footer />
