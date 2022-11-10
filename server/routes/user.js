@@ -20,7 +20,7 @@ userRouter.get("/:id", async (req, res) => {
 
 // ----------------------------Update user's profile---------------------------- //
 userRouter.put("/:id", avatarUpload, async (req, res) => {
-  // console.log(req.files);
+  console.log(req.files);
   const userId = req.params.id;
 
   try {
@@ -31,9 +31,14 @@ userRouter.put("/:id", avatarUpload, async (req, res) => {
       email: req.body.email,
     };
 
-    const avatarUrl = await cloudinaryUpload(req.files);
-    updatedUser["avatars"] = avatarUrl;
-    console.log(updatedUser);
+    if (req.files === null) {
+      updatedUser["avatars"] = null;
+    } else {
+      
+      const avatarUrl = await cloudinaryUpload(req.files);
+      updatedUser["avatars"] = avatarUrl;
+      console.log(updatedUser);
+    }
 
     // Keeping updated user's info in our database
     await pool.query(
@@ -52,7 +57,10 @@ userRouter.put("/:id", avatarUpload, async (req, res) => {
       message: "Your profile has been updated successfully.",
     });
   } catch (error) {
-    return res.sendStatus(500);
+    console.log(error);
+    return res.json({
+      message: "This email is already taken.",
+    });
   }
 });
 

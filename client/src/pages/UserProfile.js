@@ -37,7 +37,7 @@ function UserProfile() {
   const userId = contextState.user.user_id;
   const [userCurrInfo, setUserCurrInfo] = useState([]);
   const [avatar, setAvatar] = useState({});
-  console.log("userCurrInfo: ", userCurrInfo);
+  
 
   // --------------------------------------------Ant Design functions--------------------------------------------//
   const [fileList, setFileList] = useState([{}]);
@@ -59,7 +59,7 @@ function UserProfile() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  // --------------------------------------------End of Ant Design functions--------------------------------------------//
+  // --------------------------------------------End of Ant Design functions--------------------------------//
 
   // --------------------------------------------Other Functions--------------------------------------------//
 
@@ -96,15 +96,16 @@ function UserProfile() {
     formData.append("birthdate", values.birthdate);
     formData.append("education", values.education);
     formData.append("email", values.email);
-    formData.append("avatar", fileList[0].originFileObj);
-  
-    const result = await updateProfile(userId, formData);
-    console.log(result);
-    if (result == undefined) {
-      props.setFieldError("email", "This email already has an account");
+    console.log(fileList[0]);
+    if (fileList[0] != undefined) {
+      formData.append("avatar", fileList[0].originFileObj);
     }
-
-    await updateProfile(userId, formData);
+    
+    const result = await updateProfile(userId, formData);
+    const msg = result.data.message;
+    if (/taken/i.test(msg)) {
+      props.setFieldError("email", msg);
+    }
   };
 
   // --------------------------------------------End of other functions--------------------------------------------//
@@ -305,7 +306,7 @@ function UserProfile() {
                   birthdate: userCurrInfo.birthdate || null,
                   education: userCurrInfo.education,
                   email: userCurrInfo.email,
-                  avatar: {},
+                  // avatar: {},
                 }}
                 enableReinitialize
                 onSubmit={handleSubmit}
