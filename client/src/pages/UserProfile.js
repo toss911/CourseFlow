@@ -289,11 +289,12 @@ function UserProfile() {
         <Flex>
           <ImgCrop rotate>
             <Upload
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              action= 'https://www.mocky.io/v2/5cc8019d300000980a055e76'
               listType="picture-card"
               fileList={fileList}
               onChange={onChange}
               onPreview={onPreview}
+              // defaultFileList={userCurrInfo.avatar_directory}
             >
               {fileList.length < 1 && "+ Upload"}
             </Upload>
