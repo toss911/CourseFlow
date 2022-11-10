@@ -16,6 +16,7 @@ import {
   Button,
   Textarea,
   Spacer,
+  Progress,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
@@ -23,23 +24,83 @@ function LearningPage() {
   return (
     <>
       <Navbar />
-      <Flex flexDirection="row" alignItems="center" justifyContent="center">
+
+      <Flex
+        mt="100px"
+        flexDirection="row"
+        alignItems="start"
+        justifyContent="center"
+      >
         <Flex
           flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          border="1px"
-          borderColor="gray.500"
-          width="357px"
-          height="500px"
+          alignItems="start"
+          justifyContent="start"
+          width="372px"
+          height="940px"
+          shadow="shadow1"
+          //height="240px"
           mr="25px"
+          pl="24px"
+          overflowY="scroll"
         >
-          Side Bar
+          <Text mt="32px" color="orange.500" fontSize="14px" fontWeight="400">
+            Course
+          </Text>
+
+          <Heading variant="headline3" mt="24px">
+            Service Design Essentials
+          </Heading>
+          <Text variant="body2" color="gray.700" mt="8px">
+            Lorem ipsum dolor sit amet, conse ctetur adipiscing elit.
+          </Text>
+          <Text variant="body3" mt="24px">
+            15% Complete
+            <Progress
+              mt="8px"
+              height="10px"
+              width="309px"
+              value={40}
+              sx={{
+                ".css-1jrtelv": {
+                  background:
+                    "linear-gradient(109.54deg, #95BEFF 18.21%, #0040E6 95.27%)",
+                  "border-radius": "99px",
+                },
+              }}
+            />
+          </Text>
+          <Accordion defaultIndex={[0]} allowMultiple w="300px" mt="24px">
+            <AccordionItem>
+              <h2>
+                <AccordionButton>
+                  <Box flex="1" textAlign="left" display="flex" color="black">
+                    <Text color="gray.700" display="flex" variant="body2">
+                      01
+                    </Text>
+                    <Text ml="24px" variant="body2">
+                      Introduction
+                    </Text>
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+
+              <AccordionPanel ml="25px" pb={4}>
+                <UnorderedList>
+                  <ListItem fontWeight="400" color="gray.700" fontSize="16px">
+                    <Text variant="body2">Welcome to the Course</Text>
+                  </ListItem>
+                </UnorderedList>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
         </Flex>
+
         <Flex flexDirection="column" alignItems="start" width="739px">
-          <Heading mb="33px" mt="100px" variant="headline2">
+          <Heading mb="33px" variant="headline2">
             Scope of Service Design
           </Heading>
+
           <Image src="/assets/learning-page/video-mock.svg" alt="video-mock" />
           <Flex
             bg="blue.100"
