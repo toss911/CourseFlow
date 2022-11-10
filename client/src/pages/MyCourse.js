@@ -1,7 +1,7 @@
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
-import { CourseCard } from '../components/CourseCard';
-import { UserCourseCard } from '../components/UserCourseCard';
+import { Navbar } from "../components/Navbar";
+import { Footer } from "../components/Footer";
+import { CourseCard } from "../components/CourseCard";
+import { UserCourseCard } from "../components/UserCourseCard";
 import {
   Box,
   Container,
@@ -11,15 +11,15 @@ import {
   Text,
   Flex,
   Spinner,
-} from '@chakra-ui/react';
-import useCourses from '../hooks/useCourses';
-import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/authentication.js';
-import { PriceCard } from '../components/PriceCard';
+} from "@chakra-ui/react";
+import useCourses from "../hooks/useCourses";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/authentication.js";
+import { PriceCard } from "../components/PriceCard";
 
 function MyCourse() {
-  const [keywords, setKeywords] = useState('');
+  const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
   const [coursesPerPage, setCoursesPerPage] = useState(4);
 
@@ -36,7 +36,7 @@ function MyCourse() {
     totalPages,
   } = useCourses();
 
-  const noCourse = typeof courses !== 'undefined' && courses > 0;
+  const noCourse = typeof courses !== "undefined" && courses > 0;
 
   useEffect(() => {
     setIsLoading(true);
@@ -56,35 +56,35 @@ function MyCourse() {
       <Navbar />
       {/* // MY COURSE START HERE // */}
       <Container
-        display='flex'
-        flexDirection='column'
-        flexWrap='wrap'
-        align='center'
-        w='vw'
-        h='fit-content'
-        mt='100px'
-        gap='60px'
+        display="flex"
+        flexDirection="column"
+        flexWrap="wrap"
+        align="center"
+        w="vw"
+        h="fit-content"
+        mt="100px"
+        gap="60px"
       >
-        <Heading variant='headline2'>My Course</Heading>
+        <Heading variant="headline2">My Course</Heading>
         <Stack
-          direction='row'
-          flexWrap='wrap'
-          spacing='8'
-          justifyContent='center'
-          alignItems='center'
+          direction="row"
+          flexWrap="wrap"
+          spacing="8"
+          justifyContent="center"
+          alignItems="center"
         >
-          <Button variant='link'>
-            <Text variant='body2' _hover={{ color: 'black' }}>
+          <Button variant="link">
+            <Text variant="body2" _hover={{ color: "black" }}>
               All Course
             </Text>
           </Button>
-          <Button variant='link'>
-            <Text variant='body2' _hover={{ color: 'black' }}>
+          <Button variant="link">
+            <Text variant="body2" _hover={{ color: "black" }}>
               Inprogress
             </Text>
           </Button>
-          <Button variant='link'>
-            <Text variant='body2' _hover={{ color: 'black' }}>
+          <Button variant="link">
+            <Text variant="body2" _hover={{ color: "black" }}>
               Complete
             </Text>
           </Button>
@@ -94,24 +94,24 @@ function MyCourse() {
       {/* // Cards Start Here // */}
 
       <Box
-        display='flex'
-        flexWrap='wrap'
-        justifyContent='flex-start'
-        m='40px 160px 200px 160px '
-        w='100%'
+        display="flex"
+        flexWrap="wrap"
+        justifyContent="flex-start"
+        m="40px 160px 200px 160px "
+        w="100%"
       >
-        <Box position='relative' alignItems='start'>
-          <Box top='0px' position='sticky'>
+        <Box position="relative" alignItems="start">
+          <Box top="0px" position="sticky">
             <UserCourseCard />
           </Box>
         </Box>
 
         <Box
-          w='850px'
-          display='flex'
-          justifyContent='start'
-          flexWrap='wrap'
-          gap='0px'
+          w="850px"
+          display="flex"
+          justifyContent="start"
+          flexWrap="wrap"
+          gap="0px"
         >
           {currentCourses.map((course, key) => {
             return (
