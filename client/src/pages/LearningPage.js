@@ -172,6 +172,29 @@ function LearningPage() {
           </Flex>
         </Flex>
       </Flex>
+      <Flex
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="center"
+        shadow="shadow1"
+        width="100vw"
+        height="100px"
+      >
+        <Text
+          cursor="pointer"
+          color="blue.500"
+          fontWeight="700"
+          fontSize="16px"
+          ml="68px"
+        >
+          Previous Sub-lesson
+        </Text>
+
+        <Spacer />
+        <Button width="200px" height="60px" mr="68px">
+          Next Sub-lesson
+        </Button>
+      </Flex>
       <Footer />
     </>
   );
