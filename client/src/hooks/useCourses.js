@@ -80,6 +80,19 @@ const useCourses = () => {
     }
   };
 
+  const getUserCourses = async (userId) => {
+  try {
+      setIsError(false);
+      setIsLoading(true);
+      const results = await axios.get(`http://localhost:4000/user/courses/${userId}`);
+      setUserCourses(results.data.data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsError(true);
+      setIsLoading(false);
+    }
+  };
+
   return {
     courses,
     course,
