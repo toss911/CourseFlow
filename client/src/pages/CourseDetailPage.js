@@ -167,38 +167,42 @@ function CourseDetail() {
                 })}
           </Accordion>
         </Box>
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          backgroundColor="gray.100"
-          mt="169px"
-        >
-          <Heading variant="headline2" color="black" mt="121px">
-            Other Interesting Courses
-          </Heading>
-          {typeof category !== "undefined" && category.length > 0 ? (
-            <Flex pb="50px">
-              {category.map((category, key) => {
-                return (
-                  <CourseCard
-                    key={key}
-                    courseId={category.course_id}
-                    courseTitle={category.course_name}
-                    courseSummary={category.summary}
-                    courseNumLessons={category.lessons_count}
-                    courseTime={category.learning_time}
-                    courseImg={category.cover_image_directory}
-                  />
-                );
-              })}
-            </Flex>
-          ) : (
-            <Text as="i" color="black" mt="187px" mb="187px">
-              No relevant course
-            </Text>
-          )}
-        </Box>
+        {subscribeStatus ? (
+          <Box mt="300px"></Box>
+        ) : (
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            backgroundColor="gray.100"
+            mt="169px"
+          >
+            <Heading variant="headline2" color="black" mt="121px">
+              Other Interesting Courses
+            </Heading>
+            {typeof category !== "undefined" && category.length > 0 ? (
+              <Flex pb="50px">
+                {category.map((category, key) => {
+                  return (
+                    <CourseCard
+                      key={key}
+                      courseId={category.course_id}
+                      courseTitle={category.course_name}
+                      courseSummary={category.summary}
+                      courseNumLessons={category.lessons_count}
+                      courseTime={category.learning_time}
+                      courseImg={category.cover_image_directory}
+                    />
+                  );
+                })}
+              </Flex>
+            ) : (
+              <Text as="i" color="black" mt="187px" mb="187px">
+                No relevant course
+              </Text>
+            )}
+          </Box>
+        )}
         {!isAuthenticated ? <PreFooter /> : null}
         <Footer />
       </Skeleton>
