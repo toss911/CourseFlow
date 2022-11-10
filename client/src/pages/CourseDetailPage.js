@@ -67,7 +67,7 @@ function CourseDetail() {
         <Box w="100vw" pt="15px" pl="160px" display="flex" flexDirection="row">
           <Box className="left-section" display="flex" flexDirection="column">
             <Image
-              src="/assets/CourseDetail/Course1.svg"
+              src="/assets/course-detail-page/Course1.svg"
               alt="Course picture"
               h="460px"
               w="739px"
@@ -101,18 +101,72 @@ function CourseDetail() {
                     <Flex w="90%" wrap="wrap" justify="space-between">
                       {Object.keys(course).length !== 0
                         ? course.files.map((file, key) => {
-                            console.log("file: ", file);
                             return (
-                              <Flex
+                              <Link
                                 key={key}
+                                display="flex"
+                                href={file.directory}
                                 w="45%"
                                 h="82px"
                                 bg="blue.100"
                                 mt={3}
                                 borderRadius="8px"
+                                sx={{
+                                  "&:hover": {
+                                    bg: "blue.200",
+                                  },
+                                }}
                               >
-                                {file.file_name} {file.type} {file.size}
-                              </Flex>
+                                <Flex
+                                  w="50px"
+                                  h="50px"
+                                  m="16px 29px 16px 16px"
+                                  bg="white"
+                                  borderRadius="4px"
+                                  justify="center"
+                                  align="center"
+                                >
+                                  <Box w="20px">
+                                    {/^image/i.test(file.type) ? (
+                                      <Image
+                                        src="/assets/course-detail-page/image-icon.svg"
+                                        alt="image icon"
+                                      />
+                                    ) : /^audio/i.test(file.type) ? (
+                                      <Image
+                                        src="/assets/course-detail-page/audio-icon.svg"
+                                        alt="audio icon"
+                                      />
+                                    ) : /^video/i.test(file.type) ? (
+                                      <Image
+                                        src="/assets/course-detail-page/video-icon.svg"
+                                        alt="video icon"
+                                      />
+                                    ) : (
+                                      <Image
+                                        src="/assets/course-detail-page/file-icon.svg"
+                                        alt="file icon"
+                                      />
+                                    )}
+                                  </Box>
+                                </Flex>
+                                <Flex
+                                  direction="column"
+                                  w="65%"
+                                  justify="center"
+                                >
+                                  <Text
+                                    variant="body2"
+                                    noOfLines={1}
+                                    color="black"
+                                  >
+                                    {file.file_name}
+                                  </Text>
+                                  <Text variant="body4" color="blue.500">
+                                    {file.size.toLocaleString("en")} mb
+                                  </Text>
+                                </Flex>
+                              </Link>
                             );
                           })
                         : null}
