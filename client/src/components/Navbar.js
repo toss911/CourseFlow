@@ -58,7 +58,7 @@ export const Navbar = () => {
                 </HStack>
               </MenuButton>
               <MenuList>
-                <MenuItem>
+                <MenuItem onClick={() => navigate("/profile")}>
                   <Image
                     borderRadius="full"
                     src="/assets/landing-page/Icon/Profile.svg"
