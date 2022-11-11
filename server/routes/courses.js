@@ -90,8 +90,8 @@ coursesRouter.get("/:courseId", async (req, res) => {
     });
 
     return res.json({
-      data: JSON.stringify(course_data),
-      dataCategory: JSON.stringify(filterCategory.rows),
+      data: course_data,
+      dataCategory: filterCategory.rows,
     });
   } catch (error) {
     return res.sendStatus(500);
