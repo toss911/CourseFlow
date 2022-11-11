@@ -20,7 +20,11 @@ import {
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
+import { useEffect, useState } from "react";
+import useCourses from "../hooks/useCourses";
 function LearningPage() {
+  const { getCourseById, course, category, isLoading } = useCourses();
+  console.log(category);
   return (
     <>
       <Navbar />
@@ -55,20 +59,20 @@ function LearningPage() {
           </Text>
           <Text variant="body3" mt="24px">
             15% Complete
-            <Progress
-              mt="8px"
-              height="10px"
-              width="309px"
-              value={40}
-              sx={{
-                ".css-1jrtelv": {
-                  background:
-                    "linear-gradient(109.54deg, #95BEFF 18.21%, #0040E6 95.27%)",
-                  "border-radius": "99px",
-                },
-              }}
-            />
           </Text>
+          <Progress
+            mt="8px"
+            height="10px"
+            width="309px"
+            value={40}
+            sx={{
+              ".css-1jrtelv": {
+                background:
+                  "linear-gradient(109.54deg, #95BEFF 18.21%, #0040E6 95.27%)",
+                borderRadius: "99px",
+              },
+            }}
+          />
           <Accordion defaultIndex={[0]} allowMultiple w="300px" mt="24px">
             <AccordionItem>
               <h2>
