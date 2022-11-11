@@ -2,7 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "./HomePage.js";
 import OurCourses from "./OurCoursesPage.js";
 import CourseDetail from "./CourseDetailPage.js";
-import UserProfile from "./UserProfilePage.js";
+import UserProfile from "./UserProfile.js";
+import MyHomework from "./MyHomeworkPage.js";
 //import LearningPage from "./LearningPage.js";
 import MyCourses from "./MyCoursesPage.js";
 
@@ -15,6 +16,7 @@ function AuthenticatedApp() {
       <Route path="/profile" element={<UserProfile />} />
       {/* <Route path="/learning" element={<LearningPage />} /> */}
       <Route path="/mycourses" element={<MyCourses />} />
+      <Route path ="/homework/:userId" element= {<MyHomework/>}/>
     </Routes>
   );
 }
