@@ -19,9 +19,8 @@ import { useAuth } from "../contexts/authentication.js";
 import { PriceCard } from "../components/PriceCard";
 
 function MyCourse() {
-
   const { contextState } = useAuth();
-  const userId = contextState.user.user_id 
+  const userId = contextState.user.user_id;
 
   const {
     getCourses,
@@ -31,7 +30,7 @@ function MyCourse() {
     setIsLoading,
     totalPages,
     getUserCourses,
-    userCourses
+    userCourses,
   } = useCourses();
 
   const noCourse = typeof courses !== "undefined" && courses > 0;
@@ -45,7 +44,6 @@ function MyCourse() {
   }, []);
 
   console.log(userCourses);
-
 
   return (
     <Box>

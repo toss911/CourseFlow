@@ -64,7 +64,8 @@ coursesRouter.get("/:courseId", async (req, res) => {
 
     const filterCategory = await pool.query(
       `
-      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id) as lessons_count
+      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, 
+      COUNT(lessons.lesson_id) as lessons_count
       FROM courses
       INNER JOIN lessons
       ON courses.course_id = lessons.course_id
