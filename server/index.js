@@ -9,11 +9,11 @@ import cloudinary from "cloudinary";
 
 async function init() {
   dotenv.config();
-  cloudinary.config({ 
-    cloud_name: process.env.CLOUD_NAME, 
-    api_key: process.env.API_KEY, 
+  cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
     api_secret: process.env.API_SECRET,
-    secure: true
+    secure: true,
   });
 
   const app = express();
@@ -25,10 +25,6 @@ async function init() {
   app.use("/auth", authRouter);
   app.use("/courses", coursesRouter);
   app.use("/user", userRouter);
-
-  app.get("/", (req, res) => {
-    res.send("Hello World!");
-  });
 
   app.get("*", (req, res) => {
     res.status(404).send("Not found");

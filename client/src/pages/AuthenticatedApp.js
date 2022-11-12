@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "./HomePage.js";
 import OurCourses from "./OurCoursesPage.js";
 import CourseDetail from "./CourseDetailPage.js";
-import UserProfile from "./UserProfile.js";
+import UserProfile from "./UserProfilePage.js";
 
 function AuthenticatedApp() {
   return (

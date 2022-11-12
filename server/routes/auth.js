@@ -9,16 +9,15 @@ const authRouter = Router();
 authRouter.post("/register", async (req, res) => {
   try {
     const newUser = { ...req.body };
-    const inputEmail = newUser.email;
 
     const emailExist = await pool.query(
       `select email from users where email ilike $1 `,
-      [inputEmail]
+      [newUser.email]
     );
 
     if (emailExist.rowCount !== 0) {
       return res.json({
-        message: "This email already has an account",
+        message: "This email has already been taken.",
       });
     } else {
       const salt = await bcrypt.genSalt(10);
