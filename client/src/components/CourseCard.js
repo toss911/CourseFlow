@@ -1,9 +1,11 @@
 import React from "react";
 import { Box, Image, Flex, Text, Heading, Divider } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/authentication";
 
 export function CourseCard(props) {
   const navigate = useNavigate();
+  const { isAuthenticated, contextState } = useAuth();
   return (
     <Box
       h="475px"

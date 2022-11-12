@@ -26,24 +26,22 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 
 function CourseDetail() {
-  // subscribeStatus: true => already subscribed course
-  const [subscribeStatus, setSubscribeStatus] = useState(false);
-  // addStatus: true => already added course
-  const [addStatus, setAddStatus] = useState(false);
+  const [subscribeStatus, setSubscribeStatus] = useState(false); // subscribeStatus: true => user has already subscribed course
+  const [addStatus, setAddStatus] = useState(false); // addStatus: true => user has already added course
   const { getCourseById, course, category, isLoading } = useCourses();
   const { isAuthenticated, setContextState, contextState } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    let data;
-    if (isAuthenticated) {
-      data = { user_id: contextState.user.user_id };
-    }
     async function fetchData() {
-      const result = await getCourseById(data);
-      setSubscribeStatus(result.subscribe);
-      setAddStatus(result.desire);
+      if (isAuthenticated) {
+        const result = await getCourseById(contextState.user.user_id);
+        setSubscribeStatus(result.subscribe);
+        setAddStatus(result.desire);
+      } else {
+        await getCourseById();
+      }
     }
     fetchData();
 

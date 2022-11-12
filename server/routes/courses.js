@@ -31,6 +31,9 @@ coursesRouter.get("/", async (req, res) => {
 coursesRouter.get("/:courseId", async (req, res) => {
   try {
     const courseId = req.params.courseId;
+    const userId = req.query.byUser;
+
+    // Query course detail
     let course_data = await pool.query(
       `
       SELECT *
@@ -42,7 +45,7 @@ coursesRouter.get("/:courseId", async (req, res) => {
 
     const lessons = await pool.query(
       `
-      SELECT lessons.lesson_name, sub_lessons.sub_lesson_name
+      SELECT lessons.lesson_id, lessons.lesson_name, sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name
       FROM courses
       INNER JOIN lessons 
       ON courses.course_id = lessons.course_id
@@ -64,7 +67,7 @@ coursesRouter.get("/:courseId", async (req, res) => {
 
     const filterCategory = await pool.query(
       `
-      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id) as lessons_count
+      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, CAST(COUNT(lessons.lesson_id) AS INTEGER) as lessons_count
       FROM courses
       INNER JOIN lessons
       ON courses.course_id = lessons.course_id
@@ -89,9 +92,42 @@ coursesRouter.get("/:courseId", async (req, res) => {
       course_data.files.push(file);
     });
 
+    // Query user's subscription/desire course status
+    let subscribeStatus;
+    let desireStatus;
+    if (userId) {
+      const coursesSubscription = await pool.query(
+        `SELECT *
+        FROM subscriptions
+        WHERE course_id = $1 AND user_id = $2
+        `,
+        [courseId, userId]
+      );
+      if (Boolean(coursesSubscription.rowCount)) {
+        subscribeStatus = true;
+      } else {
+        subscribeStatus = false;
+      }
+
+      const desiredCourses = await pool.query(
+        `SELECT *
+          FROM desired_courses
+          WHERE course_id = $1 AND user_id = $2
+          `,
+        [courseId, userId]
+      );
+      if (Boolean(desiredCourses.rowCount)) {
+        desireStatus = true;
+      } else {
+        desireStatus = false;
+      }
+    }
+
     return res.json({
       data: course_data,
       dataCategory: filterCategory.rows,
+      subscribeStatus,
+      desireStatus,
     });
   } catch (error) {
     return res.sendStatus(500);
@@ -100,68 +136,37 @@ coursesRouter.get("/:courseId", async (req, res) => {
 
 coursesRouter.post("/:courseId", async (req, res) => {
   try {
-    const data = {
-      ...req.body,
-      courseId: req.params.courseId,
-    };
+    const courseId = req.params.courseId;
+    const userId = req.query.byUser;
+    const action = req.body.action;
 
     let message;
 
-    if (data.subscribeCourse) {
+    if (/subscribe/i.test(action)) {
       await pool.query(
         `INSERT INTO subscriptions(user_id, course_id, status)
           VALUES ($1, $2, $3)`,
-        [data.user_id, data.courseId, 0]
+        [userId, courseId, 0]
       );
-      message = "Course has been successfully subscribed";
-    }
-
-    if (data.addCourse) {
+      message = "The course has been successfully subscribed";
+    } else if (/add/i.test(action)) {
       await pool.query(
         `INSERT INTO desired_courses(user_id, course_id)
           VALUES ($1, $2)`,
-        [data.user_id, data.courseId]
+        [userId, courseId]
       );
-      message = "Desired Course has been successfully added";
-    } else if (data.addCourse === false) {
+      message =
+        "The course has been successfully added to the desired courses list";
+    } else if (/remove/i.test(action)) {
       await pool.query(
         `DELETE FROM desired_courses WHERE user_id = $1 AND course_id = $2`,
-        [data.user_id, data.courseId]
+        [userId, courseId]
       );
-      message = "Desired Course has been successfully deleted";
-    }
-
-    let subscribeStatus;
-    const coursesSubscription = await pool.query(
-      `SELECT *
-      FROM subscriptions
-      WHERE course_id = $1 AND user_id = $2
-      `,
-      [data.courseId, data.user_id]
-    );
-    if (Boolean(coursesSubscription.rowCount)) {
-      subscribeStatus = true;
-    } else {
-      subscribeStatus = false;
-    }
-
-    let desireStatus;
-    const desiredCourses = await pool.query(
-      `SELECT *
-        FROM desired_courses
-        WHERE course_id = $1 AND user_id = $2
-        `,
-      [data.courseId, data.user_id]
-    );
-    if (Boolean(desiredCourses.rowCount)) {
-      desireStatus = true;
-    } else {
-      desireStatus = false;
+      message =
+        "The course has been successfully deleted from the desired courses list";
     }
 
     return res.json({
-      desireStatus,
-      subscribeStatus,
       message,
     });
   } catch (error) {
