@@ -1,5 +1,6 @@
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import HomeworkBox from "../components/HomeworkBox";
 import {
   Box,
   Flex,
@@ -71,13 +72,15 @@ function MyHomework() {
       <Center>
         <Flex
           flexDirection="column"
-          border="1px"
           alignItems="center"
           w="1120px"
           h="1560px"
           mb="145px"
         >
-          <Heading>hi there</Heading>
+          <HomeworkBox/>
+          <HomeworkBox/>
+          <HomeworkBox/>
+          <HomeworkBox/>
         </Flex>
       </Center>
       <Footer />
