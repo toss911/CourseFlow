@@ -14,11 +14,17 @@ function AuthenticatedApp() {
       <Route path="/" element={<HomePage />} />
       <Route path="/courses" element={<OurCourses />} />
       <Route path="/courses/:courseId" element={<CourseDetail />} />
+<<<<<<< HEAD
       <Route path="/profile" element={<UserProfile />} />
       {/* <Route path="/learning" element={<LearningPage />} /> */}
       <Route path="/mycourses" element={<MyCourses />} />
       <Route path="/learning" element={<LearningPage />} />
       <Route path ="/homework/" element= {<MyHomework/>}/>
+=======
+      <Route path="profile" element={<UserProfile />} />
+      <Route path="/learning" element={<LearningPage />} />
+      <Route path ="/homework/:userId" element= {<MyHomework/>}/>
+>>>>>>> d8ee014 (feat: add ui for my homework page #3)
     </Routes>
   );
 }
