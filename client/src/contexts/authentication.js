@@ -18,9 +18,7 @@ function AuthProvider(props) {
   const register = async (data) => {
     try {
       let copiedData = Object.assign({}, data);
-      if (!copiedData.birthdate) {
-        copiedData.birthdate = null;
-      }
+      // if education data is empty => turn it from empty string to null
       if (!copiedData.education) {
         copiedData.education = null;
       }

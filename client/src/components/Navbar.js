@@ -52,13 +52,20 @@ export const Navbar = () => {
             <Menu>
               <MenuButton bg="white" color="gray.800">
                 <HStack spacing="12px">
-                  <Avatar src={contextState.user.avatar_directory} />
+                  <Avatar
+                    loading="lazy"
+                    src={
+                      contextState.user.avatar_directory
+                        ? contextState.user.avatar_directory.url
+                        : "assets/misc/user-icon.svg"
+                    }
+                  />
                   <Text variant="body2">{contextState.user.full_name}</Text>
                   <TriangleDownIcon />
                 </HStack>
               </MenuButton>
               <MenuList>
-                <MenuItem>
+                <MenuItem onClick={() => navigate("/profile")}>
                   <Image
                     borderRadius="full"
                     src="/assets/landing-page/Icon/Profile.svg"
