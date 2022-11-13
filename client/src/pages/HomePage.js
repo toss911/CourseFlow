@@ -3,9 +3,10 @@ import { Box, Image, Flex, Text, Heading, Button } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer";
 import { PreFooter } from "../components/PreFooter";
-import ReviewSlider from "../components/ReviewSlider.js";
 import { SlideData } from "../data/SlideData.js";
 import { useNavigate } from "react-router-dom";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -414,11 +415,90 @@ function HomePage() {
           justify="center"
           mb="200px"
         >
-          {/* -------------Non-Carousel START------------ */}
-          {/* <ReviewNonSlider /> */}
-          {/* -----------Carousel START ---------------*/}
           <Box w="1440px" mt="61.85px">
-            <ReviewSlider slides={SlideData} />
+            <Carousel
+              infiniteLoop
+              axis="horizontal"
+              centerMode
+              centerSlidePercentage="60"
+              showIndicators={false}
+              showStatus={false}
+              swipeable
+              emulateTouch
+              interval={2000}
+              autoPlay
+              showArrows={false}
+            >
+              {SlideData.map((slide) => {
+                return (
+                  <Flex
+                    flexDirection="column"
+                    align="start"
+                    justify="center"
+                    bg="blue.100"
+                    borderRadius="8px"
+                    mt="20px"
+                    pl="72.28px"
+                    ml="25%"
+                    w="578.78px"
+                    h="309.48px"
+                    position="relative"
+                  >
+                    <Image
+                      src={slide.image}
+                      alt={slide.alt}
+                      w="200px"
+                      h="240px"
+                      position="absolute"
+                      right="350px"
+                    />
+                    <Image
+                      src="/assets/landing-page/review/quote-large.svg"
+                      alt="quote-large-left"
+                      position="absolute"
+                      w="35.9px"
+                      h="56.7px"
+                      top="0px"
+                      left="-430px"
+                    />
+                    <Image
+                      src="/assets/landing-page/review/quote-large.svg"
+                      alt="quote-large-left"
+                      position="absolute"
+                      w="35.9px"
+                      h="56.7px"
+                      top="0px"
+                      left="-385px"
+                    />
+                    <Heading variant="headline3" color="blue.500" pt="66.79px">
+                      {slide.name}
+                    </Heading>
+                    <Text
+                      flexDirection="column"
+                      align="start"
+                      justify="center"
+                      variant="body2"
+                      color="gray.700"
+                      pt="24px"
+                      pb="68.69px"
+                      pr="25.36px"
+                      w="481.14px"
+                    >
+                      {slide.content}
+                    </Text>
+                    <Image
+                      src="/assets/landing-page/review/quote-double-small.svg"
+                      alt="quote-large-left"
+                      position="absolute"
+                      w="23.2px"
+                      h="36.64px"
+                      bottom="15px"
+                      right="-230px"
+                    />
+                  </Flex>
+                );
+              })}
+            </Carousel>
           </Box>
           <Image
             src="/assets/landing-page/review/plus.svg"

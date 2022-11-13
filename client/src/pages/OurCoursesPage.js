@@ -11,9 +11,7 @@ import {
   Flex,
   Text,
   Heading,
-  Button,
   Input,
-  Link,
   InputLeftElement,
   InputGroup,
   Center,
@@ -21,25 +19,16 @@ import {
 } from "@chakra-ui/react";
 import useCourses from "../hooks/useCourses";
 
+const coursesPerPage = 12;
+
 function OurCourses() {
   const [keywords, setKeywords] = useState("");
   const [page, setPage] = useState(1);
-  const [coursesPerPage, setCoursesPerPage] = useState(12);
+  const { getCourses, courses, isLoading, setIsLoading } = useCourses();
 
   const handleSearchTextChange = (event) => {
     setKeywords(event.target.value);
   };
-
-  const {
-    getCourses,
-    courses,
-    getCoursesbyId,
-    isLoading,
-    setIsLoading,
-    totalPages,
-  } = useCourses();
-
-  const noCourse = typeof courses !== "undefined" && courses > 0;
 
   useEffect(() => {
     setIsLoading(true);

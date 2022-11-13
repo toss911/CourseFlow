@@ -5,6 +5,7 @@ import {
   Divider,
   Modal,
   ModalOverlay,
+  ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalBody,
@@ -13,24 +14,64 @@ import {
 import { useState } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const PriceCard = (props) => {
-  const [modalMsg, setModalMsg] = useState({});
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, contextState } = useAuth();
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleAddCourse = () => {
-    onOpen();
+  const handleAddCourse = async () => {
+    setIsButtonLoading(true);
+    // if "addStatus" is true => remove from desired course
+    // if "addStatus" is false => add to desired course
+    if (!props.addStatus) {
+      const result = await axios.post(
+        `http://localhost:4000/courses/${props.courseId}`,
+        {
+          user_id: contextState.user.user_id,
+          addCourse: true,
+        }
+      );
+      if (/successfully added/g.test(result.data.message)) {
+        // setAddStatus from false to true
+        props.setAddStatus(!props.addStatus);
+      }
+    } else {
+      const result = await axios.post(
+        `http://localhost:4000/courses/${props.courseId}`,
+        {
+          user_id: contextState.user.user_id,
+          addCourse: false,
+        }
+      );
+      if (/successfully deleted/g.test(result.data.message)) {
+        // setAddStatus from true to false
+        props.setAddStatus(!props.addStatus);
+      }
+    }
+    setIsButtonLoading(false);
   };
 
-  const handleSubscribe = () => {
-    setModalMsg({
-      detail: `Do you want to subscribe ${props.courseName} Course?`,
-      cancelButton: `No, I am not`,
-      confirmButton: `Yes, I want to subscribe`,
-    });
-    onOpen();
+  const handleSubscribe = async () => {
+    setIsButtonLoading(true);
+    if (!props.subscribeStatus) {
+      const result = await axios.post(
+        `http://localhost:4000/courses/${props.courseId}`,
+        {
+          user_id: contextState.user.user_id,
+          subscribeCourse: true,
+        }
+      );
+      if (/successfully subscribed/g.test(result.data.message)) {
+        // setSubscribeStatus from false to true
+        props.setSubscribeStatus(!props.subscribeStatus);
+        onClose();
+      }
+    }
+    setIsButtonLoading(false);
   };
 
   return (
@@ -60,58 +101,89 @@ export const PriceCard = (props) => {
       </Text>
       <Divider borderColor="gray.300" />
       <Box display="flex" flexDirection="column" gap="16px" w="309px">
-        <Button
-          variant="secondary"
-          onClick={() => {
-            if (!isAuthenticated) {
-              navigate("/login");
-            } else {
-              // สร้าง Request ไปหา Server
-              handleAddCourse();
-            }
-          }}
-        >
-          Get In Desire Course
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            if (!isAuthenticated) {
-              navigate("/login");
-            } else {
-              // สร้าง Request ไปหา Server
-              handleSubscribe();
-            }
-          }}
-        >
-          Subscribe This Course
-        </Button>
+        {props.subscribeStatus ? (
+          <Button
+            variant="primary"
+            onClick={() => navigate(`/learning/${props.courseId}`)}
+          >
+            Start Learning
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="secondary"
+              isLoading={isButtonLoading}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate("/login");
+                } else {
+                  handleAddCourse();
+                }
+              }}
+            >
+              {props.addStatus
+                ? `Remove from Desired Course`
+                : `Get In Desire Course`}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate("/login");
+                } else {
+                  onOpen();
+                }
+              }}
+            >
+              Subscribe This Course
+            </Button>
+          </>
+        )}
       </Box>
       <Modal
         isCentered
         isOpen={isOpen}
         onClose={onClose}
-        onCloseComplete={() => navigate("/login")}
         closeOnOverlayClick={false}
+        size="lg"
       >
         <ModalOverlay />
         <ModalContent borderRadius="24px">
-          <ModalHeader
-            bg="blue.500"
-            color="white"
-            textAlign="center"
-            borderRadius="24px 24px 0px 0px"
-            fontSize="1.5rem"
-          >
-            Confirmation
+          <ModalHeader borderRadius="24px 24px 0px 0px">
+            <Text variant="body1" color="black">
+              Confirmation
+            </Text>
           </ModalHeader>
-          <ModalBody textAlign="center" mt="1em" color="black" fontSize="1rem">
-            Do you sure to subscribe
-            <Box mt="24px">
-              <Button variant="secondary" mr={3} onClick={onClose}>
+          <Divider sx={{ borderColor: "gray.300" }} />
+          <ModalCloseButton color="gray.500" />
+          <ModalBody p="24px 50px 24px 24px" color="black">
+            <Text variant="body2" color="gray.700" as="span">
+              Do you want to subscribe
+            </Text>
+            <Text
+              variant="body2"
+              color="gray.700"
+              as="span"
+              fontWeight="700"
+              fontStyle="italic"
+            >
+              {` ${props.courseName} `}
+            </Text>
+            <Text variant="body2" color="gray.700" as="span">
+              course?
+            </Text>
+            <Box mt="24px" width="600px">
+              <Button variant="secondary" onClick={onClose}>
                 No, I don't
               </Button>
-              <Button variant="primary" mr={3} onClick={onClose}>
+              <Button
+                ml="16px"
+                isLoading={isButtonLoading}
+                variant="primary"
+                onClick={() => {
+                  handleSubscribe();
+                }}
+              >
                 Yes, I want to subscribe
               </Button>
             </Box>
