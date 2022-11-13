@@ -24,6 +24,7 @@ import { Field, Form, Formik } from "formik";
 import { Footer } from "../components/Footer";
 import { Navbar } from "../components/Navbar";
 import { useAuth } from "../contexts/authentication";
+import jwtDecode from "jwt-decode";
 // *- Datepicker library -* //
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -31,61 +32,30 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CalendarIcon from "../components/CalendarIcon";
+let action;
 
 function UserProfile() {
   const { contextState, setContextState } = useAuth();
   const [avatar, setAvatar] = useState();
+  const [avatarFile, setAvatarFile] = useState();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const userId = contextState.user.user_id;
 
   useEffect(() => {
     if (contextState.user.avatar_directory) {
-      setAvatar(contextState.user.avatar_directory);
+      setAvatar(contextState.user.avatar_directory.url);
     }
   }, []);
-
-  const handleSubmit = async (values, props) => {
-    try {
-      const formData = new FormData();
-      formData.append("full_name", values.full_name);
-      formData.append("birthdate", values.birthdate || "");
-      formData.append("education", values.education);
-      formData.append("email", values.email);
-      formData.append("avatar", avatar);
-      const result = await axios.put(
-        `http://localhost:4000/user/${userId}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      const msg = result.data.message;
-      if (/updated successfully/i.test(msg)) {
-        onOpen();
-        const newState = Object.assign({}, contextState);
-        newState.user.avatar_directory = result.data.newUrl;
-        setContextState(newState);
-      } else if (/taken/i.test(msg)) {
-        props.setFieldError("email", msg);
-      } else if (/Internal Server Error/i.test(msg)) {
-        toast({
-          title: { msg },
-          status: "error",
-          isClosable: true,
-        });
-      }
-    } catch (err) {
-      alert(`ERROR: Please try again later`);
-    }
-  };
 
   const handleFileChange = (event) => {
     const currentFile = event.target.files[0];
     if (currentFile) {
       if (/jpeg|png/gi.test(currentFile.type)) {
         if (currentFile.size <= 2e6) {
-          setAvatar(currentFile);
+          action = "change";
+          setAvatarFile(currentFile);
+          setAvatar(URL.createObjectURL(currentFile));
         } else {
           return toast({
             title: "File size must be less than 2MB!",
@@ -103,7 +73,49 @@ function UserProfile() {
     }
   };
 
-  // *- validation -* //
+  const handleSubmit = async (values, props) => {
+    try {
+      const formData = new FormData();
+      formData.append("full_name", values.full_name);
+      formData.append("birthdate", values.birthdate || "");
+      formData.append("education", values.education);
+      formData.append("email", values.email);
+      if (/change/i.test(action)) {
+        formData.append("action", action);
+        formData.append("avatar", avatarFile);
+      } else if (/delete/i.test(action)) {
+        formData.append("action", action);
+      }
+      const result = await axios.put(
+        `http://localhost:4000/user/${userId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      const msg = result.data.message;
+      if (/updated successfully/i.test(msg)) {
+        // issue a new token since payload in the token has been changed
+        onOpen();
+        const token = result.data.token;
+        localStorage.setItem("token", token);
+        const userDataFromToken = jwtDecode(token);
+        setContextState({ ...contextState, user: userDataFromToken });
+      } else if (/taken/i.test(msg)) {
+        props.setFieldError("email", msg);
+      } else if (/Internal Server Error/i.test(msg)) {
+        toast({
+          title: msg,
+          status: "error",
+          isClosable: true,
+        });
+      }
+    } catch (err) {
+      alert(`ERROR: Please try again later`);
+    }
+  };
+
+  // *- input validation -* //
   const validateName = (value) => {
     let error;
     if (!value) {
@@ -291,13 +303,14 @@ function UserProfile() {
                     <Flex position="relative">
                       <Image
                         w="100%"
-                        src={
-                          typeof avatar === "object" &&
-                          !Array.isArray(avatar) &&
-                          avatar !== null
-                            ? URL.createObjectURL(avatar)
-                            : avatar
-                        }
+                        // src={
+                        //   typeof avatar === "object" &&
+                        //   !Array.isArray(avatar) &&
+                        //   avatar !== null
+                        //     ? URL.createObjectURL(avatar)
+                        //     : avatar
+                        // }
+                        src={avatar}
                         fit="contain"
                       />
                       <Flex
@@ -318,6 +331,7 @@ function UserProfile() {
                         cursor="pointer"
                         onClick={() => {
                           setAvatar();
+                          action = "delete";
                         }}
                       >
                         <Image
@@ -346,7 +360,7 @@ function UserProfile() {
                     </label>
                   )}
                 </Flex>
-                <Flex className="right-section" direction="column">
+                <Flex className="right-section" direction="column" w="453px">
                   {/* //------------------------- Input Name --------------------// */}
                   <Field name="full_name" validate={validateName}>
                     {({ field, form }) => (
@@ -507,7 +521,7 @@ function UserProfile() {
         isCentered
         isOpen={isOpen}
         onClose={onClose}
-        closeOnOverlayClick={false}
+        // onCloseComplete={() => window.location.reload()}
       >
         <ModalOverlay />
         <ModalContent borderRadius="24px">
@@ -521,11 +535,8 @@ function UserProfile() {
             <CheckCircleIcon mr="0.5em" />
             Success
           </ModalHeader>
-          <ModalBody textAlign="center" mt="1em" color="black" fontSize="1rem">
+          <ModalBody textAlign="center" my="2em" color="black" fontSize="1rem">
             Your profile has been updated successfully.
-            <Button m="1em" variant="success" mr={3} onClick={onClose}>
-              Continue Learning
-            </Button>
           </ModalBody>
         </ModalContent>
       </Modal>
