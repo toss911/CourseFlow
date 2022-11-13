@@ -29,10 +29,9 @@ export const PriceCard = (props) => {
     // if "addStatus" is false => add to desired course
     if (!props.addStatus) {
       const result = await axios.post(
-        `http://localhost:4000/courses/${props.courseId}`,
+        `http://localhost:4000/courses/${props.courseId}?byUser=${contextState.user.user_id}`,
         {
-          user_id: contextState.user.user_id,
-          addCourse: true,
+          action: "add",
         }
       );
       if (/successfully added/g.test(result.data.message)) {
@@ -41,10 +40,9 @@ export const PriceCard = (props) => {
       }
     } else {
       const result = await axios.post(
-        `http://localhost:4000/courses/${props.courseId}`,
+        `http://localhost:4000/courses/${props.courseId}?byUser=${contextState.user.user_id}`,
         {
-          user_id: contextState.user.user_id,
-          addCourse: false,
+          action: "remove",
         }
       );
       if (/successfully deleted/g.test(result.data.message)) {
@@ -59,10 +57,9 @@ export const PriceCard = (props) => {
     setIsButtonLoading(true);
     if (!props.subscribeStatus) {
       const result = await axios.post(
-        `http://localhost:4000/courses/${props.courseId}`,
+        `http://localhost:4000/courses/${props.courseId}?byUser=${contextState.user.user_id}`,
         {
-          user_id: contextState.user.user_id,
-          subscribeCourse: true,
+          action: "subscribe",
         }
       );
       if (/successfully subscribed/g.test(result.data.message)) {

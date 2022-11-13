@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -29,34 +29,32 @@ const useCourses = () => {
     }
   };
 
-  const getCourseById = async (data) => {
+  const getCourseById = async (userId) => {
     try {
       setIsError(false);
       setIsLoading(true);
+      let apiRoute;
+      if (userId) {
+        apiRoute = `http://localhost:4000/courses/${params.courseId}?byUser=${userId}`;
+      } else {
+        apiRoute = `http://localhost:4000/courses/${params.courseId}`;
+      }
 
       //*---- Query course data ----*//
-      const courseData = await axios.get(
-        `http://localhost:4000/courses/${params.courseId}`
-      );
-      setCourse(JSON.parse(courseData.data.data));
-      setCategory(JSON.parse(courseData.data.dataCategory));
+      const courseData = await axios.get(apiRoute);
+      setCourse(courseData.data.data);
+      setCategory(courseData.data.dataCategory);
 
-      //*---- Query subscription or desired course data ----*//
+      //*---- Query user's subscribe/desire status ----*//
       const status = {
         subscribe: false,
         desire: false,
       };
-      if (data) {
-        const statusData = await axios.post(
-          `http://localhost:4000/courses/${params.courseId}`,
-          data
-        );
-        if (statusData.data.subscribeStatus) {
-          status.subscribe = true;
-        }
-        if (statusData.data.desireStatus) {
-          status.desire = true;
-        }
+      if (courseData.data.subscribeStatus) {
+        status.subscribe = true;
+      }
+      if (courseData.data.desireStatus) {
+        status.desire = true;
       }
       setIsLoading(false);
       return status;

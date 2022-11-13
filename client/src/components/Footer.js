@@ -18,7 +18,6 @@ export function Footer() {
             src="/assets/landing-page/footer/Logo.png"
             cursor="pointer"
             onClick={() => {
-              navigate("/");
               window.scrollTo(0, 0);
             }}
           />
