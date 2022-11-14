@@ -297,22 +297,11 @@ function UserProfile() {
                   mr="120px"
                   bg="gray.100"
                   borderRadius="12px"
-                  boxShadow="shadow2"
+                  boxShadow="shadow1"
                 >
                   {avatar ? (
-                    <Flex position="relative">
-                      <Image
-                        w="100%"
-                        // src={
-                        //   typeof avatar === "object" &&
-                        //   !Array.isArray(avatar) &&
-                        //   avatar !== null
-                        //     ? URL.createObjectURL(avatar)
-                        //     : avatar
-                        // }
-                        src={avatar}
-                        fit="contain"
-                      />
+                    <Flex w="100%" h="100%" position="relative">
+                      <Image w="100%" src={avatar} fit="contain" />
                       <Flex
                         w="32px"
                         h="32px"
