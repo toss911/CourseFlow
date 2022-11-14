@@ -5,6 +5,7 @@ import CourseDetail from "./CourseDetailPage.js";
 import UserProfile from "./UserProfilePage.js";
 //import LearningPage from "./LearningPage.js";
 import MyCourses from "./MyCoursesPage.js";
+import DesireCourse from "./DesireCoursePage.js";
 
 function AuthenticatedApp() {
   return (
@@ -15,6 +16,7 @@ function AuthenticatedApp() {
       <Route path="/profile" element={<UserProfile />} />
       {/* <Route path="/learning" element={<LearningPage />} /> */}
       <Route path="/subscription" element={<MyCourses />} />
+      <Route path="desire" element={<DesireCourse />} />
     </Routes>
   );
 }
