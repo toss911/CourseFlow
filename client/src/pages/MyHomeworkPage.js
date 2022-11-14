@@ -14,8 +14,25 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 function MyHomework() {
+
+  // *- States -* //
+  const [homework, setHomework] = useState([{}]);
+  const [homeworkStatus, setHomeworkStatus] = useState("");
+  const [deadline, setDeadline] = useState("");
+
+  // *- Get homework details function-* //
+  const getHomeworkDetails = async () => {
+    const results = await axios.get("http://localhost:4000/homework");
+    setHomework(results.data);
+  };
+
+  useEffect(() => {
+    getHomeworkDetails();
+  }, []);
+
   return (
     <Box>
       <Navbar />

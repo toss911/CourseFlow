@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "./HomePage.js";
 import OurCourses from "./OurCoursesPage.js";
 import CourseDetail from "./CourseDetailPage.js";
-import UserProfile from "./UserProfile.js";
+import UserProfile from "./UserProfilePage";
 import MyHomework from "./MyHomeworkPage.js";
 //import LearningPage from "./LearningPage.js";
 import MyCourses from "./MyCoursesPage.js";
@@ -18,7 +18,7 @@ function AuthenticatedApp() {
       {/* <Route path="/learning" element={<LearningPage />} /> */}
       <Route path="/mycourses" element={<MyCourses />} />
       <Route path="/learning" element={<LearningPage />} />
-      <Route path ="/homework" element= {<MyHomework/>}/>
+      <Route path ="/homework/userid" element= {<MyHomework/>}/>
     </Routes>
   );
 }
