@@ -14,18 +14,22 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
 
 function MyHomework() {
 
-  // *- States -* //
+  // *- States and variables -* //
   const [homework, setHomework] = useState([{}]);
   const [homeworkStatus, setHomeworkStatus] = useState("");
   const [deadline, setDeadline] = useState("");
+  const { contextState } = useAuth();
+  const userId = contextState.user.user_id;
+  // console.log(userId);
 
   // *- Get homework details function-* //
   const getHomeworkDetails = async () => {
-    const results = await axios.get("http://localhost:4000/homework");
+    const results = await axios.get(`http://localhost:4000/homework/${userId}`);
     setHomework(results.data);
   };
 
