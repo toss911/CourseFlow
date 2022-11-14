@@ -30,12 +30,14 @@ function MyHomework() {
   // *- Get homework details function-* //
   const getHomeworkDetails = async () => {
     const results = await axios.get(`http://localhost:4000/homework/${userId}`);
-    setHomework(results.data);
+    setHomework(results.data.data);
   };
 
   useEffect(() => {
     getHomeworkDetails();
   }, []);
+
+  console.log(homework);
 
   return (
     <Box>
