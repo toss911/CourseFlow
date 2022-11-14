@@ -28,12 +28,16 @@ export const getAllHomework = async (req, res) => {
     };
 
     const currentDate = new Date();
-    const currentDateISO = currentDate.toISOString();
 
     // *- Find no. of days until deadline -* //
-    const findDaysUntilDeadline = (current_date, deadline) => {
-      const daysUntilDeadline = deadline - current_date;
-      return Math.abs(daysUntilDeadline);
+    const findDaysUntilDeadline = (currentDate, deadline) => {
+      const dl = new Date(deadline);
+      const cd = new Date(currentDate);
+      const deadlineDateInMs = dl.getTime();
+      const currentDateInMs = cd.getTime();
+      const msDiff = deadlineDateInMs - currentDateInMs;
+      const daysUntilDeadline = msDiff / (1000 * 60 * 60 * 24);
+      return Math.round(daysUntilDeadline);
     };
 
     // *- Add assignment status, deadline and days until deadline -* //
@@ -43,11 +47,11 @@ export const getAllHomework = async (req, res) => {
         assignment.duration
       );
       assignment["days_until_deadline"] = findDaysUntilDeadline(
-        assignment.deadline,
-        currentDateISO
+        currentDate,
+        assignment.deadline
       );
 
-      if (currentDateISO > assignment.deadline) {
+      if (currentDate > assignment.deadline) {
         assignment["status"] = "overdue";
       } else if (assignment.submitted_date != null) {
         assignment.submitted_date < assignment.deadline
