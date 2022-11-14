@@ -77,16 +77,4 @@ export const getAllHomework = async (req, res) => {
 export const submitHomework = async (req, res) => {};
 export const saveAnswerDraft = async (req, res) => {};
 
-// *- Has submitted date: -* //
-// Case1: Submitted
-// Condition(s): - submitted date must be less than duration + accepted date
-// Case2: Overdue
-// Condition(s): - submitted date is more than duration + accepted date
 
-// *- Has no submitted date: -* //
-// Case1: Pending
-// Condition(s): - If answer field is empty = pending
-// Case2: In progress
-// Condition(s): - Answer field is not empty and there's no submitted date
-// Case3: Overdue (check this first)
-// Condition(s): - current date is more than duration + accepted date
