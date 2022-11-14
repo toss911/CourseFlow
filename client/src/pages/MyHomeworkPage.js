@@ -28,20 +28,10 @@ function MyHomework() {
           justifyContent="center"
           backgroundImage="url('/assets/myhomework-page/background.png')"
         >
-          <Flex
-            flexDirection="column"
-            alignItems="center"
-            h="145px"
-          >
+          <Flex flexDirection="column" alignItems="center" h="145px">
             <Heading variant="headline2">My Homework</Heading>
             {/* Don't forget to change the color of active tabs to black */}
-            <Tabs
-              w="470px"
-              h="40px"
-              mt="60px"
-              gap="16px"
-              textColor="gray.600"
-            >
+            <Tabs w="470px" h="40px" mt="60px" gap="16px" textColor="gray.600">
               <TabList>
                 <Tab>
                   <Text variant="body2">All</Text>
@@ -59,7 +49,6 @@ function MyHomework() {
                   <Text variant="body2">Overdue</Text>
                 </Tab>
               </TabList>
-
               <TabPanels mt="40px">
                 <TabPanel>
                   <Center>
