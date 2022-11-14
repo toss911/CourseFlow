@@ -1,0 +1,88 @@
+import { pool } from "../utils/db.js";
+
+export const getAllHomework = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const results = await pool.query(
+      `SELECT courses.course_name, lessons.lesson_name, sub_lessons.sub_lesson_name, 
+        assignments.assignment_id, assignments.detail, assignments.duration, 
+        users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date
+        FROM courses
+        JOIN lessons
+        ON courses.course_id = lessons.course_id
+        JOIN sub_lessons
+        ON lessons.lesson_id = sub_lessons.lesson_id
+        JOIN assignments
+        ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+        JOIN users_assignments 
+        ON assignments.assignment_id = users_assignments.assignment_id
+        WHERE users_assignments.user_id = $1`,
+      [userId]
+    );
+
+    // *- Find deadline in date format -* //
+    const findDeadline = (accepted_date, duration) => {
+      const deadline = new Date(accepted_date);
+      deadline.setDate(deadline.getDate() + parseInt(duration));
+      return deadline;
+    };
+
+    const currentDate = new Date();
+    const currentDateISO = currentDate.toISOString();
+
+    // *- Find no. of days until deadline -* //
+    const findDaysUntilDeadline = (current_date, deadline) => {
+      const daysUntilDeadline = deadline - current_date;
+      return Math.abs(daysUntilDeadline);
+    };
+
+    // *- Add assignment status, deadline and days until deadline -* //
+    for (let assignment of results.rows) {
+      assignment["deadline"] = findDeadline(
+        assignment.accepted_date,
+        assignment.duration
+      );
+      assignment["days_until_deadline"] = findDaysUntilDeadline(
+        assignment.deadline,
+        currentDateISO
+      );
+
+      if (currentDateISO > assignment.deadline) {
+        assignment["status"] = "overdue";
+      } else if (assignment.submitted_date != null) {
+        assignment.submitted_date < assignment.deadline
+          ? (assignment["status"] = "submitted")
+          : (assignment["status"] = "overdue");
+      } else {
+        if (assignment.answer != null) {
+          assignment["status"] = "in progress";
+        } else {
+          assignment["status"] = "pending";
+        }
+      }
+    }
+
+    return res.json({
+      data: results.rows,
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+export const submitHomework = async (req, res) => {};
+export const saveAnswerDraft = async (req, res) => {};
+
+// *- Has submitted date: -* //
+// Case1: Submitted
+// Condition(s): - submitted date must be less than duration + accepted date
+// Case2: Overdue
+// Condition(s): - submitted date is more than duration + accepted date
+
+// *- Has no submitted date: -* //
+// Case1: Pending
+// Condition(s): - If answer field is empty = pending
+// Case2: In progress
+// Condition(s): - Answer field is not empty and there's no submitted date
+// Case3: Overdue (check this first)
+// Condition(s): - current date is more than duration + accepted date

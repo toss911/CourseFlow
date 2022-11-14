@@ -66,11 +66,20 @@ const HomeworkBox = () => {
                 What are the 4 elements of service design?
               </Text>
             </label>
+
             {/* Move input text to top left of the input box */}
-            <Input placeholder="Answer here..." w="719px" h="96px" textAlign="start" />
+            <Input
+              placeholder="Answer here..."
+              w="719px"
+              h="96px"
+              textAlign="start"
+            />
+            <Button variant="secondary" pt="0px" pb="0px" pl="10px" pr="10px" size="xs">
+              Save draft
+            </Button>
           </Flex>
           <Flex flexDirection="column" gap="16px" w="137px" h="108px" mt="40px">
-            <Button>Submit</Button>
+            <Button p="4px">Submit</Button>
             <Button variant="ghost">Open in course</Button>
           </Flex>
         </Flex>
