@@ -84,7 +84,9 @@ userRouter.put("/:userId", avatarUpload, async (req, res) => {
             "upload"
           );
         } else if (/delete/.test(action)) {
-          await cloudinaryUpload(prevAvatar, "delete");
+          if (prevAvatar !== null) {
+            await cloudinaryUpload(prevAvatar, "delete");
+          }
           updatedUser.avatar = null;
         }
         await pool.query(
@@ -146,7 +148,9 @@ userRouter.put("/:userId", avatarUpload, async (req, res) => {
               "upload"
             );
           } else if (/delete/.test(action)) {
-            await cloudinaryUpload(prevAvatar, "delete");
+            if (prevAvatar !== null) {
+              await cloudinaryUpload(prevAvatar, "delete");
+            }
             updatedUser.avatar = null;
           }
           await pool.query(

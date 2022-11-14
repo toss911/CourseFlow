@@ -16,7 +16,7 @@ const cloudinaryUpload = async (file, action) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.log("Error from uploading:", error);
   }
 };
 
