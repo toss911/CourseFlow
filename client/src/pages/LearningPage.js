@@ -21,10 +21,27 @@ import {
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
 import { useEffect, useState } from "react";
-import useCourses from "../hooks/useCourses";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+//import useCourses from "../hooks/useCourses";
 function LearningPage() {
-  const { getCourseById, course, category, isLoading } = useCourses();
-  console.log(category);
+  //const { getCourseById, course, category, isLoading } = useCourses();
+  const params = useParams();
+  //console.log("params: ", params);
+  const [course, setCourse] = useState({});
+
+  useEffect(() => {
+    //getCourseById();
+    const courseData = async () => {
+      const results = await axios.get(
+        `http://localhost:4000/courses/${params.courseId}/learning`
+      );
+      setCourse(results.data.data);
+      console.log("course:", course);
+    };
+    courseData();
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -52,10 +69,10 @@ function LearningPage() {
           </Text>
 
           <Heading variant="headline3" mt="24px">
-            Service Design Essentials
+            {course.course_name}
           </Heading>
           <Text variant="body2" color="gray.700" mt="8px">
-            Lorem ipsum dolor sit amet, conse ctetur adipiscing elit.
+            {course.summary}
           </Text>
           <Text variant="body3" mt="24px">
             15% Complete
@@ -73,31 +90,69 @@ function LearningPage() {
               },
             }}
           />
-          <Accordion defaultIndex={[0]} allowMultiple w="300px" mt="24px">
-            <AccordionItem>
-              <h2>
-                <AccordionButton>
-                  <Box flex="1" textAlign="left" display="flex" color="black">
-                    <Text color="gray.700" display="flex" variant="body2">
-                      01
-                    </Text>
-                    <Text ml="24px" variant="body2">
-                      Introduction
-                    </Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
+          {Object.keys(course).length === 0
+            ? null
+            : Object.keys(course.lessons).map((lessonName, key) => {
+                let numberLesson = null;
+                if (key < 10) {
+                  numberLesson = "0" + (key + 1);
+                } else {
+                  numberLesson = key + 1;
+                }
+                return (
+                  <Accordion
+                    key={key}
+                    defaultIndex={[0]}
+                    allowMultiple
+                    w="300px"
+                    mt="24px"
+                  >
+                    <AccordionItem>
+                      <h2>
+                        <AccordionButton>
+                          <Box
+                            flex="1"
+                            textAlign="left"
+                            display="flex"
+                            color="black"
+                          >
+                            <Text
+                              color="gray.700"
+                              display="flex"
+                              variant="body2"
+                            >
+                              {numberLesson}
+                            </Text>
+                            <Text ml="24px" variant="body2">
+                              {lessonName}
+                            </Text>
+                          </Box>
+                          <AccordionIcon />
+                        </AccordionButton>
+                      </h2>
 
-              <AccordionPanel ml="25px" pb={4}>
-                <UnorderedList>
-                  <ListItem fontWeight="400" color="gray.700" fontSize="16px">
-                    <Text variant="body2">Welcome to the Course</Text>
-                  </ListItem>
-                </UnorderedList>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
+                      <AccordionPanel ml="25px" pb={4}>
+                        <UnorderedList>
+                          {course.lessons[lessonName].map(
+                            (subLessonName, key) => {
+                              return (
+                                <ListItem
+                                  key={key}
+                                  fontWeight="400"
+                                  color="gray.700"
+                                  fontSize="16px"
+                                >
+                                  <Text variant="body2">{subLessonName}</Text>
+                                </ListItem>
+                              );
+                            }
+                          )}
+                        </UnorderedList>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  </Accordion>
+                );
+              })}
         </Flex>
 
         <Flex flexDirection="column" alignItems="start" width="739px">
@@ -170,7 +225,7 @@ function LearningPage() {
               </Button>
               <Spacer />
               <Text pt="20px" color="gray.700">
-                Answer within 2 days
+                Submit within 2 days
               </Text>
             </Flex>
           </Flex>

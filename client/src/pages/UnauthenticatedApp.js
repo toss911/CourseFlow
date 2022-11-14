@@ -13,7 +13,7 @@ function UnauthenticatedApp() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/courses" element={<OurCourses />} />
       <Route path="/courses/:courseId" element={<CourseDetail />} />
-      <Route path="/learning" element={<LearningPage />} />
+      <Route path="/courses/:courseId/learning" element={<LearningPage />} />
     </Routes>
   );
 }
