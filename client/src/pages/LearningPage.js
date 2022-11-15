@@ -17,6 +17,7 @@ import {
   Textarea,
   Spacer,
   Progress,
+  AspectRatio,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
@@ -34,6 +35,10 @@ function LearningPage() {
 
   const handleSubLesson = (subLessonName) => {
     setChangeSubLesson(subLessonName);
+  };
+
+  const handleVideoEnded = () => {
+    alert("Testaodkaopk");
   };
 
   return (
@@ -169,8 +174,14 @@ function LearningPage() {
           <Heading mb="33px" variant="headline2">
             {changeSubLesson}
           </Heading>
-
-          <Image src="/assets/learning-page/video-mock.svg" alt="video-mock" />
+          <AspectRatio w="739px" ratio={16 / 9}>
+            <video controls onEnded={() => handleVideoEnded()}>
+              <source
+                src="https://res.cloudinary.com/dxk5mdqoz/video/upload/v1668525048/Countdown_amqcom.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </AspectRatio>
           <Flex
             bg="blue.100"
             width="739px"
