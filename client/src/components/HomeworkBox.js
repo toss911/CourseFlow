@@ -6,10 +6,10 @@ import {
   Heading,
   Input,
   Button,
+  Textarea,
 } from "@chakra-ui/react";
 
 const HomeworkBox = (props) => {
-
   const changeBadgeColor = (status) => {
     let badgeColor;
     switch (status) {
@@ -91,7 +91,7 @@ const HomeworkBox = (props) => {
         </Flex>
         <Flex
           w="928px"
-          h="172px"
+          h="180px"
           mt="36px"
           backgroundColor="white"
           borderRadius="8px"
@@ -109,9 +109,8 @@ const HomeworkBox = (props) => {
                 {props.hwDetail}
               </Text>
             </label>
-
-            {/* Move input text to top left of the input box */}
-            <Input
+            {/* Change text area depending on status */}
+            <Textarea
               placeholder="Answer here..."
               w="719px"
               h="96px"
@@ -124,6 +123,7 @@ const HomeworkBox = (props) => {
               pl="10px"
               pr="10px"
               size="xs"
+              mt="5px"
             >
               Save draft
             </Button>
