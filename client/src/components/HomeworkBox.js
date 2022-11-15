@@ -9,6 +9,44 @@ import {
 } from "@chakra-ui/react";
 
 const HomeworkBox = (props) => {
+
+  const changeBadgeColor = (status) => {
+    let badgeColor;
+    switch (status) {
+      case "submitted":
+        badgeColor = "submitted";
+        break;
+      case "overdue":
+        badgeColor = "overdue";
+        break;
+      case "in progress":
+        badgeColor = "in-progress";
+        break;
+      case "pending":
+        badgeColor = "pending";
+    }
+    return badgeColor;
+  };
+
+  const displayDaysUntilDeadline = (status) => {
+    let display;
+    switch (status) {
+      case "submitted":
+        display = "hidden";
+        break;
+      case "overdue":
+        display = "hidden";
+        break;
+      case "in progress":
+        display = "visible";
+        break;
+      case "pending":
+        display = "visible";
+        break;
+    }
+    return display;
+  };
+
   return (
     <Box>
       <Flex
@@ -35,19 +73,19 @@ const HomeworkBox = (props) => {
             gap="12px"
             alignItems="flex-end"
           >
-            <Badge variant={props.status=="submitted"? "submitted" : "overdue"}>
-              {/* Change the font style to lowercase */}
+            <Badge
+              variant={changeBadgeColor(props.status)}
+              sx={{ textTransform: "capitalize" }}
+            >
               <Text variant="body3">{props.status}</Text>
             </Badge>
             <Text
               w="165px"
               variant="body2"
               textColor="gray.700"
-              // visibility={
-              //   props.status == "submitted" || "overdue" ? "hidden" : "visible"
-              // }
+              visibility={displayDaysUntilDeadline(props.status)}
             >
-              Submit within {props.daysUntilDeadline} days
+              Submit within {props.daysUntilDeadline} {props.dayOrDays}
             </Text>
           </Flex>
         </Flex>

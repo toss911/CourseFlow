@@ -38,7 +38,6 @@ function MyHomework() {
     );
   };
 
-  console.log(homework);
   useEffect(() => {
     getHomeworkDetails();
   }, []);
@@ -107,6 +106,7 @@ function MyHomework() {
                           hwDetail={hw.detail}
                           daysUntilDeadline={hw.days_until_deadline}
                           answer={hw.answer}
+                          dayOrDays={hw.days_until_deadline <= 1? "day" : "days"}
                         />);
                       })}
                     </Flex>
@@ -132,6 +132,7 @@ function MyHomework() {
       <Footer />
     </Box>
   );
+
 }
 
 export default MyHomework;
