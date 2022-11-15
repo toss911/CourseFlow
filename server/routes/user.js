@@ -39,9 +39,9 @@ userRouter.put("/:id", async (req, res) => {
 userRouter.get("/courses/:id", async (req, res) => {
   const userId = req.params.id;
 
-  try {
-    const results = await pool.query(
-      `select courses.course_id, courses.course_name, 
+  // try {
+  const results = await pool.query(
+    `select courses.course_id, courses.course_name, 
       courses.summary, courses.cover_image_directory, courses.learning_time, 
       count(lessons.lesson_id) 
       as lessons_count
@@ -53,16 +53,16 @@ userRouter.get("/courses/:id", async (req, res) => {
       where subscriptions.user_id = $1
       group by courses.course_id 
       order by courses.course_id asc`,
-      [userId]
-    );
-    return res.json({
-      data: results.rows,
-    });
-  } catch (error) {
-    return res.json({
-      message: "cannot get data",
-    });
-  }
+    [userId]
+  );
+  return res.json({
+    data: results.rows,
+  });
+  // } catch (error) {
+  //   return res.json({
+  //     message: "cannot get data",
+  //   });
+  // }
 });
 
 export default userRouter;
