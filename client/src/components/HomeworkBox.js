@@ -46,6 +46,7 @@ const HomeworkBox = (props) => {
     }
     return display;
   };
+  
 
   return (
     <Box>

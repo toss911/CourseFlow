@@ -42,6 +42,7 @@ function MyHomework() {
     getHomeworkDetails();
   }, []);
 
+
   return (
     <Box>
       <Navbar />
