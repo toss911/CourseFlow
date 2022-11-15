@@ -92,7 +92,20 @@ export const submitHomework = async (req, res) => {
   } catch (error) {
     return res.sendStatus(500);
   }
-
 };
 
-export const saveAnswerDraft = async (req, res) => {};
+export const saveAnswerDraft = async (req, res) => {
+  const answer = req.body.answer;
+  const assignmentId = req.params.assignmentId;
+
+  try {
+    await pool.query(
+      `UPDATE users_assignments SET answer = $1
+      WHERE assignment_id = $2
+      RETURNING *`,
+      [answer, assignmentId]
+    );
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};

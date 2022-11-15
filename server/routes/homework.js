@@ -7,4 +7,6 @@ homeworkRouter.get("/:userId", homework_controller.getAllHomework);
 
 homeworkRouter.post("/:assignmentId", homework_controller.submitHomework);
 
+homeworkRouter.post("/:assignmentId", homework_controller.saveAnswerDraft);
+
 export default homeworkRouter;
