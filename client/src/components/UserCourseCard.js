@@ -23,7 +23,15 @@ export function UserCourseCard({ coursesCount }) {
       align="center"
     >
       <Box w="357px" mt="32px">
-        <Avatar src="https://bit.ly/broken-link" w="120px" h="120px" />
+        <Avatar
+          src={
+            contextState.user.avatar_directory
+              ? contextState.user.avatar_directory.url
+              : null
+          }
+          w="120px"
+          h="120px"
+        />
         <Heading variant="headline3" color="gray.800" mt="24px">
           {contextState.user.full_name}
         </Heading>
@@ -48,7 +56,7 @@ export function UserCourseCard({ coursesCount }) {
           alignItems="start"
         >
           <Text textAlign="start" variant="body2">
-            Course Inprogress
+            Course In progress
           </Text>
           <Heading variant="headline3">{coursesCount["in progress"]}</Heading>
         </Flex>

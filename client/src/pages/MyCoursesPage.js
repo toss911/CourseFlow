@@ -16,7 +16,7 @@ import useCourses from "../hooks/useCourses";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/authentication.js";
 
-function MyCourse() {
+function MyCourses() {
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
 
@@ -31,18 +31,9 @@ function MyCourse() {
   return (
     <Box w="vw">
       <Navbar />
-      {/* // MY COURSE START HERE // */}
-      <Container
-        // display="flex"
-
-        flexWrap="wrap"
-        w="vw"
-        h="fit-content"
-        mt="100px"
-        gap="60px"
-      >
+      <Container flexWrap="wrap" w="vw" h="fit-content" mt="100px" gap="60px">
         <Heading align="center" variant="headline2" mb="60px">
-          My Course
+          My Courses
         </Heading>
         <Box>
           <Tabs
@@ -163,86 +154,4 @@ function MyCourse() {
   );
 }
 
-//   return (
-//     <Box>
-//       <Navbar />
-//       {/* // MY COURSE START HERE // */}
-//       <Container
-//         display="flex"
-//         flexDirection="column"
-//         flexWrap="wrap"
-//         align="center"
-//         w="vw"
-//         h="fit-content"
-//         mt="100px"
-//         gap="60px"
-//       >
-//         <Heading variant="headline2">My Course</Heading>
-//         <Stack
-//           direction="row"
-//           flexWrap="wrap"
-//           spacing="8"
-//           justifyContent="center"
-//           alignItems="center"
-//         >
-//           <Button variant="link">
-//             <Text variant="body2" _hover={{ color: "black" }}>
-//               All Course
-//             </Text>
-//           </Button>
-//           <Button variant="link">
-//             <Text variant="body2" _hover={{ color: "black" }}>
-//               Inprogress
-//             </Text>
-//           </Button>
-//           <Button variant="link">
-//             <Text variant="body2" _hover={{ color: "black" }}>
-//               Complete
-//             </Text>
-//           </Button>
-//         </Stack>
-//       </Container>
-
-//       {/* // Cards Start Here // */}
-
-//       <Box
-//         display="flex"
-//         flexWrap="wrap"
-//         justifyContent="flex-start"
-//         m="40px 160px 200px 160px "
-//         w="100%"
-//       >
-//         <Box position="relative" alignItems="start">
-//           <Box top="0px" position="sticky">
-//             <UserCourseCard />
-//           </Box>
-//         </Box>
-
-// <Box
-// w="850px"
-// display="flex"
-// justifyContent="start"
-// flexWrap="wrap"
-//   gap="0px"
-// >
-//   {userCourses.map((course, key) => {
-//     return (
-//       <CourseCard
-//         key={key}
-//         courseTitle={course.course_name}
-//         courseSummary={course.summary}
-//         courseNumLessons={course.lessons_count}
-//         courseTime={course.learning_time}
-//         courseImg={course.cover_image_directory}
-//         courseId={course.course_id}
-//       />
-//     );
-//   })}
-// </Box>
-//       </Box>
-//       <Footer />
-//     </Box>
-//   );
-// }
-
-export default MyCourse;
+export default MyCourses;

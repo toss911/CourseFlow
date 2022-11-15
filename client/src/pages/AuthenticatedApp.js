@@ -3,7 +3,7 @@ import HomePage from "./HomePage.js";
 import OurCourses from "./OurCoursesPage.js";
 import CourseDetail from "./CourseDetailPage.js";
 import UserProfile from "./UserProfile.js";
-import MyCourse from "./MyCourse.js";
+import MyCourses from "./MyCoursesPage.js";
 
 function AuthenticatedApp() {
   return (
@@ -12,7 +12,7 @@ function AuthenticatedApp() {
       <Route path="/courses" element={<OurCourses />} />
       <Route path="/courses/:courseId" element={<CourseDetail />} />
       <Route path="profile" element={<UserProfile />} />
-      <Route path="/mycourse" element={<MyCourse />} />
+      <Route path="/mycourses" element={<MyCourses />} />
     </Routes>
   );
 }

@@ -69,7 +69,7 @@ export const Navbar = () => {
                   />
                   Profile
                 </MenuItem>
-                <MenuItem>
+                <MenuItem onClick={() => navigate("/mycourses")}>
                   <Image
                     borderRadius="full"
                     src="/assets/landing-page/Icon/My course.svg"
