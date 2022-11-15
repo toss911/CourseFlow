@@ -15,6 +15,7 @@ export function UserCourseCard({ coursesCount }) {
       mt="24px"
       overflow="hidden"
       mb="24px"
+      bg="white"
       _hover={{
         background: "white",
         border: "solid 1px",
