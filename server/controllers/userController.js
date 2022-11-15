@@ -209,7 +209,7 @@ export const subscribedCourses = async (req, res) => {
 
     let subscribedCourses = await pool.query(
       `
-      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
+      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, CAST(COUNT(lessons.lesson_id) AS INTEGER ) AS lessons_count
       FROM lessons
       INNER JOIN courses
       ON courses.course_id = lessons.course_id
@@ -242,7 +242,7 @@ export const subscribedCourses = async (req, res) => {
 
     let subCoursesCount = await pool.query(
       `
-      SELECT status, COUNT(subscription_id) AS courses_count
+      SELECT status, CAST(COUNT(subscription_id) AS INTEGER) AS courses_count
       FROM subscriptions
       WHERE user_id = $1
       GROUP BY status`,
