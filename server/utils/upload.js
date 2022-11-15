@@ -5,7 +5,7 @@ const cloudinaryUpload = async (file, action) => {
   try {
     if (/upload/i.test(action)) {
       const result = await cloudinary.uploader.upload(file.path, {
-        folder: "courseflow",
+        folder: "courseflow/avatar",
         type: "private",
       });
       await fs.unlink(file.path);
