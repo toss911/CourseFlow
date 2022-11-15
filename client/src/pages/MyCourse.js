@@ -11,38 +11,22 @@ import {
   Tabs,
   TabList,
   Tab,
-  Stack,
-  Button,
-  Text,
 } from "@chakra-ui/react";
 import useCourses from "../hooks/useCourses";
-import { useEffect, useState } from "react";
-
+import { useEffect } from "react";
 import { useAuth } from "../contexts/authentication.js";
 
 function MyCourse() {
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
 
-  const {
-    courses,
-
-    setIsLoading,
-
-    getUserCourses,
-    userCourses,
-  } = useCourses();
-
-  const noCourse = typeof courses !== "undefined" && courses > 0;
+  const { setIsLoading, getUserCourses, userCourses, coursesCount } =
+    useCourses();
 
   useEffect(() => {
     setIsLoading(true);
-    const getData = setTimeout(() => {
-      getUserCourses(userId);
-    }, 1000);
-    return () => clearTimeout(getData);
+    getUserCourses(userId);
   }, []);
-  console.log(userCourses);
 
   return (
     <Box w="vw">
@@ -63,7 +47,7 @@ function MyCourse() {
         <Box>
           <Tabs align="center" justifyContent="center" pb="16px">
             <TabList w="fit-content">
-              <Tab> All Course</Tab>
+              <Tab>All Course</Tab>
               <Tab>Inprogress</Tab>
               <Tab>Complete</Tab>
             </TabList>
@@ -82,11 +66,16 @@ function MyCourse() {
                   pt="16px"
                   align="end"
                 >
-                  <UserCourseCard />
+                  <UserCourseCard coursesCount={coursesCount} />
                 </Box>
               </Box>
               <TabPanels>
-                <TabPanel w="850px" display="flex" flexWrap="wrap" align="end">
+                <TabPanel
+                  w="850px"
+                  display="flex"
+                  flexWrap="wrap"
+                  align="start"
+                >
                   {userCourses.map((course, key) => {
                     return (
                       <CourseCard
@@ -101,35 +90,53 @@ function MyCourse() {
                     );
                   })}
                 </TabPanel>
-                <TabPanel w="850px" display="flex" flexWrap="wrap" align="end">
-                  {userCourses.map((course, key) => {
-                    return (
-                      <CourseCard
-                        key={key}
-                        courseTitle={course.course_name}
-                        courseSummary={course.summary}
-                        courseNumLessons={course.lessons_count}
-                        courseTime={course.learning_time}
-                        courseImg={course.cover_image_directory}
-                        courseId={course.course_id}
-                      />
-                    );
-                  })}
+                <TabPanel
+                  w="850px"
+                  display="flex"
+                  flexWrap="wrap"
+                  align="start"
+                >
+                  {userCourses
+                    .filter((item) => {
+                      return item.status === false;
+                    })
+                    .map((course, key) => {
+                      return (
+                        <CourseCard
+                          key={key}
+                          courseTitle={course.course_name}
+                          courseSummary={course.summary}
+                          courseNumLessons={course.lessons_count}
+                          courseTime={course.learning_time}
+                          courseImg={course.cover_image_directory}
+                          courseId={course.course_id}
+                        />
+                      );
+                    })}
                 </TabPanel>
-                <TabPanel w="850px" display="flex" flexWrap="wrap" align="end">
-                  {userCourses.map((course, key) => {
-                    return (
-                      <CourseCard
-                        key={key}
-                        courseTitle={course.course_name}
-                        courseSummary={course.summary}
-                        courseNumLessons={course.lessons_count}
-                        courseTime={course.learning_time}
-                        courseImg={course.cover_image_directory}
-                        courseId={course.course_id}
-                      />
-                    );
-                  })}
+                <TabPanel
+                  w="850px"
+                  display="flex"
+                  flexWrap="wrap"
+                  align="start"
+                >
+                  {userCourses
+                    .filter((item) => {
+                      return item.status === true;
+                    })
+                    .map((course, key) => {
+                      return (
+                        <CourseCard
+                          key={key}
+                          courseTitle={course.course_name}
+                          courseSummary={course.summary}
+                          courseNumLessons={course.lessons_count}
+                          courseTime={course.learning_time}
+                          courseImg={course.cover_image_directory}
+                          courseId={course.course_id}
+                        />
+                      );
+                    })}
                 </TabPanel>
               </TabPanels>
             </Box>

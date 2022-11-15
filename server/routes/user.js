@@ -37,16 +37,15 @@ userRouter.put("/:id", async (req, res) => {
 });
 
 userRouter.get("/courses/:id", async (req, res) => {
+  // try {
   const userId = req.params.id;
 
-  // try {
   const results = await pool.query(
     `select courses.course_id, courses.course_name, 
-      courses.summary, courses.cover_image_directory, courses.learning_time, 
-      count(lessons.lesson_id) 
-      as lessons_count
-      from lessons
-      inner join courses
+    courses.summary, courses.cover_image_directory, courses.learning_time, 
+    count(lessons.lesson_id) as lessons_count
+    from lessons
+    inner join courses
       on courses.course_id = lessons.course_id
       inner join subscriptions
       on courses.course_id = subscriptions.course_id
@@ -55,13 +54,44 @@ userRouter.get("/courses/:id", async (req, res) => {
       order by courses.course_id asc`,
     [userId]
   );
+
+  const status = await pool.query(
+    `
+      select course_id, status
+      from subscriptions
+      where user_id = $1
+      order by course_id asc`,
+    [userId]
+  );
+
+  const count = await pool.query(
+    `
+      select status, COUNT(subscription_id) as courses_count
+      from subscriptions
+      where user_id = $1
+      group by status`,
+    [userId]
+  );
+
+  results.rows.map((item, index) => {
+    item.status = status.rows[index].status;
+  });
+
+  let coursesCount = {};
+  count.rows.map((item) => {
+    if (!item.status) {
+      coursesCount["in progress"] = item.courses_count;
+    } else {
+      coursesCount["completed"] = item.courses_count;
+    }
+  });
+
   return res.json({
     data: results.rows,
+    coursesCount,
   });
   // } catch (error) {
-  //   return res.json({
-  //     message: "cannot get data",
-  //   });
+  //   return res.sendStatus(500);
   // }
 });
 

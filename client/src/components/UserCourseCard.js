@@ -1,11 +1,9 @@
 import React from "react";
 import { Box, Flex, Text, Heading, Avatar } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 
-export function UserCourseCard(props) {
-  const navigate = useNavigate();
-  const { isAuthenticated, logout, contextState } = useAuth();
+export function UserCourseCard({ coursesCount }) {
+  const { contextState } = useAuth();
 
   return (
     <Box
@@ -52,7 +50,7 @@ export function UserCourseCard(props) {
           <Text textAlign="start" variant="body2">
             Course Inprogress
           </Text>
-          <Heading variant="headline3">10</Heading>
+          <Heading variant="headline3">{coursesCount["in progress"]}</Heading>
         </Flex>
         <Flex
           backgroundColor="gray.200"
@@ -68,7 +66,7 @@ export function UserCourseCard(props) {
           <Text textAlign="start" variant="body2" w="110px">
             Course Complete
           </Text>
-          <Heading variant="headline3">0</Heading>
+          <Heading variant="headline3">{coursesCount["completed"]}</Heading>
         </Flex>
       </Box>
     </Box>

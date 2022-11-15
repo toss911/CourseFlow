@@ -10,6 +10,7 @@ const useCourses = () => {
   const [isLoading, setIsLoading] = useState(null);
   const params = useParams();
   const [userCourses, setUserCourses] = useState([]);
+  const [coursesCount, setCoursesCount] = useState({});
 
   const getCourses = async (input) => {
     try {
@@ -75,6 +76,7 @@ const useCourses = () => {
         `http://localhost:4000/user/courses/${userId}`
       );
       setUserCourses(results.data.data);
+      setCoursesCount(results.data.coursesCount);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -94,6 +96,7 @@ const useCourses = () => {
     setIsError,
     getUserCourses,
     userCourses,
+    coursesCount,
   };
 };
 
