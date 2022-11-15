@@ -8,10 +8,12 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-const HomeworkBox = (props) => {
+const HomeworkBox = ( {allHomework} ) => {
+  console.log(allHomework);
+
   return (
     <Box>
-      {/* {props.allHomework.map(() => { */}
+      {/* {allHomework.map(() => { */}
         <Flex
           flexDirection="column"
           w="1120px"
@@ -97,8 +99,8 @@ const HomeworkBox = (props) => {
               <Button variant="ghost">Open in course</Button>
             </Flex>
           </Flex>
-        </Flex>;
-      {/* })} */}
+        </Flex>
+      {/* })}; */}
     </Box>
   );
 };

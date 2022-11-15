@@ -84,8 +84,8 @@ export const submitHomework = async (req, res) => {
   try {
     // *- Check if user has accepted the assignment -* //
     const assignmentExistForThisUser = await pool.query(
-      `SELECT exists (SELECT user_id FROM users_assignments WHERE user_id = $1)`,
-      [userId]
+      `SELECT exists (SELECT user_id FROM users_assignments WHERE assignment_id = $1)`,
+      [assignmentId]
     );
     // *- If yes, add answer and submitted date -* //
     assignmentExistForThisUser
