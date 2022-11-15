@@ -25,13 +25,18 @@ function MyHomework() {
   const [deadline, setDeadline] = useState("");
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
-  // console.log(userId);
 
   // *- Get homework details function-* //
   const getHomeworkDetails = async () => {
     const results = await axios.get(`http://localhost:4000/homework/${userId}`);
     setHomework(results.data.data);
   };
+
+  // *- Submit homework function-* //
+  // const submitHomework = async (assignmentId, answer) => {
+  //   const result = await axios.put(`http://localhost:4000/homework/${assignmentId}`, userAnswer);
+  //   console.log(result.data.message);
+  // }
 
   useEffect(() => {
     getHomeworkDetails();
@@ -82,7 +87,7 @@ function MyHomework() {
                       h="1560px"
                       mb="145px"
                     >
-                      <HomeworkBox />
+                      <HomeworkBox allHomework={homework}  />
                       <HomeworkBox />
                       <HomeworkBox />
                       <HomeworkBox />
