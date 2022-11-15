@@ -118,7 +118,7 @@ function LearningPage() {
                             >
                               {numberLesson}
                             </Text>
-                            <Text ml="24px" variant="body2">
+                            <Text ml="27px" variant="body2">
                               {lessonName}
                             </Text>
                           </Box>
@@ -126,22 +126,34 @@ function LearningPage() {
                         </AccordionButton>
                       </h2>
 
-                      <AccordionPanel ml="25px" pb={4}>
+                      <AccordionPanel pb={4}>
                         <UnorderedList>
                           {course.lessons[lessonName].map(
                             (subLessonName, key) => {
                               return (
-                                <Text
-                                  key={key}
-                                  cursor="pointer"
-                                  variant="body2"
+                                <Flex
+                                  flexDirection="row"
+                                  alignItems="start"
+                                  justifyContent="start"
                                   mt="24px"
-                                  onClick={() => {
-                                    handleSubLesson(subLessonName, key);
-                                  }}
                                 >
-                                  {subLessonName}
-                                </Text>
+                                  <Image
+                                    src="/assets/learning-page/circle.svg"
+                                    alt="empty-circle"
+                                    mt="5px"
+                                    mr="15px"
+                                  />
+                                  <Text
+                                    key={key}
+                                    cursor="pointer"
+                                    variant="body2"
+                                    onClick={() => {
+                                      handleSubLesson(subLessonName, key);
+                                    }}
+                                  >
+                                    {subLessonName}
+                                  </Text>
+                                </Flex>
                               );
                             }
                           )}
