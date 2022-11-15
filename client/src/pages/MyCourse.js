@@ -45,7 +45,21 @@ function MyCourse() {
           My Course
         </Heading>
         <Box>
-          <Tabs align="center" justifyContent="center" pb="16px">
+          <Tabs
+            align="center"
+            justifyContent="center"
+            pb="16px"
+            sx={{
+              ".css-1oezttv": {
+                borderColor: "white",
+                color: "#9AA1B9",
+              },
+              ".css-1oezttv[aria-selected=true]": {
+                borderColor: "black",
+                color: "black",
+              },
+            }}
+          >
             <TabList w="fit-content">
               <Tab>All Course</Tab>
               <Tab>Inprogress</Tab>
