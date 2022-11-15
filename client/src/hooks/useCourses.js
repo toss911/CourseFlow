@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState({});
+  const [courseLearning, setcourseLearning] = useState({});
   const [category, setCategory] = useState([]);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
@@ -64,12 +65,28 @@ const useCourses = () => {
     }
   };
 
+  const getCourseLearningById = async () => {
+    try {
+      setIsError(false);
+
+      const results = await axios.get(
+        `http://localhost:4000/courses/${params.courseId}/learning`
+      );
+      setCourse(results.data.data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsError(true);
+      setIsLoading(false);
+    }
+  };
+
   return {
     courses,
     course,
     category,
     getCourses,
     getCourseById,
+    getCourseLearningById,
     isLoading,
     setIsLoading,
     isError,

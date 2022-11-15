@@ -21,26 +21,22 @@ import {
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-//import useCourses from "../hooks/useCourses";
+import useCourses from "../hooks/useCourses";
 function LearningPage() {
-  //const { getCourseById, course, category, isLoading } = useCourses();
-  const params = useParams();
-  //console.log("params: ", params);
-  const [course, setCourse] = useState({});
+  const { getCourseLearningById, course } = useCourses();
+  const [changeSubLesson, setChangeSubLesson] = useState();
 
+  
   useEffect(() => {
-    //getCourseById();
-    const courseData = async () => {
-      const results = await axios.get(
-        `http://localhost:4000/courses/${params.courseId}/learning`
-      );
-      setCourse(results.data.data);
-      console.log("course:", course);
-    };
-    courseData();
-  }, []);
+    getCourseLearningById();
+    setChangeSubLesson(course.course_name);
+  }, [course.course_name]);
+
+
+  const handleSubLesson = (subLessonName) => {
+    setChangeSubLesson(subLessonName);
+  };
 
   return (
     <>
@@ -52,6 +48,7 @@ function LearningPage() {
         alignItems="start"
         justifyContent="center"
       >
+        {/* //------------------------- Left Column ----------------------// */}
         <Flex
           flexDirection="column"
           alignItems="start"
@@ -102,7 +99,7 @@ function LearningPage() {
                 return (
                   <Accordion
                     key={key}
-                    defaultIndex={[0]}
+                    defaultIndex={[1]}
                     allowMultiple
                     w="300px"
                     mt="24px"
@@ -136,14 +133,17 @@ function LearningPage() {
                           {course.lessons[lessonName].map(
                             (subLessonName, key) => {
                               return (
-                                <ListItem
+                                <Text
                                   key={key}
-                                  fontWeight="400"
-                                  color="gray.700"
-                                  fontSize="16px"
+                                  cursor="pointer"
+                                  variant="body2"
+                                  mt="24px"
+                                  onClick={() => {
+                                    handleSubLesson(subLessonName, key);
+                                  }}
                                 >
-                                  <Text variant="body2">{subLessonName}</Text>
-                                </ListItem>
+                                  {subLessonName}
+                                </Text>
                               );
                             }
                           )}
@@ -154,10 +154,10 @@ function LearningPage() {
                 );
               })}
         </Flex>
-
+        {/* //---------------------------- Right Column -----------------------// */}
         <Flex flexDirection="column" alignItems="start" width="739px">
           <Heading mb="33px" variant="headline2">
-            Scope of Service Design
+            {changeSubLesson}
           </Heading>
 
           <Image src="/assets/learning-page/video-mock.svg" alt="video-mock" />
