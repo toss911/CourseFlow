@@ -101,7 +101,7 @@ export const PriceCard = (props) => {
         {props.subscribeStatus ? (
           <Button
             variant="primary"
-            onClick={() => navigate(`/learning/${props.courseId}`)}
+            onClick={() => navigate(`/courses/${props.courseId}/learning`)}
           >
             Start Learning
           </Button>

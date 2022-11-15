@@ -208,7 +208,7 @@ export const getLearningById = async (req, res) => {
     });
 
     return res.json({
-      data: course_data,
+      data: { ...course_data, percentProgress: res.locals.percentProgress },
     });
   } catch (error) {
     return res.sendStatus(500);
