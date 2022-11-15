@@ -84,8 +84,8 @@ export const submitHomework = async (req, res) => {
   try {
     // *- Check if user has accepted the assignment -* //
     const assignmentExistForThisUser = await pool.query(
-      `SELECT exists (SELECT user_id FROM users_assignments WHERE assignment_id = $1)`,
-      [assignmentId]
+      `SELECT exists (SELECT user_id FROM users_assignments WHERE assignment_id = $1 AND user_id = $2)`,
+      [assignmentId, userId]
     );
     // *- If yes, add answer and submitted date -* //
     assignmentExistForThisUser
@@ -96,9 +96,9 @@ export const submitHomework = async (req, res) => {
         )
       : // *- If not, create a new user_assignment and add answer, accepted date and submitted date as the same date-* //
         await pool.query(
-          `INSERT INTO users_assignments (user_id, assignment_id, answer, accepted_date, submitted_date)
-            VALUES ($1, $2, $3, $4, $5)`,
-          [userId, assignmentId, answer, acceptedDate, submittedDate]
+          `INSERT INTO users_assignments (user_id, assignment_id, answer, accepted_date, submitted_date, status)
+            VALUES ($1, $2, $3, $4, $5, $6)`,
+          [userId, assignmentId, answer, acceptedDate, submittedDate, "submitted"]
         );
 
     return res.json({
