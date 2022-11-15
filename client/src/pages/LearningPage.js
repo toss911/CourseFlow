@@ -24,12 +24,14 @@ import { Footer } from "../components/Footer.js";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useCourses from "../hooks/useCourses";
+import { useAuth } from "../contexts/authentication.js";
 function LearningPage() {
   const { getCourseLearningById, course } = useCourses();
   const [changeSubLesson, setChangeSubLesson] = useState();
+  const { contextState } = useAuth();
 
   useEffect(() => {
-    getCourseLearningById();
+    getCourseLearningById(contextState.user.user_id);
     setChangeSubLesson(course.course_name);
   }, [course.course_name]);
 
@@ -75,13 +77,13 @@ function LearningPage() {
             {course.summary}
           </Text>
           <Text variant="body3" mt="24px">
-            15% Complete
+            {course.percentProgress}% Complete
           </Text>
           <Progress
             mt="8px"
             height="10px"
             width="309px"
-            value={40}
+            value={course.percentProgress}
             sx={{
               ".css-1jrtelv": {
                 background:
@@ -141,6 +143,7 @@ function LearningPage() {
                                   alignItems="start"
                                   justifyContent="start"
                                   mt="24px"
+                                  key={key}
                                 >
                                   <Image
                                     src="/assets/learning-page/circle.svg"
@@ -149,7 +152,6 @@ function LearningPage() {
                                     mr="15px"
                                   />
                                   <Text
-                                    key={key}
                                     cursor="pointer"
                                     variant="body2"
                                     onClick={() => {
