@@ -74,7 +74,25 @@ export const getAllHomework = async (req, res) => {
   }
 };
 
-export const submitHomework = async (req, res) => {};
+export const submitHomework = async (req, res) => {
+  const answer = req.body.answer;
+  const submittedDate = new Date();
+  const assignmentId = req.params.assignmentId;
+  try {
+    await pool.query(
+      `UPDATE users_assignments SET answer = $1, submitted_date = $2 
+        WHERE assignment_id = $3
+        RETURNING *`,
+      [answer, submittedDate, assignmentId]
+    );
+
+    return res.json({
+      message: "Homework submitted.",
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+
+};
+
 export const saveAnswerDraft = async (req, res) => {};
-
-
