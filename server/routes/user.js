@@ -8,4 +8,6 @@ const avatarUpload = multerUpload.fields([{ name: "avatar", maxCount: 1 }]);
 
 userRouter.put("/:userId", avatarUpload, user_controller.updateProfile);
 
+userRouter.get("/mycourses", user_controller.subscribedCourses);
+
 export default userRouter;

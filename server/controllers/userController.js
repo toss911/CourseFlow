@@ -202,3 +202,67 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+
+export const subscribedCourses = async (req, res) => {
+  try {
+    const userId = req.query.byUser;
+
+    let subscribedCourses = await pool.query(
+      `
+      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
+      FROM lessons
+      INNER JOIN courses
+      ON courses.course_id = lessons.course_id
+      INNER JOIN subscriptions
+      ON courses.course_id = subscriptions.course_id
+      WHERE subscriptions.user_id = $1
+      GROUP BY courses.course_id 
+      ORDER BY courses.course_id ASC`,
+      [userId]
+    );
+    subscribedCourses = subscribedCourses.rows;
+
+    let coursesStatus = await pool.query(
+      `
+      SELECT course_id, status
+      FROM subscriptions
+      WHERE user_id = $1
+      ORDER BY course_id asc`,
+      [userId]
+    );
+    coursesStatus = coursesStatus.rows;
+
+    subscribedCourses.map((course) => {
+      for (let i = 0; i < coursesStatus.length; i++) {
+        if (course.course_id === coursesStatus[i].course_id) {
+          course.status = coursesStatus[i].status;
+        }
+      }
+    });
+
+    let subCoursesCount = await pool.query(
+      `
+      SELECT status, COUNT(subscription_id) AS courses_count
+      FROM subscriptions
+      WHERE user_id = $1
+      GROUP BY status`,
+      [userId]
+    );
+
+    let coursesCount = {};
+    subCoursesCount.rows.map((item) => {
+      if (!item.status) {
+        coursesCount["in progress"] = item.courses_count;
+      } else {
+        coursesCount["completed"] = item.courses_count;
+      }
+    });
+
+    return res.json({
+      data: subscribedCourses,
+      coursesCount,
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
