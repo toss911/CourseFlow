@@ -18,7 +18,6 @@ import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
 
 function MyHomework() {
-
   // *- States and variables -* //
   const [homework, setHomework] = useState([{}]);
   const [answer, setAnswer] = useState("");
@@ -33,9 +32,13 @@ function MyHomework() {
 
   // *- Submit homework function-* //
   const submitHomework = async (assignmentId, answer) => {
-    const result = await axios.put(`http://localhost:4000/homework/${assignmentId}?userId=${userId}`, answer);
-  }
+    const result = await axios.put(
+      `http://localhost:4000/homework/${assignmentId}?userId=${userId}`,
+      answer
+    );
+  };
 
+  console.log(homework);
   useEffect(() => {
     getHomeworkDetails();
   }, []);
@@ -83,10 +86,19 @@ function MyHomework() {
                       h="1560px"
                       mb="145px"
                     >
-                      <HomeworkBox allHomework={homework}  />
-                      <HomeworkBox />
-                      <HomeworkBox />
-                      <HomeworkBox />
+                      {homework.map((hw, key) => {
+                        return (
+                        <HomeworkBox
+                          key={key}
+                          courseName={hw.course_name}
+                          lessonName={hw.lesson_name}
+                          subLessonName={hw.sub_lesson_name}
+                          status={hw.status}
+                          hwDetail={hw.detail}
+                          daysUntilDeadline={hw.days_until_deadline}
+                          answer={hw.answer}
+                        />);
+                      })}
                     </Flex>
                   </Center>
                 </TabPanel>
