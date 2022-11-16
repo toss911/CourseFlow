@@ -27,7 +27,31 @@ coursesRouter.get("/", async (req, res) => {
     return res.sendStatus(500);
   }
 });
-
+// --------------------------------------DesireCourse----------------------------------------------
+coursesRouter.get("/desire", async (req, res) => {
+  try{
+    const userId = req.query.byUser
+    console.log(userId);
+    let courseDesire = await pool.query(
+      `select desired_courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id)
+      from desired_courses
+      inner join courses
+      on courses.course_id = desired_courses.course_id
+      inner join lessons
+      on courses.course_id = lessons.course_id
+      where desired_courses.user_id = $1
+      group by desired_courses.course_id, courses.course_id`,[userId]
+    )
+    let course = courseDesire.rows
+    console.log(course);
+    return res.json({
+      data: course
+    })
+  }catch (err){ 
+    console.log(err);
+  }
+})
+// ----------------------------------------------------------------------------------------------------
 coursesRouter.get("/:courseId", async (req, res) => {
   try {
     const courseId = req.params.courseId;
@@ -39,7 +63,6 @@ coursesRouter.get("/:courseId", async (req, res) => {
       [courseId]
     );
     course_data = course_data.rows[0];
-
     const lessons = await pool.query(
       `
       SELECT lessons.lesson_name, sub_lessons.sub_lesson_name

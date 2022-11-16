@@ -3,6 +3,8 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import useCourses from "../hooks/useCourses";
 import { useEffect, useState } from "react";
+import { Pagination } from "antd";
+import "antd/dist/antd.css";
 import {
   Box,
   Image,
@@ -15,34 +17,34 @@ import {
   Center,
   Spinner,
 } from "@chakra-ui/react";
+
 const coursesPerPage = 6;
 function DesireCourse() {
-    const [keywords, setKeywords] = useState("");
-    const [page, setPage] = useState(1);
-    const { getCourses, courses, isLoading, setIsLoading } = useCourses();
-  
-    const handleSearchTextChange = (event) => {
-      setKeywords(event.target.value);
-    };
-  
-    useEffect(() => {
-      setIsLoading(true);
-      const getData = setTimeout(() => {
-        getCourses({ keywords, page });
-      }, 1000);
-      return () => clearTimeout(getData);
-    }, [keywords, page]);
-  
-    // Get current posts
-    const indexOfLastCourse = page * coursesPerPage;
-    const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-    const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
-  
-    // Change page
-    const paginate = (pageNumber) => {
-      setPage(pageNumber);
-      window.scrollTo(0, 150);
-    };
+  const [page, setPage] = useState(1);
+  const {
+    getCourses,
+    courses,
+    isLoading,
+    setIsLoading,
+    desireCourse,
+    desireCourses,
+  } = useCourses();
+
+  useEffect(() => {
+    desireCourse(5);
+    console.log(desireCourses);
+  }, []);
+
+  // Get current posts
+  const indexOfLastCourse = page * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  // Change page
+  const paginate = (pageNumber) => {
+    setPage(pageNumber);
+    window.scrollTo(0, 150);
+  };
 
   return (
     <Box>
@@ -64,7 +66,8 @@ function DesireCourse() {
                 size="xl"
                 mb="187px"
               />
-            ) : typeof courses !== "undefined" && courses.length > 0 ? (
+            ) : typeof desireCourses !== "undefined" &&
+              desireCourses.length > 0 ? (
               <Flex
                 flexDirection="row"
                 justifyContent="center"
@@ -72,13 +75,13 @@ function DesireCourse() {
                 flexWrap="wrap"
                 w="70%"
               >
-                {currentCourses.map((course, key) => {
+                {desireCourses.map((course, key) => {
                   return (
                     <CourseCard
                       key={key}
                       courseTitle={course.course_name}
                       courseSummary={course.summary}
-                      courseNumLessons={course.lessons_count}
+                      courseNumLessons={course.count}
                       courseTime={course.learning_time}
                       courseImg={course.cover_image_directory}
                       courseId={course.course_id}
@@ -94,6 +97,14 @@ function DesireCourse() {
           </Center>
         </Flex>
       </Box>
+      <Center mb="20">
+        <Pagination
+          total={courses.length}
+          current={page}
+          pageSize={coursesPerPage}
+          onChange={paginate}
+        />
+      </Center>
       <Footer />
     </Box>
   );
