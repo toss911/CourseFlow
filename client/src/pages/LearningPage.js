@@ -25,16 +25,19 @@ import axios from "axios";
 
 function LearningPage() {
   const { getCourseLearningById, course } = useCourses();
+  console.log("course: ", course);
   const [changeSubLesson, setChangeSubLesson] = useState();
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
 
   useEffect(() => {
     getCourseLearningById(userId);
+    /* setChangeSubLesson value ที่เอามาใส่ ต้องเป็น value ของหัวข้อ sub-lesson ที่เรียนจบล่าสุด (ซึ่งรับมาจาก back-end) */
     setChangeSubLesson(course.course_name);
   }, [course.course_name]);
 
   const handleSubLesson = (subLessonName) => {
+    /* เวลากดที่หัวข้อ sub-lesson จะต้องมีการส่ง request ไปขอ back-end ดึงข้อมูลของ sub-lesson นั้น ๆ มาแสดงอีกที */
     setChangeSubLesson(subLessonName);
   };
 
@@ -110,9 +113,13 @@ function LearningPage() {
                     w="300px"
                     mt="24px"
                   >
-                    <AccordionItem>
+                    <AccordionItem border="0px">
                       <h2>
-                        <AccordionButton>
+                        <AccordionButton
+                          _hover={{ backgroundColor: "gray.100" }}
+                          borderBottom="1px solid #D6D9E4"
+                          pl="0"
+                        >
                           <Box
                             flex="1"
                             textAlign="left"
@@ -126,7 +133,7 @@ function LearningPage() {
                             >
                               {numberLesson}
                             </Text>
-                            <Text ml="27px" variant="body2">
+                            <Text ml="24px" variant="body2">
                               {lessonName}
                             </Text>
                           </Box>
@@ -145,6 +152,7 @@ function LearningPage() {
                                   justifyContent="start"
                                   mt="24px"
                                   key={key}
+                                  _hover={{ backgroundColor: "gray.100" }}
                                 >
                                   <Image
                                     src="/assets/learning-page/circle.svg"
