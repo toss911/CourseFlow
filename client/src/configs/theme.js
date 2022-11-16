@@ -30,6 +30,7 @@ const colors = {
   black: "#000000",
   white: "#FFFFFF",
   green: "#2FAC8E",
+  purple: "#9B2FAC",
   linear1: {
     1: "#95BEFF",
     2: "#0040E5",
@@ -71,6 +72,30 @@ const components = {
     },
   },
   Text: {
+    variants: {
+      body1: {
+        fontSize: "20px",
+        lineHeight: `${1.5 * 20}px`,
+        fontWeight: 400,
+      },
+      body2: {
+        fontSize: "16px",
+        lineHeight: `${1.5 * 16}px`,
+        fontWeight: 400,
+      },
+      body3: {
+        fontSize: "14px",
+        lineHeight: `${1.5 * 14}px`,
+        fontWeight: 400,
+      },
+      body4: {
+        fontSize: "12px",
+        lineHeight: `${1.5 * 12}px`,
+        fontWeight: 400,
+      },
+    },
+  },
+  FormLabel: {
     variants: {
       body1: {
         fontSize: "20px",
@@ -156,6 +181,126 @@ const components = {
           borderColor: "gray.500",
           opacity: 1,
         },
+      },
+      success: {
+        bg: "blue.500",
+        borderColor: "blue.500",
+        color: "white",
+        boxShadow: "shadow1",
+        borderRadius: "12px",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          opacity: 0.5,
+        },
+        _active: {
+          opacity: 1,
+        },
+      },
+    },
+    defaultProps: {
+      variant: "primary",
+    },
+  },
+  Input: {
+    variants: {
+      default: {
+        field: {
+          border: "1px solid",
+          borderColor: "gray.400",
+          borderRadius: "8px",
+          p: "12px 16px 12px 12px",
+          bg: "white",
+          color: "black",
+          fontSize: "16px",
+          fontWeight: 400,
+          lineHeight: "normal",
+          _placeholder: {
+            color: "gray.600",
+          },
+          _focus: {
+            borderColor: "orange.500",
+          },
+          _invalid: {
+            color: "black",
+            pr: "5%",
+            borderColor: "purple",
+            backgroundImage: "url('/assets/misc/warning-icon.svg')",
+            backgroundPosition: "95% 52.5%",
+            backgroundRepeat: "no-repeat",
+          },
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.200",
+            borderColor: "gray.400",
+            opacity: 1,
+          },
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Link: {
+    variants: {
+      default: {
+        fontSize: "16px",
+        lineHeight: `${1.5 * 16}px`,
+        fontWeight: 700,
+        color: "blue.500",
+        _hover: {
+          color: "blue.400",
+          textDecoration: "none",
+        },
+        _active: {
+          color: "blue.600",
+        },
+        _disabled: {
+          color: "gray.500",
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Badge: {
+    variants: {
+      submitted: {
+        color: "#0A7B60",
+        backgroundColor: "#DDF9EF",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
+      },
+      overdue: {
+        color: "#9B2FAC",
+        backgroundColor: "#FAE7F4",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
+      },
+      pending: {
+        color: "#996500",
+        backgroundColor: "#FFFBDB",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
+      },
+      "in-progress": {
+        color: "#3557CF",
+        backgroundColor: "#EBF0FF",
+        fontSize: "14px",
+        fontWight: 500,
+        lineHeight: "150%",
+        padding: "4px 8px 4px 8px",
       },
     },
   },
