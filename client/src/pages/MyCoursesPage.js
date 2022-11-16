@@ -28,7 +28,7 @@ function MyCourses() {
     setIsLoading(true);
     const fetchData = async () => {
       const result = await axios.get(
-        `http://localhost:4000/user/mycourses?byUser=${userId}`
+        `http://localhost:4000/user/subscription?byUser=${userId}`
       );
       setCoursesCount(result.data.coursesCount);
       setCourses(result.data.data);
