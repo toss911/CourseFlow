@@ -76,30 +76,16 @@ export const getAllHomework = async (req, res) => {
 
 export const submitHomework = async (req, res) => {
   const answer = req.body.answer;
-  const acceptedDate = new Date();
   const submittedDate = new Date();
   const assignmentId = req.params.assignmentId;
   const userId = req.query.userId;
 
   try {
-    // *- Check if user has accepted the assignment -* //
-    const assignmentExistForThisUser = await pool.query(
-      `SELECT exists (SELECT user_id FROM users_assignments WHERE assignment_id = $1 AND user_id = $2)`,
-      [assignmentId, userId]
-    );
-    // *- If yes, add answer and submitted date -* //
-    assignmentExistForThisUser
-      ? await pool.query(
+    await pool.query(
           `UPDATE users_assignments SET answer = $1, submitted_date = $2 
-        WHERE assignment_id = $3`,
-          [answer, submittedDate, assignmentId]
+        WHERE assignment_id = $3 AND user_id = $4`,
+          [answer, submittedDate, assignmentId, userId]
         )
-      : // *- If not, create a new user_assignment and add answer, accepted date and submitted date as the same date-* //
-        await pool.query(
-          `INSERT INTO users_assignments (user_id, assignment_id, answer, accepted_date, submitted_date, status)
-            VALUES ($1, $2, $3, $4, $5, $6)`,
-          [userId, assignmentId, answer, acceptedDate, submittedDate, "submitted"]
-        );
 
     return res.json({
       message: "Homework submitted.",
@@ -112,12 +98,13 @@ export const submitHomework = async (req, res) => {
 export const saveAnswerDraft = async (req, res) => {
   const answer = req.body.answer;
   const assignmentId = req.params.assignmentId;
+  const userId = req.query.userId;
 
   try {
     await pool.query(
       `UPDATE users_assignments SET answer = $1
-      WHERE assignment_id = $2`,
-      [answer, assignmentId]
+      WHERE assignment_id = $2 AND user_id = $3`,
+      [answer, assignmentId, userId]
     );
   } catch (error) {
     return res.sendStatus(500);

@@ -9,9 +9,12 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const HomeworkBox = (props) => {
   const navigate = useNavigate();
+  const [answer, setAnswer] = useState("");
+
   // *- Change status badge color -* //
   const changeBadgeColor = (status) => {
     let badgeColor;
@@ -50,6 +53,12 @@ const HomeworkBox = (props) => {
     }
     return display;
   };
+
+  const handleTextChange = (event) => {
+    setAnswer(event.target.value);
+  }
+
+  console.log(answer);
 
   return (
     <Box>
@@ -134,6 +143,7 @@ const HomeworkBox = (props) => {
                 h="96px"
                 textAlign="start"
                 color="black"
+                onChange={handleTextChange}
               />
             )}
 
@@ -150,7 +160,7 @@ const HomeworkBox = (props) => {
             </Button>
           </Flex>
           <Flex flexDirection="column" gap="16px" w="137px" h="108px" mt="40px">
-            <Button p="4px">Submit</Button>
+            <Button p="4px" onClick={() => props.submitHomework(props.assignmentId, answer)}>Submit</Button>
             <Button
               variant="ghost"
               onClick={() => navigate(`/courses/${props.courseId}`)}

@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
 
+
 function MyHomework() {
   // *- States and variables -* //
   const [homework, setHomework] = useState([{}]);
@@ -51,16 +52,25 @@ function MyHomework() {
       `http://localhost:4000/homework/${assignmentId}?userId=${userId}`,
       answer
     );
+    window.location.reload();
+    getHomeworkDetails();
   };
 
   useEffect(() => {
     getHomeworkDetails();
   }, []);
 
+  console.log(homework);
+  // console.log(submittedAssignments);
+  // console.log(pendingAssignments);
+  // console.log(inProgressAssignments);
+  // console.log(overdueAssignments);
+
   return (
     <Box>
       <Navbar />
-      <Flex flexDirection="column" h="1560px" mb="345px">
+      <Box border="1px" borderColor="red">
+      <Flex flexDirection="column" h="1560px">
         <Flex
           mt="100px"
           w="1418px"
@@ -115,7 +125,6 @@ function MyHomework() {
                       w="1120px"
                       h="1560px"
                       mb="145px"
-                      overflowY="scroll"
                     >
                       {homework.map((hw, key) => {
                         return (
@@ -132,6 +141,8 @@ function MyHomework() {
                               hw.days_until_deadline <= 1 ? "day" : "days"
                             }
                             courseId={hw.course_id}
+                            submitHomework={submitHomework}
+                            assignmentId={hw.assignment_id}
                           />
                         );
                       })}
@@ -139,14 +150,14 @@ function MyHomework() {
                   </Center>
                 </TabPanel>
                 <TabPanel>
-                <Center border="1px">
+                <Center >
                     <Flex
                       flexDirection="column"
                       alignItems="center"
                       w="1120px"
                       h="1560px"
                       mb="145px"
-                      border="1px"
+                  
                 
                     >
                       {pendingAssignments.map((hw, key) => {
@@ -163,6 +174,7 @@ function MyHomework() {
                             dayOrDays={
                               hw.days_until_deadline <= 1 ? "day" : "days"
                             }
+                            assignmentId={hw.assignment_id}
                           />
                         );
                       })}
@@ -193,6 +205,7 @@ function MyHomework() {
                             dayOrDays={
                               hw.days_until_deadline <= 1 ? "day" : "days"
                             }
+                            assignmentId={hw.assignment_id}
                           />
                         );
                       })}
@@ -253,6 +266,7 @@ function MyHomework() {
                             dayOrDays={
                               hw.days_until_deadline <= 1 ? "day" : "days"
                             }
+                            assignmentId={hw.assignment_id}
                           />
                         );
                       })}
@@ -264,6 +278,7 @@ function MyHomework() {
           </Flex>
         </Flex>
       </Flex>
+      </Box>
       <Footer />
     </Box>
   );
