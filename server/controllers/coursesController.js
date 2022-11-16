@@ -175,6 +175,7 @@ export const postSubscribeOrAddCourse = async (req, res) => {
 export const getLearningById = async (req, res) => {
   try {
     const courseId = req.params.courseId;
+    const userId = req.query.byUser;
     let course_data = await pool.query(
       `
       SELECT courses.course_id, courses.course_name, courses.summary
@@ -186,7 +187,7 @@ export const getLearningById = async (req, res) => {
 
     const lessons = await pool.query(
       `
-      SELECT  lessons.lesson_name, sub_lessons.sub_lesson_name
+      SELECT  lessons.lesson_name, sub_lessons.sub_lesson_name , sub_lessons.sub_lesson_id
       FROM courses
       INNER JOIN lessons 
       ON courses.course_id = lessons.course_id
@@ -200,11 +201,38 @@ export const getLearningById = async (req, res) => {
     course_data.lessons = {};
     lessons.rows.map((lesson) => {
       if (lesson.lesson_name in course_data.lessons) {
-        course_data.lessons[lesson.lesson_name].push(lesson.sub_lesson_name);
+        course_data.lessons[lesson.lesson_name].push({
+          sub_lesson_name: lesson.sub_lesson_name,
+          sub_lesson_id: lesson.sub_lesson_id,
+          video_status: false,
+        });
       } else {
         course_data.lessons[lesson.lesson_name] = [];
-        course_data.lessons[lesson.lesson_name].push(lesson.sub_lesson_name);
+        course_data.lessons[lesson.lesson_name].push({
+          sub_lesson_name: lesson.sub_lesson_name,
+          sub_lesson_id: lesson.sub_lesson_id,
+          video_status: false,
+        });
       }
+    });
+
+    const checkStatus = await pool.query(
+      `
+      select *
+      from users_sub_lessons
+      where user_id = $1
+      `,
+      [userId]
+    );
+
+    Object.keys(course_data.lessons).map((lessonName) => {
+      course_data.lessons[lessonName].map((subLesson) => {
+        for (let i = 0; i < checkStatus.rows.length; i++) {
+          if (subLesson.sub_lesson_id == checkStatus.rows[i].sub_lesson_id) {
+            subLesson.video_status = true;
+          }
+        }
+      });
     });
 
     return res.json({

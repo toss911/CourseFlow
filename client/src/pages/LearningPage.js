@@ -24,8 +24,7 @@ import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
 
 function LearningPage() {
-  const { getCourseLearningById, course } = useCourses();
-  console.log("course: ", course);
+  const { getCourseLearningById, course, checkSubLesson } = useCourses();
   const [changeSubLesson, setChangeSubLesson] = useState();
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
@@ -46,7 +45,6 @@ function LearningPage() {
       `http://localhost:4000/courses/${course.course_id}/learning?byUser=${userId}`
     );
   };
-
   return (
     <>
       <Navbar />
@@ -140,7 +138,6 @@ function LearningPage() {
                           <AccordionIcon />
                         </AccordionButton>
                       </h2>
-
                       <AccordionPanel pb={4}>
                         <UnorderedList>
                           {course.lessons[lessonName].map(
@@ -154,12 +151,22 @@ function LearningPage() {
                                   key={key}
                                   _hover={{ backgroundColor: "gray.100" }}
                                 >
-                                  <Image
-                                    src="/assets/learning-page/circle.svg"
-                                    alt="empty-circle"
-                                    mt="5px"
-                                    mr="15px"
-                                  />
+                                  {subLessonName.video_status === true ? (
+                                    <Image
+                                      src="/assets/learning-page/half-circle.svg"
+                                      alt="empty-circle"
+                                      mt="3px"
+                                      mr="15px"
+                                    />
+                                  ) : (
+                                    <Image
+                                      src="/assets/learning-page/circle.svg"
+                                      alt="empty-circle"
+                                      mt="3px"
+                                      mr="15px"
+                                    />
+                                  )}
+
                                   <Text
                                     cursor="pointer"
                                     variant="body2"
@@ -167,7 +174,7 @@ function LearningPage() {
                                       handleSubLesson(subLessonName, key);
                                     }}
                                   >
-                                    {subLessonName}
+                                    {subLessonName.sub_lesson_name}
                                   </Text>
                                 </Flex>
                               );
