@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as courses_controller from "../controllers/coursesController.js";
 import { protect } from "../middlewares/protect.js";
 import { getProgress } from "../middlewares/getProgress.js";
+import { checkSubscription } from "../middlewares/checkSubscription.js";
 
 const coursesRouter = Router();
 
@@ -18,6 +19,7 @@ coursesRouter.post(
 coursesRouter.get(
   "/:courseId/learning",
   protect,
+  checkSubscription,
   getProgress,
   courses_controller.getLearningById
 );
@@ -25,6 +27,7 @@ coursesRouter.get(
 coursesRouter.post(
   "/:courseId/learning",
   protect,
+  checkSubscription,
   courses_controller.postWatchedAndAcceptedHomeWork
 );
 

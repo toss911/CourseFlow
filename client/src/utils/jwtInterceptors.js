@@ -23,6 +23,8 @@ export default function jwtInterceptor() {
       ) {
         window.localStorage.removeItem("token");
         window.location.replace("/login");
+      } else if (error.response.status === 403) {
+        window.history.back();
       }
     }
   );
