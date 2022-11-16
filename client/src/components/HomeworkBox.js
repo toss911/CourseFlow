@@ -8,8 +8,11 @@ import {
   Button,
   Textarea,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 const HomeworkBox = (props) => {
+  const navigate = useNavigate();
+  // *- Change status badge color -* //
   const changeBadgeColor = (status) => {
     let badgeColor;
     switch (status) {
@@ -28,6 +31,7 @@ const HomeworkBox = (props) => {
     return badgeColor;
   };
 
+  // *- Display days until deadline or not -* //
   const displayDaysUntilDeadline = (status) => {
     let display;
     switch (status) {
@@ -46,7 +50,6 @@ const HomeworkBox = (props) => {
     }
     return display;
   };
-  
 
   return (
     <Box>
@@ -111,12 +114,29 @@ const HomeworkBox = (props) => {
               </Text>
             </label>
             {/* Change text area depending on status */}
-            <Textarea
-              placeholder="Answer here..."
-              w="719px"
-              h="96px"
-              textAlign="start"
-            />
+            {props.answer != null ? 
+              props.submitted_date != null? (
+                <Box>{props.answer}</Box>
+              ) : (
+                <Textarea
+                  placeholder="Answer here..."
+                  w="719px"
+                  h="96px"
+                  textAlign="start"
+                  color="black"
+                  defaultValue={props.answer}
+                />
+              )
+             : (
+              <Textarea
+                placeholder="Answer here..."
+                w="719px"
+                h="96px"
+                textAlign="start"
+                color="black"
+              />
+            )}
+
             <Button
               variant="secondary"
               pt="0px"
@@ -131,7 +151,12 @@ const HomeworkBox = (props) => {
           </Flex>
           <Flex flexDirection="column" gap="16px" w="137px" h="108px" mt="40px">
             <Button p="4px">Submit</Button>
-            <Button variant="ghost">Open in course</Button>
+            <Button
+              variant="ghost"
+              onClick={() => navigate(`/courses/${props.courseId}`)}
+            >
+              Open in course
+            </Button>
           </Flex>
         </Flex>
       </Flex>

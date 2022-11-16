@@ -4,7 +4,7 @@ export const getAllHomework = async (req, res) => {
   try {
     const userId = req.params.userId;
     const results = await pool.query(
-      `SELECT courses.course_name, lessons.lesson_name, sub_lessons.sub_lesson_name, 
+      `SELECT courses.course_name, courses.course_id, lessons.lesson_name, sub_lessons.sub_lesson_name, 
         assignments.assignment_id, assignments.detail, assignments.duration, 
         users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date
         FROM courses
