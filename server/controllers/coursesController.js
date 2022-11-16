@@ -205,6 +205,7 @@ export const getLearningById = async (req, res) => {
           sub_lesson_name: lesson.sub_lesson_name,
           sub_lesson_id: lesson.sub_lesson_id,
           video_status: false,
+          assign_status: false,
         });
       } else {
         course_data.lessons[lesson.lesson_name] = [];
@@ -212,11 +213,12 @@ export const getLearningById = async (req, res) => {
           sub_lesson_name: lesson.sub_lesson_name,
           sub_lesson_id: lesson.sub_lesson_id,
           video_status: false,
+          assign_status: false,
         });
       }
     });
 
-    const checkStatus = await pool.query(
+    const checkVideoStatus = await pool.query(
       `
       select *
       from users_sub_lessons
@@ -224,17 +226,39 @@ export const getLearningById = async (req, res) => {
       `,
       [userId]
     );
+    const checkAssignStatus = await pool.query(
+      `
+      select users_assignments.user_id, users_assignments.submitted_date, sub_lessons.sub_lesson_id
+      from sub_lessons
+      inner join assignments
+      on sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+      inner join users_assignments
+      on assignments.assignment_id = users_assignments.assignment_id
+      where user_id = $1
+      `,
+      [userId]
+    );
 
     Object.keys(course_data.lessons).map((lessonName) => {
       course_data.lessons[lessonName].map((subLesson) => {
-        for (let i = 0; i < checkStatus.rows.length; i++) {
-          if (subLesson.sub_lesson_id == checkStatus.rows[i].sub_lesson_id) {
+        for (let i = 0; i < checkVideoStatus.rows.length; i++) {
+          if (
+            subLesson.sub_lesson_id == checkVideoStatus.rows[i].sub_lesson_id
+          ) {
             subLesson.video_status = true;
+          }
+        }
+        for (let i = 0; i < checkAssignStatus.rows.length; i++) {
+          if (
+            subLesson.sub_lesson_id ==
+              checkAssignStatus.rows[i].sub_lesson_id &&
+            checkAssignStatus.rows[i].submitted_date != null
+          ) {
+            subLesson.assign_status = true;
           }
         }
       });
     });
-
     return res.json({
       data: { ...course_data, percentProgress: res.locals.percentProgress },
     });

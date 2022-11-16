@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState({});
-  const [checkSubLesson, setCheckSubLesson] = useState({});
   const [category, setCategory] = useState([]);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
@@ -72,7 +71,6 @@ const useCourses = () => {
         `http://localhost:4000/courses/${params.courseId}/learning?byUser=${userId}`
       );
       setCourse(results.data.data);
-      setCheckSubLesson(results.data.dataCheckStatus);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -83,7 +81,6 @@ const useCourses = () => {
   return {
     courses,
     course,
-    checkSubLesson,
     category,
     getCourses,
     getCourseById,
