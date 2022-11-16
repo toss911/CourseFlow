@@ -56,7 +56,7 @@ export const getProgress = async (req, res, next) => {
         ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
         INNER JOIN users_assignments
         ON users_assignments.assignment_id = assignments.assignment_id
-        WHERE lessons.course_id = $1 AND users_assignments.user_id = $2`,
+        WHERE lessons.course_id = $1 AND users_assignments.user_id = $2 AND users_assignments.submitted_date IS NOT NULL`,
       [courseId, userId]
     );
     totalCompletedAssignment = Number(
