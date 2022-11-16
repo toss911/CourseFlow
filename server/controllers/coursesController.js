@@ -1,4 +1,5 @@
 import { pool } from "../utils/db.js";
+import format from "pg-format";
 
 export const getAll = async (req, res) => {
   try {
@@ -267,34 +268,57 @@ export const getLearningById = async (req, res) => {
   }
 };
 
-export const postWatchedAndAcceptedHomeWork = async (req, res) => {
+export const postWatchedOrAccepted = async (req, res) => {
   try {
     const userId = req.query.byUser;
-    const courseId = req.params.courseId;
-    const acceptedDate = new Date();
-    await pool.query(
-      `
-    INSERT INTO users_sub_lessons(user_id, sub_lesson_id)
-    VALUES ($1, $2)`,
-      [userId, courseId]
-    );
+    const subLessonId = req.query.subLessonId;
+    const action = req.body.action;
 
-    // 1. รอถามเรื่อง 1 sub-lesson มีแค่ 1 assignment รึเปล่า
-    // 2. ถามเรื่องเวลาที่ user accept assignment จะให้ status ของ assignment นั้นเป็นอะไร หรือให้ไม่แสดงขึ้นมาเลย?
-    // 3. เจอบัคว่าหน้า learning ที่ควรจะให้แค่เฉพาะคนที่ subscribed เข้าได้ แต่อันนี้เข้าได้ทุกคน
-    let assignmentId = pool.query(`
-    SELECT assignments.assignment_id
-    FROM assignments
-    WHERE
-    `);
+    if (/accepted/i.test(action)) {
+      const acceptedDate = new Date();
 
-    await pool.query(
-      `
-    INSERT INTO users_assignments(user_id, assignment_id, accepted_date, status)
-    VALUES ($1, $2, $3, $4)`,
-      [userId, assignmentId, acceptedDate, "pending"]
-    );
-    return res.json({ userId, courseId });
+      let result = await pool.query(
+        `
+      SELECT assignment_id
+      FROM sub_lessons
+      INNER JOIN assignments
+      ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+      WHERE sub_lessons.sub_lesson_id = $1`,
+        [subLessonId]
+      );
+      result = result.rows;
+
+      const assignmentList = [];
+      for (let i = 0; i < result.length; i++) {
+        assignmentList.push(result[i].assignment_id);
+      }
+
+      const sqlStatement = format(
+        `
+        INSERT INTO users_assignments(user_id, assignment_id, accepted_date, status)
+        VALUES (%s, UNNEST(ARRAY[%s]), %L, %L)`,
+        userId,
+        assignmentList,
+        acceptedDate,
+        "pending"
+      );
+
+      await pool.query(sqlStatement);
+      res.json({
+        message: "Successfully insert data into users_assignments table",
+      });
+    } else if (/watched/i.test(action)) {
+      await pool.query(
+        `
+        INSERT INTO users_sub_lessons(user_id, sub_lesson_id)
+        VALUES ($1, $2)
+        RETURNING *`,
+        [userId, subLessonId]
+      );
+      return res.json({
+        message: "Successfully insert data into users_sub_lessons table",
+      });
+    }
   } catch (error) {
     return res.sendStatus(500);
   }

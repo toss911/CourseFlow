@@ -28,7 +28,7 @@ coursesRouter.post(
   "/:courseId/learning",
   protect,
   checkSubscription,
-  courses_controller.postWatchedAndAcceptedHomeWork
+  courses_controller.postWatchedOrAccepted
 );
 
 export default coursesRouter;

@@ -15,6 +15,7 @@ import {
   Spacer,
   Progress,
   AspectRatio,
+  Badge,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
@@ -34,18 +35,26 @@ function LearningPage() {
     /* setChangeSubLesson value ที่เอามาใส่ ต้องเป็น value ของหัวข้อ sub-lesson ที่เรียนจบล่าสุด (ซึ่งรับมาจาก back-end) */
     setChangeSubLesson(course.course_name);
   }, [course.course_name]);
-  console.log(course);
-  const handleSubLesson = (subLessonName) => {
+
+  const handleSubLesson = async (subLessonId) => {
     /* เวลากดที่หัวข้อ sub-lesson จะต้องมีการส่ง request ไปขอ back-end ดึงข้อมูลของ sub-lesson นั้น ๆ มาแสดงอีกที */
-    Object.keys(course.lessons).map((lessonName) => {
-      course.lessons[lessonName].map((subLesson) => {});
-    });
-    setChangeSubLesson(subLessonName);
+    await axios.get(
+      `http://localhost:4000/courses/${course.course_id}/learning?byUser=${userId}&subLessonId=${subLessonId}`
+    );
   };
 
-  const handleVideoEnded = async () => {
+  const handleAcceptAssignment = async (subLessonId) => {
     await axios.post(
-      `http://localhost:4000/courses/${course.course_id}/learning?byUser=${userId}`
+      `http://localhost:4000/courses/${course.course_id}/learning?byUser=${userId}&subLessonId=${subLessonId}`,
+      { action: "accepted" }
+    );
+  };
+
+  const handleVideoEnded = async (subLessonId) => {
+    /* หลังจากดูวิดีโอจบแล้ว จะต้องยิง request ไปเพื่อของ post ข้อมูลลงตาราง users_sub_lessons ว่ามีการดูจบแล้ว */
+    await axios.post(
+      `http://localhost:4000/courses/${course.course_id}/learning?byUser=${userId}&subLessonId=${subLessonId}`,
+      { action: "watched" }
     );
   };
   return (
@@ -182,10 +191,7 @@ function LearningPage() {
                                   cursor="pointer"
                                   variant="body2"
                                   onClick={() => {
-                                    handleSubLesson(
-                                      subLesson.sub_lesson_name,
-                                      key
-                                    );
+                                    handleSubLesson(subLesson.sub_lesson_id);
                                   }}
                                 >
                                   {subLesson.sub_lesson_name}
@@ -231,17 +237,7 @@ function LearningPage() {
             >
               <Text variant="body1">Assignment</Text>
               <Spacer />
-              <Text
-                bg="#FFFBDB"
-                color="#996500"
-                fontSize="16px"
-                fontWeight="500"
-                mt="3px"
-                p="4px 8px"
-                borderRadius="4px"
-              >
-                Pending
-              </Text>
+              <Badge variant="pending">pending</Badge>
             </Flex>
             <Text variant="body2" mt="25px">
               What are the service design?
@@ -269,11 +265,9 @@ function LearningPage() {
               mt="25px"
               mb="24px"
             >
-              <Button width="210px" height="60px">
-                Send Assignment
-              </Button>
-              <Button ml="20px" width="100px" height="60px">
-                Save
+              <Button height="60px">Send Assignment</Button>
+              <Button variant="save draft" ml="20px" height="60px">
+                Save Draft
               </Button>
               <Spacer />
               <Text pt="20px" color="gray.700">
