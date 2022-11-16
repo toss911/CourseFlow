@@ -72,7 +72,23 @@ function MyHomework() {
           <Flex flexDirection="column" alignItems="center" h="145px">
             <Heading variant="headline2">My Homework</Heading>
             {/* Don't forget to change the color of active tabs to black */}
-            <Tabs w="470px" h="40px" mt="60px" gap="16px" textColor="gray.600">
+            <Tabs
+              w="470px"
+              h="40px"
+              mt="60px"
+              gap="16px"
+              textColor="gray.600"
+              sx={{
+                ".css-1oezttv": {
+                  borderColor: "white",
+                  color: "#9AA1B9",
+                },
+                ".css-1oezttv[aria-selected=true]": {
+                  borderColor: "black",
+                  color: "black",
+                },
+              }}
+            >
               <TabList>
                 <Tab>
                   <Text variant="body2">All</Text>
