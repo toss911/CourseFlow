@@ -54,11 +54,7 @@ function MyHomework() {
           justifyContent="center"
           backgroundImage="url('/assets/myhomework-page/background.png')"
         >
-          <Flex
-            flexDirection="column"
-            alignItems="center"
-            h="145px"
-          >
+          <Flex flexDirection="column" alignItems="center" h="145px">
             <Heading variant="headline2">My Homework</Heading>
             {/* Don't forget to change the color of active tabs to black */}
             <Tabs
@@ -67,6 +63,16 @@ function MyHomework() {
               mt="60px"
               gap="16px"
               textColor="gray.600"
+              sx={{
+                ".css-1oezttv": {
+                  borderColor: "white",
+                  color: "#9AA1B9",
+                },
+                ".css-1oezttv[aria-selected=true]": {
+                  borderColor: "black",
+                  color: "black",
+                },
+              }}
             >
               <TabList>
                 <Tab>
@@ -97,17 +103,20 @@ function MyHomework() {
                     >
                       {homework.map((hw, key) => {
                         return (
-                        <HomeworkBox
-                          key={key}
-                          courseName={hw.course_name}
-                          lessonName={hw.lesson_name}
-                          subLessonName={hw.sub_lesson_name}
-                          status={hw.status}
-                          hwDetail={hw.detail}
-                          daysUntilDeadline={hw.days_until_deadline}
-                          answer={hw.answer}
-                          dayOrDays={hw.days_until_deadline <= 1? "day" : "days"}
-                        />);
+                          <HomeworkBox
+                            key={key}
+                            courseName={hw.course_name}
+                            lessonName={hw.lesson_name}
+                            subLessonName={hw.sub_lesson_name}
+                            status={hw.status}
+                            hwDetail={hw.detail}
+                            daysUntilDeadline={hw.days_until_deadline}
+                            answer={hw.answer}
+                            dayOrDays={
+                              hw.days_until_deadline <= 1 ? "day" : "days"
+                            }
+                          />
+                        );
                       })}
                     </Flex>
                   </Center>
@@ -132,7 +141,6 @@ function MyHomework() {
       <Footer />
     </Box>
   );
-
 }
 
 export default MyHomework;
