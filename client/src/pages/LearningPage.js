@@ -4,15 +4,12 @@ import {
   Image,
   Text,
   Heading,
-  Link,
   Accordion,
   AccordionItem,
   AccordionButton,
   AccordionIcon,
   AccordionPanel,
   UnorderedList,
-  ListItem,
-  Input,
   Button,
   Textarea,
   Spacer,
@@ -22,16 +19,18 @@ import {
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import useCourses from "../hooks/useCourses";
 import { useAuth } from "../contexts/authentication.js";
+import axios from "axios";
+
 function LearningPage() {
   const { getCourseLearningById, course } = useCourses();
   const [changeSubLesson, setChangeSubLesson] = useState();
   const { contextState } = useAuth();
+  const userId = contextState.user.user_id;
 
   useEffect(() => {
-    getCourseLearningById(contextState.user.user_id);
+    getCourseLearningById(userId);
     setChangeSubLesson(course.course_name);
   }, [course.course_name]);
 
@@ -39,8 +38,10 @@ function LearningPage() {
     setChangeSubLesson(subLessonName);
   };
 
-  const handleVideoEnded = () => {
-    alert("Testaodkaopk");
+  const handleVideoEnded = async () => {
+    await axios.post(
+      `http://localhost:4000/courses/${course.course_id}/learning?byUser=${userId}`
+    );
   };
 
   return (

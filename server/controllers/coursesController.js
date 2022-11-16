@@ -214,3 +214,36 @@ export const getLearningById = async (req, res) => {
     return res.sendStatus(500);
   }
 };
+
+export const postWatchedAndAcceptedHomeWork = async (req, res) => {
+  try {
+    const userId = req.query.byUser;
+    const courseId = req.params.courseId;
+    const acceptedDate = new Date();
+    await pool.query(
+      `
+    INSERT INTO users_sub_lessons(user_id, sub_lesson_id)
+    VALUES ($1, $2)`,
+      [userId, courseId]
+    );
+
+    // 1. รอถามเรื่อง 1 sub-lesson มีแค่ 1 assignment รึเปล่า
+    // 2. ถามเรื่องเวลาที่ user accept assignment จะให้ status ของ assignment นั้นเป็นอะไร หรือให้ไม่แสดงขึ้นมาเลย?
+    // 3. เจอบัคว่าหน้า learning ที่ควรจะให้แค่เฉพาะคนที่ subscribed เข้าได้ แต่อันนี้เข้าได้ทุกคน
+    let assignmentId = pool.query(`
+    SELECT assignments.assignment_id
+    FROM assignments
+    WHERE
+    `);
+
+    await pool.query(
+      `
+    INSERT INTO users_assignments(user_id, assignment_id, accepted_date, status)
+    VALUES ($1, $2, $3, $4)`,
+      [userId, assignmentId, acceptedDate, "pending"]
+    );
+    return res.json({ userId, courseId });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};

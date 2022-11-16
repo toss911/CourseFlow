@@ -22,4 +22,10 @@ coursesRouter.get(
   courses_controller.getLearningById
 );
 
+coursesRouter.post(
+  "/:courseId/learning",
+  protect,
+  courses_controller.postWatchedAndAcceptedHomeWork
+);
+
 export default coursesRouter;
