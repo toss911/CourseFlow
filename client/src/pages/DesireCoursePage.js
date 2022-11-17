@@ -3,6 +3,7 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import useCourses from "../hooks/useCourses";
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/authentication.js";
 import { Pagination } from "antd";
 import "antd/dist/antd.css";
 import {
@@ -11,11 +12,9 @@ import {
   Flex,
   Text,
   Heading,
-  Input,
-  InputLeftElement,
-  InputGroup,
   Center,
   Spinner,
+  Stack,
 } from "@chakra-ui/react";
 
 const coursesPerPage = 6;
@@ -29,9 +28,11 @@ function DesireCourse() {
     desireCourse,
     desireCourses,
   } = useCourses();
+  const {contextState} = useAuth();
+  console.log(contextState);
 
   useEffect(() => {
-    desireCourse(5);
+    desireCourse(contextState.user.user_id);
     console.log(desireCourses);
   }, []);
 
@@ -47,11 +48,11 @@ function DesireCourse() {
   };
 
   return (
+    <Stack direction='column' spacing='49px'>
+    <Navbar />
     <Box>
-      <Navbar />
+    <Image w="100%" src="/assets/courseCard/bgOc.svg" position="relative" />
       <Box>
-        <Image w="100%" src="/assets/courseCard/bgOc.svg" position="relative" />
-
         <Flex flexDirection="column" alignItems="center" mt="-100">
           <Heading variant="headline2" mb="60px">
             Desire Course
@@ -73,7 +74,7 @@ function DesireCourse() {
                 justifyContent="center"
                 mb="180px"
                 flexWrap="wrap"
-                w="70%"
+                w="100%"
               >
                 {desireCourses.map((course, key) => {
                   return (
@@ -91,7 +92,7 @@ function DesireCourse() {
               </Flex>
             ) : (
               <Text as="i" color="black" mb="187px">
-                Course not found
+                No Desire Courses
               </Text>
             )}
           </Center>
@@ -105,8 +106,9 @@ function DesireCourse() {
           onChange={paginate}
         />
       </Center>
-      <Footer />
     </Box>
+    <Footer />
+  </Stack>
   );
 }
 

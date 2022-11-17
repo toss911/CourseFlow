@@ -1,29 +1,4 @@
-// import { Navbar } from "../components/Navbar";
-// import { Footer } from "../components/Footer";
-// import { Box, Center, Heading, Image, Flex } from "@chakra-ui/react";
 
-// function UserProfile() {
-//   return (
-//     <Box>
-//       <Navbar />
-//       <Box>
-//         <Image
-//           w="100%"
-//           src="/assets/profile-page/profileBg.svg"
-//           position="relative"
-//           mt="10%"
-//         />
-
-//         <Flex flexDirection="column" alignItems="center">
-//           <Heading variant="headline2" mb="60px">
-//             Profile
-//           </Heading>
-//         </Flex>
-//       </Box>
-//       <Footer />
-//     </Box>
-//   );
-// }
 import { Footer } from "../components/Footer";
 import {
     Center,
