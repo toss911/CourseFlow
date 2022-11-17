@@ -55,12 +55,8 @@ const HomeworkBox = (props) => {
 
 
   const handleTextChange = (event) => {
-    if (props.answer != null) {
-      setAnswer({ answer: props.answer + event.target.value });
-    }
-    else {
-      setAnswer({ answer: event.target.value});
-    }
+
+      setAnswer({ answer: event.target.value });
     
   };
 
