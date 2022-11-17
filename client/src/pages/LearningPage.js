@@ -34,12 +34,9 @@ function LearningPage() {
     /* setChangeSubLesson value ที่เอามาใส่ ต้องเป็น value ของหัวข้อ sub-lesson ที่เรียนจบล่าสุด (ซึ่งรับมาจาก back-end) */
     setChangeSubLesson(course.course_name);
   }, [course.course_name]);
-  console.log(course);
+
   const handleSubLesson = (subLessonName) => {
     /* เวลากดที่หัวข้อ sub-lesson จะต้องมีการส่ง request ไปขอ back-end ดึงข้อมูลของ sub-lesson นั้น ๆ มาแสดงอีกที */
-    Object.keys(course.lessons).map((lessonName) => {
-      course.lessons[lessonName].map((subLesson) => {});
-    });
     setChangeSubLesson(subLessonName);
   };
 
@@ -97,9 +94,9 @@ function LearningPage() {
               },
             }}
           />
-          {Object.keys(course).length === 0
+          {Object.values(course).length === 0
             ? null
-            : Object.keys(course.lessons).map((lessonName, key) => {
+            : Object.values(course.lessons).map((lesson, key) => {
                 let numberLesson = null;
                 if (key < 10) {
                   numberLesson = "0" + (key + 1);
@@ -135,7 +132,7 @@ function LearningPage() {
                               {numberLesson}
                             </Text>
                             <Text ml="24px" variant="body2">
-                              {lessonName}
+                              {lesson.lesson_name}
                             </Text>
                           </Box>
                           <AccordionIcon />
@@ -143,56 +140,56 @@ function LearningPage() {
                       </h2>
                       <AccordionPanel pb={4}>
                         <UnorderedList>
-                          {course.lessons[lessonName].map((subLesson, key) => {
-                            return (
-                              <Flex
-                                flexDirection="row"
-                                alignItems="start"
-                                justifyContent="start"
-                                mt="24px"
-                                key={key}
-                                _hover={{ backgroundColor: "gray.100" }}
-                              >
-                                {subLesson.video_status &&
-                                subLesson.assign_status === true ? (
-                                  <Image
-                                    src="/assets/learning-page/success-circle.svg"
-                                    alt="empty-circle"
-                                    mt="3px"
-                                    mr="15px"
-                                  />
-                                ) : subLesson.video_status ||
-                                  subLesson.assign_status === true ? (
-                                  <Image
-                                    src="/assets/learning-page/half-circle.svg"
-                                    alt="empty-circle"
-                                    mt="3px"
-                                    mr="15px"
-                                  />
-                                ) : (
-                                  <Image
-                                    src="/assets/learning-page/circle.svg"
-                                    alt="empty-circle"
-                                    mt="3px"
-                                    mr="15px"
-                                  />
-                                )}
-
-                                <Text
-                                  cursor="pointer"
-                                  variant="body2"
-                                  onClick={() => {
-                                    handleSubLesson(
-                                      subLesson.sub_lesson_name,
-                                      key
-                                    );
-                                  }}
+                          {Object.values(lesson.sub_lessons).map(
+                            (subLesson, key) => {
+                              return (
+                                <Flex
+                                  flexDirection="row"
+                                  alignItems="start"
+                                  justifyContent="start"
+                                  mt="24px"
+                                  key={key}
+                                  _hover={{ backgroundColor: "gray.100" }}
                                 >
-                                  {subLesson.sub_lesson_name}
-                                </Text>
-                              </Flex>
-                            );
-                          })}
+                                  {subLesson.watched_status == true ? (
+                                    <Image
+                                      src="/assets/learning-page/success-circle.svg"
+                                      alt="empty-circle"
+                                      mt="3px"
+                                      mr="15px"
+                                    />
+                                  ) : subLesson.watched_status == true ? (
+                                    <Image
+                                      src="/assets/learning-page/half-circle.svg"
+                                      alt="empty-circle"
+                                      mt="3px"
+                                      mr="15px"
+                                    />
+                                  ) : (
+                                    <Image
+                                      src="/assets/learning-page/circle.svg"
+                                      alt="empty-circle"
+                                      mt="3px"
+                                      mr="15px"
+                                    />
+                                  )}
+
+                                  <Text
+                                    cursor="pointer"
+                                    variant="body2"
+                                    onClick={() => {
+                                      handleSubLesson(
+                                        subLesson.sub_lesson_name,
+                                        key
+                                      );
+                                    }}
+                                  >
+                                    {subLesson.sub_lesson_name}
+                                  </Text>
+                                </Flex>
+                              );
+                            }
+                          )}
                         </UnorderedList>
                       </AccordionPanel>
                     </AccordionItem>

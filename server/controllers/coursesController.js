@@ -185,9 +185,9 @@ export const getLearningById = async (req, res) => {
     );
     course_data = course_data.rows[0];
 
-    const lessons = await pool.query(
+    let lessons = await pool.query(
       `
-      SELECT  lessons.lesson_name, sub_lessons.sub_lesson_name , sub_lessons.sub_lesson_id
+      SELECT  lessons.lesson_name, lessons.lesson_id, sub_lessons.sub_lesson_name , sub_lessons.sub_lesson_id
       FROM courses
       INNER JOIN lessons 
       ON courses.course_id = lessons.course_id
@@ -200,65 +200,63 @@ export const getLearningById = async (req, res) => {
 
     course_data.lessons = {};
     lessons.rows.map((lesson) => {
-      if (lesson.lesson_name in course_data.lessons) {
-        course_data.lessons[lesson.lesson_name].push({
-          sub_lesson_name: lesson.sub_lesson_name,
-          sub_lesson_id: lesson.sub_lesson_id,
-          video_status: false,
-          assign_status: false,
-        });
+      if (lesson.lesson_id in course_data.lessons) {
+        course_data.lessons[lesson.lesson_id].sub_lessons = {
+          ...course_data.lessons[lesson.lesson_id].sub_lessons,
+          [lesson.sub_lesson_id]: {
+            sub_lesson_name: lesson.sub_lesson_name,
+            video_directory: lesson.video_directory,
+            watched_status: false,
+          },
+        };
       } else {
-        course_data.lessons[lesson.lesson_name] = [];
-        course_data.lessons[lesson.lesson_name].push({
-          sub_lesson_name: lesson.sub_lesson_name,
-          sub_lesson_id: lesson.sub_lesson_id,
-          video_status: false,
-          assign_status: false,
-        });
+        course_data.lessons[lesson.lesson_id] = {
+          lesson_name: lesson.lesson_name,
+          sub_lessons: {
+            [lesson.sub_lesson_id]: {
+              sub_lesson_name: lesson.sub_lesson_name,
+              video_directory: lesson.video_directory,
+              watched_status: false,
+            },
+          },
+        };
       }
     });
 
-    const checkVideoStatus = await pool.query(
+    let checkWatchedStatus = await pool.query(
       `
-      select *
+      select users_sub_lessons.user_id,users_sub_lessons.sub_lesson_id,lessons.course_id,lessons.lesson_id
       from users_sub_lessons
-      where user_id = $1
+      inner join sub_lessons
+      on users_sub_lessons.sub_lesson_id = sub_lessons.sub_lesson_id
+      inner join lessons
+      on sub_lessons.lesson_id = lessons.lesson_id
+      where users_sub_lessons.user_id = $1 AND lessons.course_id = $2
       `,
-      [userId]
+      [userId, courseId]
     );
+    checkWatchedStatus = checkWatchedStatus.rows;
     const checkAssignStatus = await pool.query(
       `
       select users_assignments.user_id, users_assignments.submitted_date, sub_lessons.sub_lesson_id
-      from sub_lessons
+      from lessons
+      inner join sub_lessons
+      on lessons.lesson_id = sub_lessons.lesson_id
       inner join assignments
       on sub_lessons.sub_lesson_id = assignments.sub_lesson_id
       inner join users_assignments
       on assignments.assignment_id = users_assignments.assignment_id
-      where user_id = $1
+      where users_assignments.user_id = $1 and lessons.course_id = $2 and users_assignments.submitted_date is not null
       `,
-      [userId]
+      [userId, courseId]
     );
 
-    Object.keys(course_data.lessons).map((lessonName) => {
-      course_data.lessons[lessonName].map((subLesson) => {
-        for (let i = 0; i < checkVideoStatus.rows.length; i++) {
-          if (
-            subLesson.sub_lesson_id == checkVideoStatus.rows[i].sub_lesson_id
-          ) {
-            subLesson.video_status = true;
-          }
-        }
-        for (let i = 0; i < checkAssignStatus.rows.length; i++) {
-          if (
-            subLesson.sub_lesson_id ==
-              checkAssignStatus.rows[i].sub_lesson_id &&
-            checkAssignStatus.rows[i].submitted_date != null
-          ) {
-            subLesson.assign_status = true;
-          }
-        }
-      });
-    });
+    for (let i = 0; i < checkWatchedStatus.length; i++) {
+      course_data.lessons[checkWatchedStatus[i].lesson_id].sub_lessons[
+        checkWatchedStatus[i].sub_lesson_id
+      ].watched_status = true;
+    }
+
     return res.json({
       data: { ...course_data, percentProgress: res.locals.percentProgress },
     });
