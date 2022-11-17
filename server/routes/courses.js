@@ -8,9 +8,11 @@ coursesRouter.get("/", courses_controller.getAll);
 coursesRouter.get("/:courseId", courses_controller.getById);
 
 coursesRouter.post("/:courseId", courses_controller.postSubscribeOrAddCourse);
+
 coursesRouter.get("/desire", async (req, res) => {
-  try{
+  // try{
     const userId = req.query.byUser
+    console.log('asfffa');
     console.log(userId);
     let courseDesire = await pool.query(
       `select desired_courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id)
@@ -27,9 +29,9 @@ coursesRouter.get("/desire", async (req, res) => {
     return res.json({
       data: course
     })
-  }catch (err){ 
-    console.log(err);
-  }
+//   }catch (err){ 
+//     console.log(err);
+//   }
 })
 
 export default coursesRouter;

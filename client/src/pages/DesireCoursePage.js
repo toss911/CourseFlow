@@ -29,7 +29,7 @@ function DesireCourse() {
     desireCourses,
   } = useCourses();
   const {contextState} = useAuth();
-  console.log(contextState);
+  // console.log(contextState.user.user_id);
 
   useEffect(() => {
     desireCourse(contextState.user.user_id);
