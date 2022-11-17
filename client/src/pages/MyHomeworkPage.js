@@ -212,6 +212,7 @@ function MyHomework() {
                                 assignmentId={hw.assignment_id}
                                 submittedDate={hw.submitted_date}
                                 saveAnswerDraft={saveAnswerDraft}
+                                submitHomework={submitHomework}
                               />
                             );
                           })}
@@ -286,6 +287,7 @@ function MyHomework() {
                                 assignmentId={hw.assignment_id}
                                 submittedDate={hw.submitted_date}
                                 saveAnswerDraft={saveAnswerDraft}
+                                submitHomework={submitHomework}
                               />
                             );
                           })}
