@@ -56,6 +56,7 @@ function MyHomework() {
   console.log(homework);
 
   return (
+    <Stack direction="column">
     <Box>
       <Navbar />
       <Box>
@@ -63,7 +64,9 @@ function MyHomework() {
           <Flex
             mt="100px"
             w="1418px"
-            h="190px"
+            backgroundSize="100%"
+            // h="190px"
+            backgroundRepeat="no-repeat"
             ml="43px"
             justifyContent="center"
             backgroundImage="url('/assets/myhomework-page/background.png')"
@@ -72,7 +75,7 @@ function MyHomework() {
               <Heading variant="headline2">My Homework</Heading>
               <Tabs
                 w="470px"
-                h="40px"
+                // h="40px"
                 mt="60px"
                 gap="16px"
                 textColor="gray.600"
@@ -145,7 +148,7 @@ function MyHomework() {
                         flexDirection="column"
                         alignItems="center"
                         w="1120px"
-                        h="1560px"
+                        // h="1560px"
                         mb="145px"
                       >
                         {homework
@@ -182,7 +185,7 @@ function MyHomework() {
                         flexDirection="column"
                         alignItems="center"
                         w="1120px"
-                        h="1560px"
+                        // h="1560px"
                         mb="145px"
                       >
                         {homework
@@ -219,7 +222,7 @@ function MyHomework() {
                         flexDirection="column"
                         alignItems="center"
                         w="1120px"
-                        h="1560px"
+                        // h="1560px"
                         mb="145px"
                         pl="24px"
                       >
@@ -256,7 +259,7 @@ function MyHomework() {
                         flexDirection="column"
                         alignItems="center"
                         w="1120px"
-                        h="1560px"
+                        // h="1560px"
                         mb="145px"
                       >
                         {homework
@@ -293,6 +296,7 @@ function MyHomework() {
       </Box>
       <Footer />
     </Box>
+    </Stack>
   );
 }
 
