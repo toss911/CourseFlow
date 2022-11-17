@@ -24,8 +24,15 @@ coursesRouter.get(
   courses_controller.getLearningById
 );
 
+coursesRouter.get(
+  "/:courseId/learning/:subLessonId",
+  protect,
+  checkSubscription,
+  courses_controller.getSubLesson
+);
+
 coursesRouter.post(
-  "/:courseId/learning",
+  "/:courseId/learning/:subLessonId",
   protect,
   checkSubscription,
   courses_controller.postWatchedOrAccepted

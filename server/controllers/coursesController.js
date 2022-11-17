@@ -271,12 +271,11 @@ export const getLearningById = async (req, res) => {
 export const postWatchedOrAccepted = async (req, res) => {
   try {
     const userId = req.query.byUser;
-    const subLessonId = req.query.subLessonId;
+    const subLessonId = req.params.subLessonId;
     const action = req.body.action;
+    const dateNow = new Date();
 
     if (/accepted/i.test(action)) {
-      const acceptedDate = new Date();
-
       let result = await pool.query(
         `
       SELECT assignment_id
@@ -299,7 +298,7 @@ export const postWatchedOrAccepted = async (req, res) => {
         VALUES (%s, UNNEST(ARRAY[%s]), %L, %L)`,
         userId,
         assignmentList,
-        acceptedDate,
+        dateNow,
         "pending"
       );
 
@@ -308,13 +307,23 @@ export const postWatchedOrAccepted = async (req, res) => {
         message: "Successfully insert data into users_assignments table",
       });
     } else if (/watched/i.test(action)) {
-      await pool.query(
+      // ลองดูวิธีการบล็อคการยิง API มา Insert ซ้ำภายใน Front-end อีกที
+      const isExisted = await pool.query(
         `
-        INSERT INTO users_sub_lessons(user_id, sub_lesson_id)
-        VALUES ($1, $2)
-        RETURNING *`,
+        SELECT *
+        FROM users_sub_lessons
+        WHERE user_id = $1 AND sub_lesson_id = $2
+        `,
         [userId, subLessonId]
       );
+      if (!Boolean(isExisted.rowCount)) {
+        await pool.query(
+          `
+            INSERT INTO users_sub_lessons(user_id, sub_lesson_id, created_date)
+            VALUES ($1, $2, $3)`,
+          [userId, subLessonId, dateNow]
+        );
+      }
       return res.json({
         message: "Successfully insert data into users_sub_lessons table",
       });
@@ -322,4 +331,92 @@ export const postWatchedOrAccepted = async (req, res) => {
   } catch (error) {
     return res.sendStatus(500);
   }
+};
+
+export const getSubLesson = async (req, res) => {
+  const userId = req.query.byUser;
+  const subLessonId = req.params.subLessonId;
+  const courseId = req.params.courseId;
+
+  let querySubLesson = await pool.query(
+    `
+    SELECT sub_lessons.sub_lesson_name, sub_lessons.video_directory, assignments.assignment_id, assignments.detail, assignments.duration
+    FROM lessons
+    INNER JOIN sub_lessons
+    ON lessons.lesson_id = sub_lessons.lesson_id
+    LEFT JOIN assignments
+    ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+    WHERE lessons.course_id = $1 AND sub_lessons.sub_lesson_id = $2`,
+    [courseId, subLessonId]
+  );
+  querySubLesson = querySubLesson.rows;
+  const subLessonData = {
+    sub_lesson_id: subLessonId,
+    sub_lesson_name: querySubLesson[0].sub_lesson_name,
+    video_directory: querySubLesson[0].video_directory,
+    assignments: {},
+  };
+  querySubLesson.map((assignment) => {
+    if (assignment.assignment_id !== null) {
+      subLessonData.assignments[assignment.assignment_id] = {
+        detail: assignment.detail,
+        duration: assignment.duration,
+      };
+    } else {
+      subLessonData.assignments = null;
+    }
+  });
+
+  let queryAssignmentStatus = await pool.query(
+    `
+    SELECT assignments.assignment_id, assignments.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id
+    FROM assignments
+    INNER JOIN users_assignments
+    ON assignments.assignment_id = users_assignments.assignment_id
+    WHERE assignments.sub_lesson_id = $1 AND users_assignments.user_id = $2
+    `,
+    [subLessonId, userId]
+  );
+
+  if (Boolean(queryAssignmentStatus.rowCount)) {
+    subLessonData.assignment_status = "accepted";
+    // เช็คก่อนว่า overdue ไหม
+    queryAssignmentStatus.rows.map((assignment) => {
+      // If an assignment status is overdue => Stored in response's data immediately (no need to check overdue status again)
+      if (
+        assignment.status === "overdue" ||
+        assignment.status === "submitted"
+      ) {
+        subLessonData.assignments[String(assignment.assignment_id)].status =
+          assignment.status;
+      } else {
+        // If an assignment status isn't overdue => Need to check whether it is overdue or not first
+        let daysAfterAccepted = Math.abs(assignment.accepted_date - new Date());
+        daysAfterAccepted = daysAfterAccepted / (1000 * 60 * 60 * 24);
+        // If it is overdue => Changed status to "overdue" then send into response's data and also update the database
+        if (daysAfterAccepted >= assignment.duration) {
+          assignment.status = "overdue";
+          pool.query(
+            `
+            UPDATE users_assignments
+            SET status = 'overdue'
+            WHERE user_assignment_id = $1
+            `,
+            [assignment.user_assignment_id]
+          );
+        }
+        subLessonData.assignments[String(assignment.assignment_id)].status =
+          assignment.status;
+      }
+    });
+  } else {
+    /* In case of there is no assignment in that sub lesson, assignment_status will automatically be assigned as "accepted" */
+    if (subLessonData.assignments === null) {
+      subLessonData.assignment_status = "accepted";
+    } else {
+      subLessonData.assignment_status = "unaccepted";
+    }
+  }
+
+  return res.json({ data: subLessonData });
 };
