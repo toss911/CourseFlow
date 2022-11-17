@@ -42,6 +42,7 @@ export const getAllHomework = async (req, res) => {
 
     // *- Add assignment status, deadline and days until deadline -* //
     for (let assignment of results.rows) {
+    
       assignment["deadline"] = findDeadline(
         assignment.accepted_date,
         assignment.duration

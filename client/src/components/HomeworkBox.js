@@ -4,7 +4,6 @@ import {
   Badge,
   Text,
   Heading,
-  Input,
   Button,
   Textarea,
 } from "@chakra-ui/react";
@@ -35,7 +34,7 @@ const HomeworkBox = (props) => {
   };
 
   // *- Display days until deadline or not -* //
-  const displayDaysUntilDeadline = (status) => {
+  const displayOrNot = (status) => {
     let display;
     switch (status) {
       case "submitted":
@@ -54,9 +53,10 @@ const HomeworkBox = (props) => {
     return display;
   };
 
+
   const handleTextChange = (event) => {
-    setAnswer({answer: event.target.value});
-  }
+    setAnswer({ answer: event.target.value });
+  };
 
   console.log(answer);
 
@@ -96,7 +96,7 @@ const HomeworkBox = (props) => {
               w="165px"
               variant="body2"
               textColor="gray.700"
-              visibility={displayDaysUntilDeadline(props.status)}
+              visibility={displayOrNot(props.status)}
             >
               Submit within {props.daysUntilDeadline} {props.dayOrDays}
             </Text>
@@ -123,20 +123,21 @@ const HomeworkBox = (props) => {
               </Text>
             </label>
             {/* Change text area depending on status */}
-            {props.answer != null ? 
-              props.submitted_date != null? (
-                <Box>{props.answer}</Box>
-              ) : (
-                <Textarea
-                  placeholder="Answer here..."
-                  w="719px"
-                  h="96px"
-                  textAlign="start"
-                  color="black"
-                  defaultValue={props.answer}
-                />
-              )
-             : (
+            {props.submittedDate? (
+              <Box w="719px" h="96px">
+                {props.answer}
+              </Box>
+            ) : props.answer? (
+              <Textarea
+                placeholder="Answer here..."
+                w="719px"
+                h="96px"
+                textAlign="start"
+                color="black"
+                onChange={handleTextChange}
+                defaultValue={props.answer}
+              />
+            ) : (
               <Textarea
                 placeholder="Answer here..."
                 w="719px"
@@ -155,16 +156,23 @@ const HomeworkBox = (props) => {
               pr="10px"
               size="xs"
               mt="5px"
-              onClick={()=>props.saveAnswerDraft(props.assignmentId, answer)}
+              onClick={() => props.saveAnswerDraft(props.assignmentId, answer)}
+              visibility={props.submittedDate? "hidden" : "visible"}
             >
               Save draft
             </Button>
           </Flex>
           <Flex flexDirection="column" gap="16px" w="137px" h="108px" mt="40px">
-            <Button p="4px" onClick={() => props.submitHomework(props.assignmentId, answer)}>Submit</Button>
+            <Button
+              p="4px"
+              onClick={() => props.submitHomework(props.assignmentId, answer)}
+              visibility={props.submittedDate? "hidden" : "visible"}
+            >
+              Submit
+            </Button>
             <Button
               variant="ghost"
-              onClick={() => navigate(`/courses/${props.courseId}`)}
+              onClick={() => navigate(`/courses/${props.courseId}/learning`)}
             >
               Open in course
             </Button>

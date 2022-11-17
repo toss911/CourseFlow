@@ -12,6 +12,7 @@ import {
   TabPanel,
   Text,
   Center,
+  Stack,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authentication.js";
@@ -45,17 +46,20 @@ function MyHomework() {
       `http://localhost:4000/homework/save/${assignmentId}?userId=${userId}`,
       answer
     );
+    window.location.reload();
   };
 
   useEffect(() => {
     getHomeworkDetails();
   }, []);
 
+  console.log(homework);
+
   return (
     <Box>
       <Navbar />
       <Box>
-        <Flex flexDirection="column" h="1560px">
+        <Flex flexDirection="column">
           <Flex
             mt="100px"
             w="1418px"
@@ -64,7 +68,7 @@ function MyHomework() {
             justifyContent="center"
             backgroundImage="url('/assets/myhomework-page/background.png')"
           >
-            <Flex flexDirection="column" alignItems="center" h="145px">
+            <Flex flexDirection="column" alignItems="center">
               <Heading variant="headline2">My Homework</Heading>
               <Tabs
                 w="470px"
@@ -107,7 +111,7 @@ function MyHomework() {
                         flexDirection="column"
                         alignItems="center"
                         w="1120px"
-                        h="1560px"
+                        // h="1560px"
                         mb="145px"
                       >
                         {homework.map((hw, key) => {
@@ -128,6 +132,7 @@ function MyHomework() {
                               submitHomework={submitHomework}
                               saveAnswerDraft={saveAnswerDraft}
                               assignmentId={hw.assignment_id}
+                              submittedDate={hw.submitted_date}
                             />
                           );
                         })}
@@ -164,6 +169,7 @@ function MyHomework() {
                                 submitHomework={submitHomework}
                                 saveAnswerDraft={saveAnswerDraft}
                                 assignmentId={hw.assignment_id}
+                                submittedDate={hw.submitted_date}
                               />
                             );
                           })}
@@ -200,6 +206,7 @@ function MyHomework() {
                                 submitHomework={submitHomework}
                                 saveAnswerDraft={saveAnswerDraft}
                                 assignmentId={hw.assignment_id}
+                                submittedDate={hw.submitted_date}
                               />
                             );
                           })}
@@ -236,6 +243,7 @@ function MyHomework() {
                                 }
                                 saveAnswerDraft={saveAnswerDraft}
                                 submitHomework={submitHomework}
+                                submittedDate={hw.submitted_date}
                               />
                             );
                           })}
@@ -270,6 +278,7 @@ function MyHomework() {
                                   hw.days_until_deadline <= 1 ? "day" : "days"
                                 }
                                 assignmentId={hw.assignment_id}
+                                submittedDate={hw.submitted_date}
                               />
                             );
                           })}
