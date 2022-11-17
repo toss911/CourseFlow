@@ -13,7 +13,7 @@ import { useState } from "react";
 
 const HomeworkBox = (props) => {
   const navigate = useNavigate();
-  const [answer, setAnswer] = useState("");
+  const [answer, setAnswer] = useState({});
 
   // *- Change status badge color -* //
   const changeBadgeColor = (status) => {
@@ -55,7 +55,7 @@ const HomeworkBox = (props) => {
   };
 
   const handleTextChange = (event) => {
-    setAnswer(event.target.value);
+    setAnswer({answer: event.target.value});
   }
 
   console.log(answer);

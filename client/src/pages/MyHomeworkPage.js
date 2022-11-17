@@ -32,7 +32,7 @@ function MyHomework() {
   // *- Submit homework function-* //
   const submitHomework = async (assignmentId, answer) => {
     const result = await axios.put(
-      `http://localhost:4000/homework/${assignmentId}?userId=${userId}`,
+      `http://localhost:4000/homework/submit/${assignmentId}?userId=${userId}`,
       answer
     );
     window.location.reload();
@@ -42,20 +42,14 @@ function MyHomework() {
   // *- Save answer draft-* //
   const saveAnswerDraft = async (assignmentId, answer) => {
     const result = await axios.put(
-      `http://localhost:4000/homework/${assignmentId}?userId=${userId}`,
+      `http://localhost:4000/homework/save/${assignmentId}?userId=${userId}`,
       answer
     );
   };
 
   useEffect(() => {
     getHomeworkDetails();
-    console.log("โอ๊ต");
   }, []);
-
-  // console.log(submittedAssignments);
-  // console.log(pendingAssignments);
-  // console.log(inProgressAssignments);
-  // console.log(overdueAssignments);
 
   return (
     <Box>
@@ -72,7 +66,6 @@ function MyHomework() {
           >
             <Flex flexDirection="column" alignItems="center" h="145px">
               <Heading variant="headline2">My Homework</Heading>
-              {/* Don't forget to change the color of active tabs to black */}
               <Tabs
                 w="470px"
                 h="40px"
@@ -168,6 +161,8 @@ function MyHomework() {
                                 dayOrDays={
                                   hw.days_until_deadline <= 1 ? "day" : "days"
                                 }
+                                submitHomework={submitHomework}
+                                saveAnswerDraft={saveAnswerDraft}
                                 assignmentId={hw.assignment_id}
                               />
                             );
@@ -202,6 +197,8 @@ function MyHomework() {
                                 dayOrDays={
                                   hw.days_until_deadline <= 1 ? "day" : "days"
                                 }
+                                submitHomework={submitHomework}
+                                saveAnswerDraft={saveAnswerDraft}
                                 assignmentId={hw.assignment_id}
                               />
                             );
@@ -237,6 +234,8 @@ function MyHomework() {
                                 dayOrDays={
                                   hw.days_until_deadline <= 1 ? "day" : "days"
                                 }
+                                saveAnswerDraft={saveAnswerDraft}
+                                submitHomework={submitHomework}
                               />
                             );
                           })}
