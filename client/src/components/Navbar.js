@@ -113,7 +113,6 @@ export const Navbar = () => {
                 <MenuItem
                   onClick={() => {
                     logout();
-                    // onClick={() => {navigate("/desire")}}
                   }}
                 >
                   <Image
