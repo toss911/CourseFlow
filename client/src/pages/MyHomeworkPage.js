@@ -249,7 +249,7 @@ function MyHomework() {
                                 saveAnswerDraft={saveAnswerDraft}
                                 submitHomework={submitHomework}
                                 submittedDate={hw.submitted_date}
-                                saveAnswerDraft={saveAnswerDraft}
+                          
                               />
                             );
                           })}
