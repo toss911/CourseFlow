@@ -12,7 +12,7 @@ import { useState } from "react";
 
 const HomeworkBox = (props) => {
   const navigate = useNavigate();
-  const [answer, setAnswer] = useState({answer: props.answer});
+  const [answer, setAnswer] = useState({ answer: props.answer });
 
   // *- Change status badge color -* //
   const changeBadgeColor = (status) => {
@@ -53,13 +53,9 @@ const HomeworkBox = (props) => {
     return display;
   };
 
-
   const handleTextChange = (event) => {
-
-      setAnswer({ answer: event.target.value });
-    
+    setAnswer({ answer: event.target.value });
   };
-
 
   return (
     <Box>
@@ -93,14 +89,25 @@ const HomeworkBox = (props) => {
             >
               <Text variant="body3">{props.status}</Text>
             </Badge>
-            <Text
-              w="165px"
-              variant="body2"
-              textColor="gray.700"
-              visibility={displayOrNot(props.status)}
-            >
-              Submit within {props.daysUntilDeadline} {props.dayOrDays}
-            </Text>
+            {props.daysUntilDeadline === 0 ? (
+              <Text
+                w="165px"
+                variant="body2"
+                textColor="gray.700"
+                visibility={displayOrNot(props.status)}
+              >
+                Submit within today
+              </Text>
+            ) : (
+              <Text
+                w="165px"
+                variant="body2"
+                textColor="gray.700"
+                visibility={displayOrNot(props.status)}
+              >
+                Submit within {props.daysUntilDeadline} {props.dayOrDays}
+              </Text>
+            )}
           </Flex>
         </Flex>
         <Flex
@@ -124,11 +131,11 @@ const HomeworkBox = (props) => {
               </Text>
             </label>
             {/* Change text area depending on status */}
-            {props.submittedDate? (
+            {props.submittedDate ? (
               <Box w="719px" h="96px">
                 {props.answer}
               </Box>
-            ) : props.answer? (
+            ) : props.answer ? (
               <Textarea
                 placeholder="Answer here..."
                 w="719px"
@@ -158,7 +165,7 @@ const HomeworkBox = (props) => {
               size="xs"
               mt="5px"
               onClick={() => props.saveAnswerDraft(props.assignmentId, answer)}
-              visibility={props.submittedDate? "hidden" : "visible"}
+              visibility={props.submittedDate ? "hidden" : "visible"}
             >
               Save draft
             </Button>
@@ -167,7 +174,7 @@ const HomeworkBox = (props) => {
             <Button
               p="4px"
               onClick={() => props.submitHomework(props.assignmentId, answer)}
-              visibility={props.submittedDate? "hidden" : "visible"}
+              visibility={props.submittedDate ? "hidden" : "visible"}
             >
               Submit
             </Button>

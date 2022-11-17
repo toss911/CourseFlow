@@ -54,8 +54,6 @@ function MyHomework() {
     getHomeworkDetails();
   }, []);
 
-  console.log(homework);
-
   return (
     <Stack direction="column">
     <Box>
