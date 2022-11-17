@@ -18,34 +18,33 @@ import {
 } from "@chakra-ui/react";
 
 const coursesPerPage = 6;
+
 function DesireCourse() {
-  const [page, setPage] = useState(1);
   const {
     getCourses,
-    courses,
     isLoading,
     setIsLoading,
     desireCourse,
     desireCourses,
   } = useCourses();
   const {contextState} = useAuth();
+  const [page, setPage] = useState(1);
   // console.log(contextState.user.user_id);
 
   useEffect(() => {
-    desireCourse(contextState.user.user_id);
-    console.log(desireCourses);
-  }, []);
+    desireCourse(contextState.user.user_id);}, []);
 
   // Get current posts
   const indexOfLastCourse = page * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const currentCourses = desireCourses.slice(indexOfFirstCourse, indexOfLastCourse);
 
   // Change page
   const paginate = (pageNumber) => {
     setPage(pageNumber);
     window.scrollTo(0, 150);
   };
+  console.log(desireCourses.length);
 
   return (
     <Stack direction='column' spacing='49px'>
@@ -74,9 +73,10 @@ function DesireCourse() {
                 justifyContent="center"
                 mb="180px"
                 flexWrap="wrap"
-                w="100%"
+                w="70%"
+                // w="100%" ถ้าจอคนอื่นให้ใช้อันนี้
               >
-                {desireCourses.map((course, key) => {
+                {currentCourses.map((course, key) => {
                   return (
                     <CourseCard
                       key={key}
@@ -100,7 +100,7 @@ function DesireCourse() {
       </Box>
       <Center mb="20">
         <Pagination
-          total={courses.length}
+          total={desireCourses.length}
           current={page}
           pageSize={coursesPerPage}
           onChange={paginate}

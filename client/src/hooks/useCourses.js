@@ -76,7 +76,7 @@ const useCourses = () => {
       
       setDesireCourses(desireCourseData.data.data)
       setIsLoading(false)
-      console.log(desireCourses.data); 
+      console.log(desireCourses.data.data); 
     }catch (error) { 
       setIsError(true);
       setIsLoading(false);
