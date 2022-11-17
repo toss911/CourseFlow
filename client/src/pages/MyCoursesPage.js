@@ -44,6 +44,7 @@ function MyCourses() {
       backgroundRepeat="no-repeat"
       backgroundSize="98%"
       backgroundPosition="43px 188px"
+      justifyContent="center"
     >
       <Navbar />
       <Skeleton isLoaded={!isLoading}>
@@ -51,10 +52,8 @@ function MyCourses() {
           <Heading align="center" variant="headline2" mb="60px">
             My Courses
           </Heading>
-          <Box>
+          <Box justifyContent="center">
             <Tabs
-              align="center"
-              justifyContent="center"
               pb="16px"
               sx={{
                 ".css-1oezttv": {
@@ -67,31 +66,25 @@ function MyCourses() {
                 },
               }}
             >
-              <TabList w="fit-content">
+              <TabList justifyContent={"center"} gap={"16px"} border={"0px"}>
                 <Tab>All Courses</Tab>
                 <Tab>In progress</Tab>
                 <Tab>Completed</Tab>
               </TabList>
 
-              <Box display="flex" justifyContent="end" flex="wrap">
-                <Box>
-                  <Box
-                    top="0px"
-                    position="sticky"
-                    flex="wrap"
-                    pt="16px"
-                    align="end"
-                  >
+              <Box
+                display="flex"
+                justifyContent="end"
+                flex="wrap"
+                m="0px 60px 200px 20px"
+              >
+                <Box mb="35px">
+                  <Box top="0px" position="sticky" flex="wrap" pt="16px">
                     <UserCourseCard coursesCount={coursesCount} />
                   </Box>
                 </Box>
-                <TabPanels>
-                  <TabPanel
-                    w="850px"
-                    display="flex"
-                    flexWrap="wrap"
-                    align="start"
-                  >
+                <TabPanels align="end">
+                  <TabPanel w="880px" display="flex" flexWrap="wrap">
                     {courses.map((course, key) => {
                       return (
                         <CourseCard
@@ -106,12 +99,7 @@ function MyCourses() {
                       );
                     })}
                   </TabPanel>
-                  <TabPanel
-                    w="850px"
-                    display="flex"
-                    flexWrap="wrap"
-                    align="start"
-                  >
+                  <TabPanel w="850px" display="flex" flexWrap="wrap">
                     {courses
                       .filter((item) => {
                         return item.status === false;
@@ -130,12 +118,7 @@ function MyCourses() {
                         );
                       })}
                   </TabPanel>
-                  <TabPanel
-                    w="850px"
-                    display="flex"
-                    flexWrap="wrap"
-                    align="start"
-                  >
+                  <TabPanel w="850px" display="flex" flexWrap="wrap">
                     {courses
                       .filter((item) => {
                         return item.status === true;
