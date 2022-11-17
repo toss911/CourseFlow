@@ -106,6 +106,10 @@ export const saveAnswerDraft = async (req, res) => {
       WHERE assignment_id = $2 AND user_id = $3`,
       [answer, assignmentId, userId]
     );
+
+    return res.json({
+      message: "Draft saved."
+    })
   } catch (error) {
     return res.sendStatus(500);
   }

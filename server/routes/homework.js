@@ -5,8 +5,8 @@ const homeworkRouter = Router();
 
 homeworkRouter.get("/:userId", homework_controller.getAllHomework);
 
-homeworkRouter.put("/:assignmentId", homework_controller.submitHomework);
+homeworkRouter.put("/submit/:assignmentId", homework_controller.submitHomework);
 
-homeworkRouter.put("/:assignmentId", homework_controller.saveAnswerDraft);
+homeworkRouter.put("/save/:assignmentId", homework_controller.saveAnswerDraft);
 
 export default homeworkRouter;

@@ -155,6 +155,7 @@ const HomeworkBox = (props) => {
               pr="10px"
               size="xs"
               mt="5px"
+              onClick={()=>props.saveAnswerDraft(props.assignmentId, answer)}
             >
               Save draft
             </Button>
