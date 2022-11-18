@@ -1,5 +1,4 @@
 import { pool } from "../utils/db.js";
-import format from "pg-format";
 
 export const getAll = async (req, res) => {
   try {
