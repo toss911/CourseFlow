@@ -24,11 +24,18 @@ coursesRouter.get(
   courses_controller.getLearningById
 );
 
-coursesRouter.post(
-  "/:courseId/learning",
+coursesRouter.get(
+  "/:courseId/learning/:subLessonId",
   protect,
   checkSubscription,
-  courses_controller.postWatchedAndAcceptedHomeWork
+  courses_controller.getSubLesson
+);
+
+coursesRouter.post(
+  "/:courseId/learning/:subLessonId",
+  protect,
+  checkSubscription,
+  courses_controller.postWatchedOrAccepted
 );
 
 export default coursesRouter;

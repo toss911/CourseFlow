@@ -200,6 +200,40 @@ const components = {
           opacity: 1,
         },
       },
+      "save draft": {
+        bg: "white",
+        color: "blue.500",
+        boxShadow: "shadow1",
+        borderRadius: "12px",
+        border: "1px solid",
+        borderColor: "blue.500",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          color: "blue.300",
+          borderColor: "blue.300",
+          _disabled: {
+            bg: "white",
+            color: "gray.500",
+            borderColor: "gray.500",
+            opacity: 1,
+          },
+        },
+        _active: {
+          bg: "gray.100",
+          color: "blue.500",
+          borderColor: "blue.500",
+        },
+        _disabled: {
+          bg: "white",
+          color: "gray.500",
+          borderColor: "gray.500",
+          opacity: 1,
+        },
+      },
     },
     defaultProps: {
       variant: "primary",
@@ -294,7 +328,7 @@ const components = {
         lineHeight: "150%",
         padding: "4px 8px 4px 8px",
       },
-      "in-progress": {
+      "in progress": {
         color: "#3557CF",
         backgroundColor: "#EBF0FF",
         fontSize: "14px",
