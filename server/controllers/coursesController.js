@@ -301,24 +301,24 @@ export const getLearningById = async (req, res) => {
     //     "Object.values(assign_data): ",
     //     Object.values(subLessonId[1])[0]
     //   );
-      // for (let i = 0; i < subLessonId[1].length; i++) {
-      //   if (Object.values(subLessonId[1])) {
-      //   }
-      // }
+    // for (let i = 0; i < subLessonId[1].length; i++) {
+    //   if (Object.values(subLessonId[1])) {
+    //   }
+    // }
 
-      //console.log("assignId: ", assignId);
-      // กรณีที่ sub_lesson นั้น ไม่มี assign
-      //if (assignId === "null") {
-      //newData = { [Object.keys(assign_data)[key]]: false };
-      // newData = {
-      //   ...newData,
-      //   [Object.keys(assign_data)[key]]: true,
-      // };
-      // กรณีที่ sub_lesson นั้น เป็น true ทั้งหมด หรือ มี false แค่อันเดียว
-      //}else if(d){
+    //console.log("assignId: ", assignId);
+    // กรณีที่ sub_lesson นั้น ไม่มี assign
+    //if (assignId === "null") {
+    //newData = { [Object.keys(assign_data)[key]]: false };
+    // newData = {
+    //   ...newData,
+    //   [Object.keys(assign_data)[key]]: true,
+    // };
+    // กรณีที่ sub_lesson นั้น เป็น true ทั้งหมด หรือ มี false แค่อันเดียว
+    //}else if(d){
 
-      // if (Object.values(subLessonId)) {
-      // }
+    // if (Object.values(subLessonId)) {
+    // }
     //});
     //console.log("newData = ", newData);
     //console.log("assign: ", assign_data);

@@ -32,6 +32,7 @@ import { useEffect, useState } from "react";
 import useCourses from "../hooks/useCourses";
 import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
+let assignment_id;
 
 function LearningPage() {
   const [userAssignment, setUserAssignment] = useState({});
@@ -59,7 +60,6 @@ function LearningPage() {
   }, []);
 
   const handleSubLesson = async (subLessonId) => {
-    console.log("subLessonId: ", subLessonId);
     setIsLoading(true);
     const result = await axios.get(
       `http://localhost:4000/courses/${course.course_id}/learning/${subLessonId}?byUser=${userId}`
@@ -104,9 +104,11 @@ function LearningPage() {
   const handleSaveDraft = async (assignmentId, status) => {
     // หลังบ้านต้องมีการเปลี่ยนสถานะเป็น in progress ด้วย เพราะ API เดิมของอายยังไม่มีใส่ status เข้าไป (ในกรณีที่สเตตัสเดิมเป็น overdue ก็จะยังคงเป็น overdue เหมือนเดิม)
     setIsLoading(true);
+    console.log(`answer[${assignmentId}]: `, answer[assignmentId]);
     const body = { answer: answer[assignmentId], status: status };
     if (body.answer === "") {
       alert(`Please fill out the answer`);
+      setIsLoading(false);
       return;
     }
     await axios.put(
@@ -119,9 +121,12 @@ function LearningPage() {
   const handleSubmit = async (assignmentId, status) => {
     // หลังบ้านต้องมีการเปลี่ยนสถานะเป็น sumitted ด้วย เพราะ API เดิมของอายยังไม่มีใส่ status เข้าไป (ในกรณีที่สเตตัสเดิมเป็น overdue ก็จะยังคงเป็น overdue เหมือนเดิม)
     setIsLoading(true);
+    console.log(`answer[${assignmentId}]: `, answer[assignmentId]);
+
     const body = { answer: answer[assignmentId], status: status };
     if (body.answer === "") {
       alert(`Please fill out the answer`);
+      setIsLoading(false);
       return;
     }
     await axios.put(
@@ -227,8 +232,8 @@ function LearningPage() {
                       </h2>
                       <AccordionPanel pb={4}>
                         <UnorderedList>
-                          {Object.values(lesson.sub_lessons).map(
-                            (subLesson, key) => {
+                          {Object.keys(lesson.sub_lessons).map(
+                            (subLessonId, key) => {
                               return (
                                 <Flex
                                   flexDirection="row"
@@ -238,14 +243,16 @@ function LearningPage() {
                                   key={key}
                                   _hover={{ backgroundColor: "gray.100" }}
                                 >
-                                  {subLesson.watched_status == true ? (
+                                  {lesson.sub_lessons[subLessonId]
+                                    .watched_status == true ? (
                                     <Image
                                       src="/assets/learning-page/success-circle.svg"
                                       alt="empty-circle"
                                       mt="3px"
                                       mr="15px"
                                     />
-                                  ) : subLesson.watched_status == true ? (
+                                  ) : lesson.sub_lessons[subLessonId]
+                                      .watched_status == true ? (
                                     <Image
                                       src="/assets/learning-page/half-circle.svg"
                                       alt="empty-circle"
@@ -265,13 +272,13 @@ function LearningPage() {
                                     cursor="pointer"
                                     variant="body2"
                                     onClick={() => {
-                                      handleSubLesson(
-                                        subLesson.sub_lesson_name,
-                                        key
-                                      );
+                                      handleSubLesson(subLessonId);
                                     }}
                                   >
-                                    {subLesson.sub_lesson_name}
+                                    {
+                                      lesson.sub_lessons[subLessonId]
+                                        .sub_lesson_name
+                                    }
                                   </Text>
                                 </Flex>
                               );
@@ -375,17 +382,21 @@ function LearningPage() {
                         mt="24px"
                         width="691px"
                       >
-                        <Text variant="body1">Assignment</Text>
+                        <Text variant="body1" color="black">
+                          Assignment
+                        </Text>
                         <Spacer />
                         <Badge
                           variant={
                             userAssignment.assignments[assignmentId].status
                           }
+                          textTransform="capitalize"
+                          fontWeight="500"
                         >
                           {userAssignment.assignments[assignmentId].status}
                         </Badge>
                       </Flex>
-                      <Text variant="body2" mt="25px">
+                      <Text variant="body2" mt="25px" color="black">
                         {userAssignment.assignments[assignmentId].detail}
                       </Text>
                       <Textarea
@@ -451,6 +462,7 @@ function LearningPage() {
                           <Button
                             height="60px"
                             onClick={() => {
+                              assignment_id = assignmentId;
                               onSubmitOpen();
                             }}
                           >
@@ -478,51 +490,6 @@ function LearningPage() {
                           </Text>
                         </Flex>
                       ) : null}
-                      <Modal
-                        isCentered
-                        isOpen={isSubmitOpen}
-                        onClose={onSubmitClose}
-                        closeOnOverlayClick={false}
-                      >
-                        <ModalOverlay />
-                        <ModalContent borderRadius="24px">
-                          <ModalHeader borderRadius="24px 24px 0px 0px">
-                            <Text variant="body1" color="black">
-                              Confirmation
-                            </Text>
-                          </ModalHeader>
-                          <Divider sx={{ borderColor: "gray.300" }} />
-                          <ModalCloseButton color="gray.500" />
-                          <ModalBody p="24px 50px 24px 24px" color="black">
-                            <Text variant="body2" color="gray.700">
-                              Do you want to submit the assignment?
-                            </Text>
-                            <Box mt="24px" width="600px">
-                              <Button
-                                variant="secondary"
-                                onClick={onSubmitClose}
-                              >
-                                No, I don't.
-                              </Button>
-                              <Button
-                                ml="16px"
-                                isLoading={isLoading}
-                                variant="primary"
-                                onClick={() => {
-                                  onSubmitClose();
-                                  handleSubmit(
-                                    assignmentId,
-                                    userAssignment.assignments[assignmentId]
-                                      .status
-                                  );
-                                }}
-                              >
-                                Yes, I want to submit.
-                              </Button>
-                            </Box>
-                          </ModalBody>
-                        </ModalContent>
-                      </Modal>
                     </Flex>
                   );
                 }
@@ -588,6 +555,47 @@ function LearningPage() {
                 }}
               >
                 Yes, I want to accept.
+              </Button>
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isCentered
+        isOpen={isSubmitOpen}
+        onClose={onSubmitClose}
+        closeOnOverlayClick={false}
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader borderRadius="24px 24px 0px 0px">
+            <Text variant="body1" color="black">
+              Confirmation
+            </Text>
+          </ModalHeader>
+          <Divider sx={{ borderColor: "gray.300" }} />
+          <ModalCloseButton color="gray.500" />
+          <ModalBody p="24px 50px 24px 24px" color="black">
+            <Text variant="body2" color="gray.700">
+              Do you want to submit the assignment?
+            </Text>
+            <Box mt="24px" width="600px">
+              <Button variant="secondary" onClick={onSubmitClose}>
+                No, I don't.
+              </Button>
+              <Button
+                ml="16px"
+                isLoading={isLoading}
+                variant="primary"
+                onClick={() => {
+                  onSubmitClose();
+                  handleSubmit(
+                    assignment_id,
+                    userAssignment.assignments[assignment_id].status
+                  );
+                }}
+              >
+                Yes, I want to submit.
               </Button>
             </Box>
           </ModalBody>
