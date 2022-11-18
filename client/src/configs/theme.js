@@ -328,7 +328,7 @@ const components = {
         lineHeight: "150%",
         padding: "4px 8px 4px 8px",
       },
-      "in-progress": {
+      "in progress": {
         color: "#3557CF",
         backgroundColor: "#EBF0FF",
         fontSize: "14px",

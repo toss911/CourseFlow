@@ -369,7 +369,7 @@ export const getSubLesson = async (req, res) => {
 
   let queryAssignmentStatus = await pool.query(
     `
-    SELECT assignments.assignment_id, assignments.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id
+    SELECT assignments.assignment_id, assignments.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id, users_assignments.answer, users_assignments.submitted_date
     FROM assignments
     INNER JOIN users_assignments
     ON assignments.assignment_id = users_assignments.assignment_id
@@ -380,8 +380,12 @@ export const getSubLesson = async (req, res) => {
 
   if (Boolean(queryAssignmentStatus.rowCount)) {
     subLessonData.assignment_status = "accepted";
-    // เช็คก่อนว่า overdue ไหม
     queryAssignmentStatus.rows.map((assignment) => {
+      subLessonData.assignments[String(assignment.assignment_id)].answer =
+        assignment.answer;
+      subLessonData.assignments[
+        String(assignment.assignment_id)
+      ].submitted_date = assignment.submitted_date;
       // If an assignment status is overdue => Stored in response's data immediately (no need to check overdue status again)
       if (
         assignment.status === "overdue" ||

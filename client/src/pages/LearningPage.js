@@ -37,7 +37,16 @@ function LearningPage() {
   const [userAssignment, setUserAssignment] = useState({});
   const [subLessonData, setSubLessonData] = useState({});
   const [answer, setAnswer] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isAcceptOpen,
+    onOpen: onAcceptOpen,
+    onClose: onAcceptClose,
+  } = useDisclosure();
+  const {
+    isOpen: isSubmitOpen,
+    onOpen: onSubmitOpen,
+    onClose: onSubmitClose,
+  } = useDisclosure();
   const { getCourseLearningById, course, isLoading, setIsLoading } =
     useCourses();
   const { contextState } = useAuth();
@@ -47,10 +56,10 @@ function LearningPage() {
     getCourseLearningById(userId);
     /* getCourseLearningById ส่ง sub_lesson_id บทล่าสุดที่เรียนมา หลังจากนั้นนำ sub_lesson_id นั้นไป fetch ขอข้อมูลของ sub_lesson_id นั้น ๆ (ทั้ง sub_lesson และ assignment) */
     // handleSubLesson(lastest_sub_lesson_id)
-    /* */
   }, []);
 
   const handleSubLesson = async (subLessonId) => {
+    console.log("subLessonId: ", subLessonId);
     setIsLoading(true);
     const result = await axios.get(
       `http://localhost:4000/courses/${course.course_id}/learning/${subLessonId}?byUser=${userId}`
@@ -64,6 +73,14 @@ function LearningPage() {
       sub_lesson_name: result.data.data.sub_lesson_name,
       video_directory: result.data.data.video_directory,
     });
+    if (result.data.data.assignments !== null) {
+      const allAnswer = {};
+      Object.keys(result.data.data.assignments).map((assignmentId) => {
+        allAnswer[assignmentId] =
+          result.data.data.assignments[assignmentId].answer || "";
+      });
+      setAnswer(allAnswer);
+    }
     setIsLoading(false);
   };
 
@@ -84,20 +101,34 @@ function LearningPage() {
     await getCourseLearningById(userId);
   };
 
-  const handleSaveDraft = async (assignmentId) => {
-    const body = { answer: answer[assignmentId] };
+  const handleSaveDraft = async (assignmentId, status) => {
+    // หลังบ้านต้องมีการเปลี่ยนสถานะเป็น in progress ด้วย เพราะ API เดิมของอายยังไม่มีใส่ status เข้าไป (ในกรณีที่สเตตัสเดิมเป็น overdue ก็จะยังคงเป็น overdue เหมือนเดิม)
+    setIsLoading(true);
+    const body = { answer: answer[assignmentId], status: status };
+    if (body.answer === "") {
+      alert(`Please fill out the answer`);
+      return;
+    }
     await axios.put(
-      `http://localhost:4000/homework/save/${assignmentId}?userId=${userId}`,
+      `http://localhost:4000/assignment/${course.course_id}/save/${assignmentId}?byUser=${userId}`,
       body
     );
+    handleSubLesson(subLessonData.sub_lesson_id);
   };
 
-  const handleSubmit = async (assignmentId) => {
-    const body = { answer: answer[assignmentId] };
+  const handleSubmit = async (assignmentId, status) => {
+    // หลังบ้านต้องมีการเปลี่ยนสถานะเป็น sumitted ด้วย เพราะ API เดิมของอายยังไม่มีใส่ status เข้าไป (ในกรณีที่สเตตัสเดิมเป็น overdue ก็จะยังคงเป็น overdue เหมือนเดิม)
+    setIsLoading(true);
+    const body = { answer: answer[assignmentId], status: status };
+    if (body.answer === "") {
+      alert(`Please fill out the answer`);
+      return;
+    }
     await axios.put(
-      `http://localhost:4000/homework/submit/${assignmentId}?userId=${userId}`,
+      `http://localhost:4000/assignment/${course.course_id}/submit/${assignmentId}?byUser=${userId}`,
       body
     );
+    handleSubLesson(subLessonData.sub_lesson_id);
   };
 
   return (
@@ -301,7 +332,7 @@ function LearningPage() {
                   <Button
                     height="60px"
                     onClick={() => {
-                      onOpen();
+                      onAcceptOpen();
                     }}
                   >
                     Accept Assignment
@@ -326,7 +357,12 @@ function LearningPage() {
                       flexDirection="column"
                       alignItems="start"
                       pl="24px"
-                      mb="15px"
+                      mb={
+                        key ===
+                        Object.keys(userAssignment.assignments).length - 1
+                          ? "60px"
+                          : "15px"
+                      }
                       borderRadius="8px"
                       key={key}
                     >
@@ -357,9 +393,31 @@ function LearningPage() {
                         placeholder="Answer..."
                         size="16px"
                         fontWeight="400"
-                        bg="white"
+                        fontStyle={
+                          userAssignment.assignments[assignmentId]
+                            .submitted_date === null
+                            ? "normal"
+                            : "italic"
+                        }
+                        color={
+                          userAssignment.assignments[assignmentId]
+                            .submitted_date === null
+                            ? "black"
+                            : "gray.600"
+                        }
+                        bg={
+                          userAssignment.assignments[assignmentId]
+                            .submitted_date === null
+                            ? "white"
+                            : "blue.100"
+                        }
                         p="12px 16px 12px 12px"
-                        border="1px solid"
+                        border={
+                          userAssignment.assignments[assignmentId]
+                            .submitted_date === null
+                            ? "1px solid"
+                            : "0px"
+                        }
                         borderColor="gray.400"
                         borderRadius="8px"
                         _focus={{ borderColor: "gray.100" }}
@@ -370,40 +428,98 @@ function LearningPage() {
                             [assignmentId]: e.target.value,
                           })
                         }
+                        isReadOnly={
+                          userAssignment.assignments[assignmentId]
+                            .submitted_date === null
+                            ? false
+                            : true
+                        }
                       />
-                      <Flex
-                        flexDirection="row"
-                        alignItems="start"
-                        justifyContent="center"
-                        width="691px"
-                        mt="25px"
-                        mb="24px"
+                      {userAssignment.assignments[assignmentId]
+                        .submitted_date === null ? (
+                        <Flex
+                          flexDirection="row"
+                          alignItems="start"
+                          justifyContent="center"
+                          width="691px"
+                          mt="25px"
+                          mb="24px"
+                        >
+                          <Button
+                            height="60px"
+                            onClick={() => {
+                              onSubmitOpen();
+                            }}
+                          >
+                            Send Assignment
+                          </Button>
+                          <Button
+                            variant="save draft"
+                            ml="20px"
+                            height="60px"
+                            onClick={() => {
+                              handleSaveDraft(
+                                assignmentId,
+                                userAssignment.assignments[assignmentId].status
+                              );
+                            }}
+                            isLoading={isLoading}
+                          >
+                            Save Draft
+                          </Button>
+                          <Spacer />
+                          <Text pt="20px" color="gray.700">
+                            Submit within{" "}
+                            {userAssignment.assignments[assignmentId].duration}{" "}
+                            days
+                          </Text>
+                        </Flex>
+                      ) : null}
+                      <Modal
+                        isCentered
+                        isOpen={isSubmitOpen}
+                        onClose={onSubmitClose}
+                        closeOnOverlayClick={false}
                       >
-                        <Button
-                          height="60px"
-                          onClick={() => {
-                            handleSubmit(assignmentId);
-                          }}
-                        >
-                          Send Assignment
-                        </Button>
-                        <Button
-                          variant="save draft"
-                          ml="20px"
-                          height="60px"
-                          onClick={() => {
-                            handleSaveDraft(assignmentId);
-                          }}
-                        >
-                          Save Draft
-                        </Button>
-                        <Spacer />
-                        <Text pt="20px" color="gray.700">
-                          Submit within{" "}
-                          {userAssignment.assignments[assignmentId].duration}{" "}
-                          days
-                        </Text>
-                      </Flex>
+                        <ModalOverlay />
+                        <ModalContent borderRadius="24px">
+                          <ModalHeader borderRadius="24px 24px 0px 0px">
+                            <Text variant="body1" color="black">
+                              Confirmation
+                            </Text>
+                          </ModalHeader>
+                          <Divider sx={{ borderColor: "gray.300" }} />
+                          <ModalCloseButton color="gray.500" />
+                          <ModalBody p="24px 50px 24px 24px" color="black">
+                            <Text variant="body2" color="gray.700">
+                              Do you want to submit the assignment?
+                            </Text>
+                            <Box mt="24px" width="600px">
+                              <Button
+                                variant="secondary"
+                                onClick={onSubmitClose}
+                              >
+                                No, I don't.
+                              </Button>
+                              <Button
+                                ml="16px"
+                                isLoading={isLoading}
+                                variant="primary"
+                                onClick={() => {
+                                  onSubmitClose();
+                                  handleSubmit(
+                                    assignmentId,
+                                    userAssignment.assignments[assignmentId]
+                                      .status
+                                  );
+                                }}
+                              >
+                                Yes, I want to submit.
+                              </Button>
+                            </Box>
+                          </ModalBody>
+                        </ModalContent>
+                      </Modal>
                     </Flex>
                   );
                 }
@@ -438,8 +554,8 @@ function LearningPage() {
       <Footer />
       <Modal
         isCentered
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isAcceptOpen}
+        onClose={onAcceptClose}
         closeOnOverlayClick={false}
       >
         <ModalOverlay />
@@ -452,23 +568,23 @@ function LearningPage() {
           <Divider sx={{ borderColor: "gray.300" }} />
           <ModalCloseButton color="gray.500" />
           <ModalBody p="24px 50px 24px 24px" color="black">
-            <Text variant="body2" color="gray.700" as="span">
-              Do you want to accept the assignment
+            <Text variant="body2" color="gray.700">
+              Do you want to accept the assignment?
             </Text>
             <Box mt="24px" width="600px">
-              <Button variant="secondary" onClick={onClose}>
-                No, I don't
+              <Button variant="secondary" onClick={onAcceptClose}>
+                No, I don't.
               </Button>
               <Button
                 ml="16px"
                 isLoading={isLoading}
                 variant="primary"
                 onClick={() => {
-                  onClose();
+                  onAcceptClose();
                   handleAcceptAssignment(subLessonData.sub_lesson_id);
                 }}
               >
-                Yes, I want to accept
+                Yes, I want to accept.
               </Button>
             </Box>
           </ModalBody>
