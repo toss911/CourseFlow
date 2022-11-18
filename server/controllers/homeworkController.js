@@ -6,7 +6,7 @@ export const getAllHomework = async (req, res) => {
     const results = await pool.query(
       `SELECT courses.course_name, courses.course_id, lessons.lesson_name, sub_lessons.sub_lesson_name, 
         assignments.assignment_id, assignments.detail, assignments.duration, 
-        users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date
+        users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date, users_assignments.updated_date
         FROM courses
         JOIN lessons
         ON courses.course_id = lessons.course_id
@@ -16,7 +16,8 @@ export const getAllHomework = async (req, res) => {
         ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
         JOIN users_assignments 
         ON assignments.assignment_id = users_assignments.assignment_id
-        WHERE users_assignments.user_id = $1`,
+        WHERE users_assignments.user_id = $1
+        ORDER BY updated_date desc`,
       [userId]
     );
 
@@ -78,14 +79,15 @@ export const getAllHomework = async (req, res) => {
 export const submitHomework = async (req, res) => {
   const answer = req.body.answer;
   const submittedDate = new Date();
+  const updatedDate = new Date();
   const assignmentId = req.params.assignmentId;
   const userId = req.query.userId;
 
   try {
     await pool.query(
-          `UPDATE users_assignments SET answer = $1, submitted_date = $2 
-        WHERE assignment_id = $3 AND user_id = $4`,
-          [answer, submittedDate, assignmentId, userId]
+          `UPDATE users_assignments SET answer = $1, submitted_date = $2, updated_date = $3
+        WHERE assignment_id = $4 AND user_id = $5`,
+          [answer, submittedDate, updatedDate, assignmentId, userId]
         )
 
     return res.json({
@@ -100,12 +102,13 @@ export const saveAnswerDraft = async (req, res) => {
   const answer = req.body.answer;
   const assignmentId = req.params.assignmentId;
   const userId = req.query.userId;
+  const updatedDate = new Date();
 
   try {
     await pool.query(
-      `UPDATE users_assignments SET answer = $1
-      WHERE assignment_id = $2 AND user_id = $3`,
-      [answer, assignmentId, userId]
+      `UPDATE users_assignments SET answer = $1, updated_date = $2
+      WHERE assignment_id = $3 AND user_id = $4`,
+      [answer, updatedDate, assignmentId, userId]
     );
 
     return res.json({
