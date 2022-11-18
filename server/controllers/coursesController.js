@@ -187,19 +187,24 @@ export const getLearningById = async (req, res) => {
 
     let lessons = await pool.query(
       `
-      SELECT  lessons.lesson_name, lessons.lesson_id, sub_lessons.sub_lesson_name , sub_lessons.sub_lesson_id
+      SELECT  lessons.lesson_name, lessons.lesson_id, sub_lessons.sub_lesson_name , sub_lessons.sub_lesson_id , assignments.assignment_id , sub_lessons.video_directory, users_assignments.submitted_date
       FROM courses
       INNER JOIN lessons 
       ON courses.course_id = lessons.course_id
       INNER JOIN sub_lessons 
       ON lessons.lesson_id = sub_lessons.lesson_id
+      LEFT JOIN assignments
+      ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+      LEFT JOIN users_assignments
+      ON users_assignments.assignment_id = assignments.assignment_id
       WHERE courses.course_id=$1
       order by lessons.sequence ASC, sub_lessons.sequence ASC`,
       [courseId]
     );
+    lessons = lessons.rows;
 
     course_data.lessons = {};
-    lessons.rows.map((lesson) => {
+    lessons.map((lesson) => {
       if (lesson.lesson_id in course_data.lessons) {
         course_data.lessons[lesson.lesson_id].sub_lessons = {
           ...course_data.lessons[lesson.lesson_id].sub_lessons,
@@ -207,6 +212,7 @@ export const getLearningById = async (req, res) => {
             sub_lesson_name: lesson.sub_lesson_name,
             video_directory: lesson.video_directory,
             watched_status: false,
+            assign_status: false,
           },
         };
       } else {
@@ -217,12 +223,12 @@ export const getLearningById = async (req, res) => {
               sub_lesson_name: lesson.sub_lesson_name,
               video_directory: lesson.video_directory,
               watched_status: false,
+              assign_status: false,
             },
           },
         };
       }
     });
-
     let checkWatchedStatus = await pool.query(
       `
       select users_sub_lessons.user_id,users_sub_lessons.sub_lesson_id,lessons.course_id,lessons.lesson_id
@@ -236,26 +242,91 @@ export const getLearningById = async (req, res) => {
       [userId, courseId]
     );
     checkWatchedStatus = checkWatchedStatus.rows;
-    const checkAssignStatus = await pool.query(
-      `
-      select users_assignments.user_id, users_assignments.submitted_date, sub_lessons.sub_lesson_id
-      from lessons
-      inner join sub_lessons
-      on lessons.lesson_id = sub_lessons.lesson_id
-      inner join assignments
-      on sub_lessons.sub_lesson_id = assignments.sub_lesson_id
-      inner join users_assignments
-      on assignments.assignment_id = users_assignments.assignment_id
-      where users_assignments.user_id = $1 and lessons.course_id = $2 and users_assignments.submitted_date is not null
-      `,
-      [userId, courseId]
-    );
+    //console.log("checkWatchedStatus: ", checkWatchedStatus);
 
     for (let i = 0; i < checkWatchedStatus.length; i++) {
-      course_data.lessons[checkWatchedStatus[i].lesson_id].sub_lessons[
-        checkWatchedStatus[i].sub_lesson_id
+      course_data.lessons[String(checkWatchedStatus[i].lesson_id)].sub_lessons[
+        String(checkWatchedStatus[i].sub_lesson_id)
       ].watched_status = true;
     }
+
+    // let checkAssignStatus = await pool.query(
+    //   `
+    //   select users_assignments.user_id, users_assignments.submitted_date, sub_lessons.sub_lesson_id, lessons.lesson_id , assignments.assignment_id
+    //   from lessons
+    //   inner join sub_lessons
+    //   on lessons.lesson_id = sub_lessons.lesson_id
+    //   inner join assignments
+    //   on sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+    //   inner join users_assignments
+    //   on assignments.assignment_id = users_assignments.assignment_id
+    //   where users_assignments.user_id = $1 and lessons.course_id = $2
+    //   `,
+    //   [userId, courseId]
+    // );
+    // checkAssignStatus = checkAssignStatus.rows;
+    // console.log("checkAssignStatus: ", checkAssignStatus);
+
+    let assign_data = {};
+    lessons.map((lesson) => {
+      // ให้ส่ง sub_lesson_id ที่ไม่มี assignment ออกมาด้วย แต่ขึ้นเป็น null
+      // console.log("lessons ", lessons);
+
+      if (lesson.submitted_date != null) {
+        assign_data[lesson.sub_lesson_id] = {
+          ...assign_data[lesson.sub_lesson_id],
+          [lesson.assignment_id]: true,
+        };
+      } else {
+        assign_data[lesson.sub_lesson_id] = {
+          ...assign_data[lesson.sub_lesson_id],
+          [lesson.assignment_id]: false,
+        };
+      }
+    });
+    //console.log(lessons);
+    //console.log("assign_data: ", assign_data);
+    // assign_data:  {
+    // '1001': { '1518': true },
+    // '1002': { '1030': false },
+    // '1003': { '1057': true, '1356': false },
+    // '1004': { '1529': true, '1638': false },
+    // }
+
+    // ทำเงื่อนไขเช็ค assign_data -> ทำให้ data เป็น '556': false; -> เอาค่าที่ได้ไปแมพใส่ไปใน assign_status
+    // let newData = {};
+    // Object.entries(assign_data).map((subLessonId) => {
+    //   console.log(
+    //     "Object.values(assign_data): ",
+    //     Object.values(subLessonId[1])[0]
+    //   );
+      // for (let i = 0; i < subLessonId[1].length; i++) {
+      //   if (Object.values(subLessonId[1])) {
+      //   }
+      // }
+
+      //console.log("assignId: ", assignId);
+      // กรณีที่ sub_lesson นั้น ไม่มี assign
+      //if (assignId === "null") {
+      //newData = { [Object.keys(assign_data)[key]]: false };
+      // newData = {
+      //   ...newData,
+      //   [Object.keys(assign_data)[key]]: true,
+      // };
+      // กรณีที่ sub_lesson นั้น เป็น true ทั้งหมด หรือ มี false แค่อันเดียว
+      //}else if(d){
+
+      // if (Object.values(subLessonId)) {
+      // }
+    //});
+    //console.log("newData = ", newData);
+    //console.log("assign: ", assign_data);
+
+    // for (let i = 0; i < checkAssignStatus.length; i++) {
+    //   course_data.lessons[checkAssignStatus[i].lesson_id].sub_lessons[
+    //     checkAssignStatus[i].sub_lesson_id
+    //   ].assign_status = true;
+    // }
 
     return res.json({
       data: { ...course_data, percentProgress: res.locals.percentProgress },
