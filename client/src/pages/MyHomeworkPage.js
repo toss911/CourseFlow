@@ -55,15 +55,12 @@ function MyHomework() {
   }, []);
 
   return (
-    <Stack direction="column">
     <Box>
-     
-        <Navbar />
-        <Box>
-          <Flex flexDirection="column">
+      <Navbar />
+      <Box w="100wv">
+        <Flex flexDirection="column">
           <Flex
             mt="100px"
-            w="1418px"
             backgroundSize="100%"
             // h="190px"
             backgroundRepeat="no-repeat"
@@ -248,7 +245,6 @@ function MyHomework() {
                                 saveAnswerDraft={saveAnswerDraft}
                                 submitHomework={submitHomework}
                                 submittedDate={hw.submitted_date}
-                          
                               />
                             );
                           })}
@@ -289,21 +285,18 @@ function MyHomework() {
                               />
                             );
                           })}
-                        </Flex>
-                      </Center>
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
-              </Flex>
+                      </Flex>
+                    </Center>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
             </Flex>
-          
-       
-    
-      <Footer />
-      </Flex>
+          </Flex>
+
+          <Footer />
+        </Flex>
       </Box>
     </Box>
-    </Stack>
   );
 }
 

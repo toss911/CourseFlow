@@ -83,7 +83,7 @@ function MyCourses() {
                     <UserCourseCard coursesCount={coursesCount} />
                   </Box>
                 </Box>
-                <TabPanels align="end">
+                <TabPanels>
                   <TabPanel w="880px" display="flex" flexWrap="wrap">
                     {courses.map((course, key) => {
                       return (
