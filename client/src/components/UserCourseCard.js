@@ -58,7 +58,11 @@ export function UserCourseCard({ coursesCount }) {
           <Text textAlign="start" variant="body2">
             Course In progress
           </Text>
-          <Heading variant="headline3">{coursesCount["in progress"]}</Heading>
+          <Heading variant="headline3">
+            {Boolean(coursesCount["in progress"])
+              ? coursesCount["in progress"]
+              : "0"}
+          </Heading>
         </Flex>
         <Flex
           backgroundColor="gray.200"
@@ -78,7 +82,11 @@ export function UserCourseCard({ coursesCount }) {
           <Text textAlign="start" variant="body2" w="110px">
             Course Complete
           </Text>
-          <Heading variant="headline3">{coursesCount["completed"]}</Heading>
+          <Heading variant="headline3">
+            {Boolean(coursesCount["completed"])
+              ? coursesCount["completed"]
+              : "0"}
+          </Heading>
         </Flex>
       </Box>
     </Box>

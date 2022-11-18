@@ -25,7 +25,7 @@ const HomeworkBox = (props) => {
         badgeColor = "overdue";
         break;
       case "in progress":
-        badgeColor = "in-progress";
+        badgeColor = "in progress";
         break;
       case "pending":
         badgeColor = "pending";

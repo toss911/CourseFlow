@@ -65,22 +65,37 @@ const useCourses = () => {
     }
   };
 
-  const desireCourse = async(userId) => {
-    try{
+  const desireCourse = async (userId) => {
+    try {
       setIsError(false);
       setIsLoading(true);
       const desireCourseData = await axios.get(
         `http://localhost:4000/courses/desire?byUser=${userId}`
         // `http://localhost:4000/courses/desire/5`
-      )
-      
-      setDesireCourses(desireCourseData.data.data)
-      setIsLoading(false)
-      console.log(desireCourses.data.data); 
-    }catch (error) { 
+      );
+
+      setDesireCourses(desireCourseData.data.data);
+      setIsLoading(false);
+      console.log(desireCourses.data.data);
+    } catch (error) {
       setIsError(true);
       setIsLoading(false);
-  }}
+    }
+  };
+
+  const getCourseLearningById = async (userId) => {
+    try {
+      setIsError(false);
+      const results = await axios.get(
+        `http://localhost:4000/courses/${params.courseId}/learning?byUser=${userId}`
+      );
+      setCourse(results.data.data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsError(true);
+      setIsLoading(false);
+    }
+  };
 
   return {
     courses,
@@ -88,6 +103,7 @@ const useCourses = () => {
     category,
     getCourses,
     getCourseById,
+    getCourseLearningById,
     isLoading,
     setIsLoading,
     isError,

@@ -52,6 +52,7 @@ function AuthProvider(props) {
       } else {
         return result.data.message;
       }
+      console.log("result.data.token: ", result.data.token);
     } catch (error) {
       alert(`ERROR: Please try again later`);
     }

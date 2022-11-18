@@ -222,7 +222,6 @@ function MyHomework() {
                         w="1120px"
                         // h="1560px"
                         mb="145px"
-                        pl="24px"
                       >
                         {homework
                           .filter((hw) => {
