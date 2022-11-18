@@ -123,7 +123,6 @@ function OurCourses() {
           onChange={paginate}
         />
       </Center>
-
       <Footer />
     </Box>
   );
