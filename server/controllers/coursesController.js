@@ -142,6 +142,27 @@ export const postSubscribeOrAddCourse = async (req, res) => {
     let message;
 
     if (/subscribe/i.test(action)) {
+      /* Checking that user has already added this course or not */
+      let isCourseAdded = await pool.query(
+        `
+        SELECT EXISTS 
+        (SELECT *
+          FROM desired_courses
+          WHERE user_id = $1 AND course_id = $2)
+        `,
+        [userId, courseId]
+      );
+
+      isCourseAdded = isCourseAdded.rows[0].exists;
+      if (isCourseAdded) {
+        await pool.query(
+          `
+          DELETE FROM desired_courses
+          WHERE user_id = $1 AND course_id = $2
+          `,
+          [userId, courseId]
+        );
+      }
       await pool.query(
         `INSERT INTO subscriptions(user_id, course_id, status)
               VALUES ($1, $2, $3)`,
