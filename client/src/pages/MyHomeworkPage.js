@@ -12,7 +12,6 @@ import {
   TabPanel,
   Text,
   Center,
-  Stack,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authentication.js";
@@ -208,6 +207,7 @@ function MyHomework() {
                                 submittedDate={hw.submitted_date}
                                 saveAnswerDraft={saveAnswerDraft}
                                 submitHomework={submitHomework}
+                                courseId={hw.course_id}
                               />
                             );
                           })}
@@ -244,6 +244,7 @@ function MyHomework() {
                                 saveAnswerDraft={saveAnswerDraft}
                                 submitHomework={submitHomework}
                                 submittedDate={hw.submitted_date}
+                                courseId={hw.course_id}
                               />
                             );
                           })}
@@ -281,6 +282,7 @@ function MyHomework() {
                                 submittedDate={hw.submitted_date}
                                 saveAnswerDraft={saveAnswerDraft}
                                 submitHomework={submitHomework}
+                                courseId={hw.course_id}
                               />
                             );
                           })}
