@@ -21,7 +21,6 @@ root.render(
         </AuthProvider>
       </ChakraProvider>
     </BrowserRouter>
-    //{" "}
   </React.StrictMode>
 );
 
