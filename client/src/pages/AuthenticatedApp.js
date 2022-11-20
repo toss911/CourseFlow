@@ -7,6 +7,7 @@ import MyHomework from "./MyHomeworkPage.js";
 import MyCourses from "./MyCoursesPage.js";
 import LearningPage from "./LearningPage.js";
 import DesireCourse from "./DesireCoursePage.js";
+import LoginAdminPage from "./LoginAdminPage.js";
 
 function AuthenticatedApp() {
   return (
@@ -19,6 +20,7 @@ function AuthenticatedApp() {
       <Route path="/desire" element={<DesireCourse />} />
       <Route path="/profile" element={<UserProfile />} />
       <Route path="/courses/:courseId/learning" element={<LearningPage />} />
+      <Route path="/admin" element={<LoginAdminPage />} />
     </Routes>
   );
 }
