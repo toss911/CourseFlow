@@ -1,4 +1,14 @@
-import { Flex, Heading, Input, Button } from "@chakra-ui/react";
+import {
+  Flex,
+  Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Button,
+  Image,
+  InputRightElement,
+} from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
 
 const AdminNavbar = (props) => {
   return (
@@ -14,8 +24,21 @@ const AdminNavbar = (props) => {
         {props.heading}
       </Heading>
       <Flex gap="16px" alignItems="center">
-        {/* Dont forget to add the icon */}
-        <Input w="320px" placeholder="Search..." onChange={props.handleSearchText}/>
+        <InputGroup>
+          <InputLeftElement
+            pointerEvents="none"
+            children={
+              <Image src="../../assets/admin-page/search.svg" alt="search" />
+            }
+          />
+          <Input
+            type="text"
+            w="320px"
+            placeholder="Search..."
+            onChange={props.handleSearchText}
+          />
+        </InputGroup>
+
         <Button w="172px" h="60px">
           {props.action}
         </Button>
