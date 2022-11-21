@@ -539,3 +539,27 @@ export const getSubLesson = async (req, res) => {
 
   return res.json({ data: subLessonData });
 };
+
+export const getAdminCourses = async (req, res) => {
+
+  let searchText = req.query.searchText || "";
+  searchText = "\\m" + searchText;
+  const adminId = req.query.adminId;
+
+  const results = await pool.query(
+    `
+      SELECT courses.course_id, courses.course_name, courses.cover_image_directory, count(lessons.lesson_id) as lessons_count, courses.price, courses.created_date, courses.updated_date
+        FROM lessons
+        INNER JOIN courses
+        ON courses.course_id = lessons.course_id
+        WHERE courses.course_name ~* $1 AND courses.admin_id = $2
+        GROUP BY courses.course_id
+        ORDER BY courses.course_id asc
+      `,
+    [searchText, adminId]
+  );
+
+  return res.json({
+    data: results.rows,
+  });
+};
