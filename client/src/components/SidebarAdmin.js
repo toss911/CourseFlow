@@ -22,8 +22,8 @@ export function Sidebar(){
                 <Tab justifyContent='start' _selected={{ color: 'gray.800', bg: 'gray.200' }} w='240px' h='56px'><Image src="/assets/admin-page/assign.svg" pr='19.75'/>Assignment</Tab>
             </TabList>
         </Tabs>
-        <Box as='b' ml='-52px' onClick={() => {logoutAdmin(); }} mt='60vh'>
-        <Button bg='white' color='gray.800' shadow='none' _hover='none' w='240px'><Image src="/assets/admin-page/Vector.svg" pr='19px'/>Log out</Button>
+        <Box as='b' ml='-45%' mt='60vh' >
+        <Button variant='gray' w='100%'><Image src="/assets/admin-page/Vector.svg" pr='19px'/>Log out</Button>
         </Box>
         </Flex>
         </Box>

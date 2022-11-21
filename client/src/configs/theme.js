@@ -182,6 +182,31 @@ const components = {
           opacity: 1,
         },
       },
+      gray: {
+        bg: "white",
+        color: "gray.900",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          bg: "gray.100",
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.400",
+            opacity: 1,
+          },
+        },
+        _active: {
+          bg: "gray.400",
+        },
+        _disabled: {
+          color: "gray.600",
+          bg: "gray.400",
+          opacity: 1,
+        },
+      },
       success: {
         bg: "blue.500",
         borderColor: "blue.500",
