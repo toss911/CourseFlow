@@ -64,6 +64,12 @@ function AuthProvider(props) {
     navigate("/");
   };
 
+  const logoutAdmin = () => {
+    localStorage.removeItem("token");
+    setContextState({ ...contextState, user: null });
+    navigate("/admin");
+  };
+  
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   if (isAuthenticated && !contextState.user) {
@@ -81,6 +87,7 @@ function AuthProvider(props) {
         logout,
         register,
         isAuthenticated,
+        logoutAdmin
       }}
     >
       {props.children}
