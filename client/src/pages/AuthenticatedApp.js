@@ -21,9 +21,6 @@ function AuthenticatedApp() {
       <Route path="/desire" element={<DesireCourse />} />
       <Route path="/profile" element={<UserProfile />} />
       <Route path="/courses/:courseId/learning" element={<LearningPage />} />
-
-      {/* Admin, just for viewing */}
-      <Route path="/courses/admin" element={<AdminViewCourses />} />
     </Routes>
   );
 }

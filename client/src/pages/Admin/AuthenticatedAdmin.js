@@ -4,7 +4,7 @@ import AdminViewCourses from "./AdminViewCoursesPage";
 function AuthenticatedAdmin() {
     return (
       <Routes>
-        <Route path="/courses/admin" element={<AdminViewCourses />} />
+        <Route path="/admin/courses" element={<AdminViewCourses />} />
       </Routes>
     );
   }
