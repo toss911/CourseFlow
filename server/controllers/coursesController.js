@@ -379,12 +379,37 @@ export const getLatestSubLesson = async (req, res) => {
       [userId, courseId]
     );
     latestSubLesson = latestSubLesson.rows[0];
+
     /* If there is no value of latest sub lesson, it means that user learns this course for the first time */
     if (Boolean(latestSubLesson)) {
+      latestSubLesson = latestSubLesson.latest_sub_lesson_id;
+      let subLessonList = await pool.query(
+        `
+        SELECT lessons.lesson_id, sub_lessons.sub_lesson_id
+        FROM lessons
+        INNER JOIN sub_lessons
+        ON lessons.lesson_id = sub_lessons.lesson_id
+        WHERE lessons.course_id = $1
+        ORDER BY lessons.sequence ASC, sub_lessons.sequence ASC
+        `,
+        [courseId]
+      );
+      subLessonList = subLessonList.rows;
+
+      /* Finding the next sub lesson of latest watched sub lesson */
+      for (let i = 0; i < subLessonList.length; i++) {
+        if (subLessonList[i].sub_lesson_id === latestSubLesson) {
+          if (Boolean(subLessonList[i + 1])) {
+            latestSubLesson = subLessonList[i + 1].sub_lesson_id;
+          }
+          break;
+        }
+      }
       return res.json({
         data: latestSubLesson,
       });
     } else {
+      /* User learns this course for the first time => redirect to the first lesson */
       latestSubLesson = await pool.query(
         `
       SELECT sub_lessons.sub_lesson_id AS latest_sub_lesson_id
@@ -397,7 +422,7 @@ export const getLatestSubLesson = async (req, res) => {
       `,
         [courseId]
       );
-      latestSubLesson = latestSubLesson.rows[0];
+      latestSubLesson = latestSubLesson.rows[0].latest_sub_lesson_id;
       return res.json({
         data: latestSubLesson,
       });
@@ -447,7 +472,6 @@ export const postWatchedOrAccepted = async (req, res) => {
         message: "Successfully insert data into users_assignments table",
       });
     } else if (/watched/i.test(action)) {
-      // ลองดูวิธีการบล็อคการยิง API มา Insert ซ้ำภายใน Front-end อีกที
       const isExisted = await pool.query(
         `
         SELECT *
@@ -462,6 +486,13 @@ export const postWatchedOrAccepted = async (req, res) => {
             INSERT INTO users_sub_lessons(user_id, sub_lesson_id, created_date)
             VALUES ($1, $2, $3)`,
           [userId, subLessonId, dateNow]
+        );
+      } else {
+        await pool.query(
+          `
+            UPDATE users_sub_lessons SET created_date = $1
+            WHERE user_id = $2 AND sub_lesson_id = $3`,
+          [dateNow, userId, subLessonId]
         );
       }
       return res.json({

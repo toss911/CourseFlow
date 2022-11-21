@@ -20,7 +20,7 @@ function LearningHome() {
         let latestSubLessonId = await axios.get(
           `http://localhost:4000/courses/${courseId}/learning/latest?byUser=${userId}`
         );
-        latestSubLessonId = latestSubLessonId.data.data.latest_sub_lesson_id;
+        latestSubLessonId = latestSubLessonId.data.data;
         navigate(`/courses/${courseId}/learning/${latestSubLessonId}`);
       }
       getLatestSubLesson();

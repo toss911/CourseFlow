@@ -162,7 +162,7 @@ function LearningPage() {
   return (
     <>
       <Navbar />
-      <Skeleton isLoaded={!isCourseLoading || !isLoading}>
+      <Skeleton isLoaded={!isCourseLoading}>
         <Flex
           pt="100px"
           flexDirection="row"
