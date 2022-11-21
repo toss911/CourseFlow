@@ -1,21 +1,3 @@
-// import React from "react";
-// import { Box, Center,Flex ,Heading,Image} from "@chakra-ui/react";
-
-// function LoginAdminPage(){
-//     return(
-    
-//         <Box w='100vw' h='100vh' bgGradient='linear(to-l,  #5697FF 7.78%, #2558DD 73.86%)'>
-//         <Center>
-//         <Flex mt='150px' w='568px' h='568px' bg='white' shadow='shadow1' borderRadius='8px'>
-//         <Image src="/assets/login-admin-page/logo.svg" w='315px' h='36px'/>
-//         <Heading color='gray.700' fontSize='24px'>Admin Panel Control</Heading>
-//         </Flex>
-//         </Center>
-//         </Box>
-//     )   
-// }
-
-// export default LoginAdminPage;
 import {
     Box,
     Flex,
@@ -74,7 +56,8 @@ import {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        bgGradient='linear(to-l,  #5697FF 7.78%, #2558DD 73.86%)'
+        // bgGradient='linear(to-l, #5697FF 7.78%, #2558DD 73.86%)'
+        bgGradient='linear(to-l, linear2.1,linear2.2)'
         backgroundSize="cover"
         backgroundPosition="center"
       >
