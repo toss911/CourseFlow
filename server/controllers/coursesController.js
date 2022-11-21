@@ -315,7 +315,6 @@ export const getLearningById = async (req, res) => {
 
     let assign_data = {};
     checkAssignStatus.map((lesson) => {
-      // ให้ส่ง sub_lesson_id ที่ไม่มี assignment ออกมาด้วย แต่ขึ้นเป็น null
       // console.log("lessons ", lessons);
 
       if (lesson.submitted_date != null) {
@@ -330,8 +329,8 @@ export const getLearningById = async (req, res) => {
         };
       }
     });
-    //console.log(lessons);
-    console.log("assign_data: ", assign_data);
+
+    //console.log("assign_data: ", assign_data);
 
     // assign_data:  {
     // '1001': { '1518': true },
@@ -340,35 +339,19 @@ export const getLearningById = async (req, res) => {
     // '1004': { '1529': true }
     // }
 
-    // ทำเงื่อนไขเช็ค assign_data -> ทำให้ data เป็น '556': false; -> เอาค่าที่ได้ไปแมพใส่ไปใน assign_status
-    let newData = {};
-    Object.entries(assign_data).map((subLessonId) => {
-      console.log("Object.values(subLessonId): ", Object.values(subLessonId));
-      for (let i = 0; i < subLessonId[1].length; i++) {
-        if (Object.values(subLessonId[1])) {
-        }
-      }
+    // todo: ทำเงื่อนไขเช็ค assign_data -> ทำให้ data เป็น '1001': false; -> เอาค่าที่ได้ไปแมพใส่ไปใน assign_status
 
-      //console.log("assignId: ", assignId);
-      //กรณีที่ sub_lesson นั้น ไม่มี assign
-      // if (assignId === "null") {
-      //   newData = { [Object.keys(assign_data)[key]]: false };
-      //   newData = {
-      //     ...newData,
-      //     [Object.keys(assign_data)[key]]: true,
-      //   };
-      // //กรณีที่ sub_lesson นั้น เป็น true ทั้งหมด หรือ มี false แค่อันเดียว
-      //   }
+    Object.keys(assign_data).map((subLessonId) => {
+      Object.values(assign_data[subLessonId]).map((status) => {
+        //กรณีที่ sub_lesson นั้น มี status แค่อันนึงเป็น false
+        if (status === false) {
+          console.log(assign_data[subLessonId]);
+        }
+        //กรณีที่ sub_lesson นั้น ไม่มี assign
+
+      });
     });
 
-    //console.log("newData = ", newData);
-    //console.log("assign: ", assign_data);
-
-    // for (let i = 0; i < checkAssignStatus.length; i++) {
-    //   course_data.lessons[checkAssignStatus[i].lesson_id].sub_lessons[
-    //     checkAssignStatus[i].sub_lesson_id
-    //   ].assign_status = true;
-    // }
     return res.json({
       data: { ...course_data, percentProgress: res.locals.percentProgress },
     });
