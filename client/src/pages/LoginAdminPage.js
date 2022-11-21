@@ -17,21 +17,21 @@ import {
   import { Field, Form, Formik } from "formik";
   
   function LoginAdminPage() {
-    const { login, contextState } = useAuth();
+    const {loginAdmin} = useAuth();
   
     const handleSubmit = async (values, props) => {
-      const result = await login(values);
+      const result = await loginAdmin(values);
       props.setSubmitting(false);
       if (result) {
         if (/account/g.test(result)) {
-          props.setFieldError("email", result);
+          props.setFieldError("username", result);
         } else {
           props.setFieldError("password", result);
         }
       }
     };
   
-    const validateEmail = (value) => {
+    const validateUsername = (value) => {
       let error;
       if (!value) {
         error = "Usernae is required";
@@ -46,8 +46,6 @@ import {
       }
       return error;
     };
-  
-    const navigate = useNavigate();
   
     return (
       <Box
@@ -72,16 +70,16 @@ import {
           <Image src="/assets/login-admin-page/logo.svg" w='315px' h='36px'/>
           <Heading color='gray.700' fontSize='24px' pt='24px'>Admin Panel Control</Heading>
             <Formik
-              initialValues={{ email: "", password: "" }}
+              initialValues={{ username: "", password: "" }}
               onSubmit={handleSubmit}
             >
               {({ isSubmitting }) => (
                 <Flex flexDirection="column" justifyContent="flex-start">
                   <Form>
-                    <Field name="email" validate={validateEmail}>
+                    <Field name="username" validate={validateUsername}>
                       {({ field, form }) => (
                         <FormControl
-                          isInvalid={form.errors.email && form.touched.email}
+                          isInvalid={form.errors.username && form.touched.username}
                         >
                           <FormLabel
                             variant="body2"
@@ -93,13 +91,13 @@ import {
                           </FormLabel>
                           <Input
                             mt="4px"
-                            type="email"
+                            type="username"
                             w="453px"
                             h="48px"
                             placeholder="Enter Username"
                             {...field}
                           />
-                          <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                          <FormErrorMessage>{form.errors.username}</FormErrorMessage>
                         </FormControl>
                       )}
                     </Field>
