@@ -540,6 +540,7 @@ export const getSubLesson = async (req, res) => {
   return res.json({ data: subLessonData });
 };
 
+// Admin
 export const getAdminCourses = async (req, res) => {
 
   let searchText = req.query.searchText || "";
@@ -558,6 +559,13 @@ export const getAdminCourses = async (req, res) => {
       `,
     [searchText, adminId]
   );
+
+  // for (let course of results.rows) {
+  //   course.created_date = new Date(course.created_date);
+  //   course.updated_date = new Date(course.updated_date);
+  // }
+
+  // console.log(results.rows);
 
   return res.json({
     data: results.rows,

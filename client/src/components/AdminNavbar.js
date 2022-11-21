@@ -6,14 +6,11 @@ import {
   InputLeftElement,
   Button,
   Image,
-  InputRightElement,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
 
 const AdminNavbar = (props) => {
   return (
     <Flex
-      gap="16px"
       borderBottom="1px"
       borderColor="gray.400"
       alignItems="center"
@@ -23,7 +20,7 @@ const AdminNavbar = (props) => {
       <Heading variant="headline3" w="596px" ml="40px">
         {props.heading}
       </Heading>
-      <Flex gap="16px" alignItems="center">
+      <Flex gap="16px" alignItems="center" w="508px">
         <InputGroup>
           <InputLeftElement
             pointerEvents="none"

@@ -53,7 +53,7 @@ function AdminViewCourses() {
   }, [searchText]);
 
   return (
-    <Box>
+    <Box h="100vh">
       <Flex>
         <Sidebar />
         <Flex flexDirection="column">
@@ -63,8 +63,8 @@ function AdminViewCourses() {
             handleSearchText={handleTextChange}
           />
           <Box backgroundColor="gray.100" h="100vh">
-            <TableContainer borderRadius="8px" mt="48px" ml="48px" w="1120px">
-              <Table variant="simple" backgroundColor="white">
+            <TableContainer borderRadius="8px" mt="48px" ml="48px" w="1120px" h="500px" overflowY="scroll">
+              <Table variant="simple" backgroundColor="white" size="md">
                 <Thead backgroundColor="gray.300" h="41px">
                   <Tr>
                     <Th></Th>
@@ -86,9 +86,9 @@ function AdminViewCourses() {
                 <Tbody>
                   {adminCourses.map((course, key) => {
                     return (
-                      <Tr key={key}>
+                      <Tr key={key} h="88px" w="1120px">
                         <Td>{key + 1}</Td>
-                        <Td>
+                        <Td> 
                           <Image src={course.cover_image_directory} />
                         </Td>
                         <Td>
