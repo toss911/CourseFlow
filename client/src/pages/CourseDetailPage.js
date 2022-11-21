@@ -175,7 +175,7 @@ function CourseDetail() {
             ) : null}
 
             <Heading mt="100px" color="black" mb="20px" variant="headline2">
-              Module Samples
+              Sample Lesson
             </Heading>
             <Accordion defaultIndex={[0]} allowMultiple w="739px">
               {Object.keys(course).length === 0

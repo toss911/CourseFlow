@@ -4,7 +4,7 @@ export const getAllHomework = async (req, res) => {
   try {
     const userId = req.params.userId;
     const results = await pool.query(
-      `SELECT courses.course_name, courses.course_id, lessons.lesson_name, sub_lessons.sub_lesson_name, 
+      `SELECT courses.course_name, courses.course_id, lessons.lesson_name, sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, 
         assignments.assignment_id, assignments.detail, assignments.duration, 
         users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date, users_assignments.updated_date
         FROM courses
@@ -43,7 +43,6 @@ export const getAllHomework = async (req, res) => {
 
     // *- Add assignment status, deadline and days until deadline -* //
     for (let assignment of results.rows) {
-    
       assignment["deadline"] = findDeadline(
         assignment.accepted_date,
         assignment.duration
@@ -85,10 +84,10 @@ export const submitHomework = async (req, res) => {
 
   try {
     await pool.query(
-          `UPDATE users_assignments SET answer = $1, submitted_date = $2, updated_date = $3
+      `UPDATE users_assignments SET answer = $1, submitted_date = $2, updated_date = $3
         WHERE assignment_id = $4 AND user_id = $5`,
-          [answer, submittedDate, updatedDate, assignmentId, userId]
-        )
+      [answer, submittedDate, updatedDate, assignmentId, userId]
+    );
 
     return res.json({
       message: "Homework submitted.",
@@ -112,8 +111,8 @@ export const saveAnswerDraft = async (req, res) => {
     );
 
     return res.json({
-      message: "Draft saved."
-    })
+      message: "Draft saved.",
+    });
   } catch (error) {
     return res.sendStatus(500);
   }

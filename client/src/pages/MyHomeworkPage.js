@@ -119,6 +119,7 @@ function MyHomework() {
                               key={key}
                               courseName={hw.course_name}
                               lessonName={hw.lesson_name}
+                              subLessonId={hw.sub_lesson_id}
                               subLessonName={hw.sub_lesson_name}
                               status={hw.status}
                               hwDetail={hw.detail}
@@ -157,6 +158,7 @@ function MyHomework() {
                                 key={key}
                                 courseName={hw.course_name}
                                 lessonName={hw.lesson_name}
+                                subLessonId={hw.sub_lesson_id}
                                 subLessonName={hw.sub_lesson_name}
                                 status={hw.status}
                                 hwDetail={hw.detail}
@@ -195,6 +197,7 @@ function MyHomework() {
                                 key={key}
                                 courseName={hw.course_name}
                                 lessonName={hw.lesson_name}
+                                subLessonId={hw.sub_lesson_id}
                                 subLessonName={hw.sub_lesson_name}
                                 status={hw.status}
                                 hwDetail={hw.detail}
@@ -233,6 +236,7 @@ function MyHomework() {
                                 key={key}
                                 courseName={hw.course_name}
                                 lessonName={hw.lesson_name}
+                                subLessonId={hw.sub_lesson_id}
                                 subLessonName={hw.sub_lesson_name}
                                 status={hw.status}
                                 hwDetail={hw.detail}
@@ -270,6 +274,7 @@ function MyHomework() {
                                 key={key}
                                 courseName={hw.course_name}
                                 lessonName={hw.lesson_name}
+                                subLessonId={hw.sub_lesson_id}
                                 subLessonName={hw.sub_lesson_name}
                                 status={hw.status}
                                 hwDetail={hw.detail}

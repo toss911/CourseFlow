@@ -27,20 +27,21 @@ coursesRouter.get(
 );
 
 coursesRouter.get(
-  "/:courseId/learning/:subLessonId",
+  "/:courseId/learning/latest",
   protect,
   checkSubscription,
-  courses_controller.getSubLesson
+  courses_controller.getLatestSubLesson
 );
 
 coursesRouter.get(
   "/:courseId/learning/:subLessonId",
   protect,
   checkSubscription,
-  courses_controller.getSubLessonAtLearningById
+  courses_controller.getSubLesson
 );
+
 coursesRouter.post(
-  "/:courseId/learning/latest",
+  "/:courseId/learning/:subLessonId",
   protect,
   checkSubscription,
   courses_controller.postWatchedOrAccepted
