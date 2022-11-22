@@ -63,7 +63,7 @@ function AdminViewCourses() {
             handleSearchText={handleTextChange}
           />
           <Box backgroundColor="gray.100" h="100vh">
-            <TableContainer borderRadius="8px" mt="48px" ml="48px" w="1120px" h="500px" overflowY="scroll">
+            <TableContainer borderRadius="8px" mt="48px" ml="48px" w="1120px" h="650px" overflowY="scroll">
               <Table variant="simple" backgroundColor="white" size="md">
                 <Thead backgroundColor="gray.300" h="41px">
                   <Tr>
