@@ -10,8 +10,24 @@ import {
 import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import AdminNavbarAdd from "../../components/AdminNavbarAdd";
+import axios from "axios";
+
+// Steps:
+// 1. Check if the user (admin) added at least one lesson and one sub-lesson:
+// >> If YES, 1. Send POST request to create a new course. 
+//            2. FE shows pop-up modal 'Course created successfully', and 
+//            3. Redirect user to admin-view-courses page.  
+// >> If NO,  1. Jump to lesson table section
+//            2. Display message 'Must add at least one lesson and one sub-lesson to continue'
 
 const AdminAddCoursesPage = () => {
+
+  let courseData = [];
+
+  const addCourse = async () => {
+    const result = await axios.post("", courseData)
+  };
+
   return (
     <>
       <Flex>
