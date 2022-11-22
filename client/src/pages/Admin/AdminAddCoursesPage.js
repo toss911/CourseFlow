@@ -1,4 +1,4 @@
-import { Box, Flex, Stack, Input, Text, Container } from "@chakra-ui/react";
+import { Box, Flex, Stack, Input, Text, Container, Heading, Button } from "@chakra-ui/react";
 import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import AdminNavbarAdd from "../../components/AdminNavbarAdd";
@@ -54,8 +54,18 @@ const AdminAddCoursesPage = () => {
                 </Box>
               </Stack>
             </Flex>
+            {/* Lesson Section */}
+          <Flex flexDirection="column">
+            <Flex>
+              <Heading variant="headline3">Lesson</Heading>
+              <Button variant="primary">+ Add Lesson</Button>
+
+            </Flex>
+
+          </Flex>
           </Box>
         </Flex>
+  
       </Flex>
     </>
   );
