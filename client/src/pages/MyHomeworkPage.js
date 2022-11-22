@@ -117,6 +117,12 @@ function MyHomework() {
                       size="xl"
                     />
                   </Center>
+                ) : homework.length === 0 ? (
+                  <Flex h="40vh" justify="center" align="center">
+                    <Text color="black" as="i">
+                      No homework
+                    </Text>
+                  </Flex>
                 ) : (
                   <TabPanels mt="40px">
                     <TabPanel>
@@ -125,7 +131,6 @@ function MyHomework() {
                           flexDirection="column"
                           alignItems="center"
                           w="1120px"
-                          // h="1560px"
                           mb="145px"
                         >
                           {homework.map((hw, key) => {
@@ -160,7 +165,6 @@ function MyHomework() {
                           flexDirection="column"
                           alignItems="center"
                           w="1120px"
-                          // h="1560px"
                           mb="145px"
                         >
                           {homework
@@ -199,7 +203,6 @@ function MyHomework() {
                           flexDirection="column"
                           alignItems="center"
                           w="1120px"
-                          // h="1560px"
                           mb="145px"
                         >
                           {homework
@@ -238,7 +241,6 @@ function MyHomework() {
                           flexDirection="column"
                           alignItems="center"
                           w="1120px"
-                          // h="1560px"
                           mb="145px"
                         >
                           {homework
@@ -276,7 +278,6 @@ function MyHomework() {
                           flexDirection="column"
                           alignItems="center"
                           w="1120px"
-                          // h="1560px"
                           mb="145px"
                         >
                           {homework

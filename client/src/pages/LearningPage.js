@@ -25,6 +25,7 @@ import {
   ModalBody,
   useDisclosure,
   Skeleton,
+  Link,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
@@ -40,6 +41,7 @@ function LearningPage() {
   const [subLessonData, setSubLessonData] = useState({});
   const [answer, setAnswer] = useState("");
   const [isCourseLoading, setIsCourseLoading] = useState(false);
+  const [sequence, setSequence] = useState([]);
   const [openAccordionIndex, setOpenAccordionIndex] = useState();
   const {
     isOpen: isAcceptOpen,
@@ -73,6 +75,11 @@ function LearningPage() {
         }
         i++;
       }
+      let subLessonSequence = [];
+      Object.values(result.lessonSequence).map((subLessonIDs) => {
+        subLessonSequence.push(...subLessonIDs);
+      });
+      setSequence(subLessonSequence);
       setIsCourseLoading(false);
     }
     fetchCourseData();
@@ -553,20 +560,75 @@ function LearningPage() {
         width="100vw"
         height="100px"
       >
-        <Text
-          cursor="pointer"
-          color="blue.500"
-          fontWeight="700"
-          fontSize="16px"
-          ml="68px"
-        >
-          Previous Sub-lesson
-        </Text>
+        {/* If the sub lesson was the first one of a course, there will be no previous sub lesson button */}
+        {sequence.indexOf(Number(params.subLessonId)) === 0 ? null : (
+          <Link
+            ml="68px"
+            onClick={() => {
+              let prevLessonId =
+                sequence[sequence.indexOf(Number(params.subLessonId)) - 1];
+              navigate(`/courses/${params.courseId}/learning/${prevLessonId}`);
+              window.scrollTo(0, 150);
+            }}
+          >
+            {Object.keys(course).length === 0
+              ? null
+              : Object.keys(course.lessonSequence).map((lessonId) => {
+                  if (
+                    course.lessonSequence[lessonId].includes(
+                      Number(params.subLessonId)
+                    )
+                  ) {
+                    if (
+                      Object.values(course.lessonSequence[lessonId]).indexOf(
+                        Number(params.subLessonId)
+                      ) === 0
+                    ) {
+                      return `Previous Lesson`;
+                    } else {
+                      return `Previous Sub-lesson`;
+                    }
+                  }
+                })}
+          </Link>
+        )}
 
         <Spacer />
-        <Button width="200px" height="60px" mr="68px">
-          Next Sub-lesson
-        </Button>
+        {/* If the sub lesson was the last one of a course, there will be no next sub lesson button */}
+        {sequence.indexOf(Number(params.subLessonId)) ===
+        sequence.length - 1 ? null : (
+          <Button
+            height="60px"
+            mr="68px"
+            onClick={() => {
+              let nextLessonId =
+                sequence[sequence.indexOf(Number(params.subLessonId)) + 1];
+              navigate(`/courses/${params.courseId}/learning/${nextLessonId}`);
+              window.scrollTo(0, 150);
+            }}
+          >
+            {Object.keys(course).length === 0
+              ? null
+              : Object.keys(course.lessonSequence).map((lessonId) => {
+                  if (
+                    course.lessonSequence[lessonId].includes(
+                      Number(params.subLessonId)
+                    )
+                  ) {
+                    if (
+                      Object.values(course.lessonSequence[lessonId]).indexOf(
+                        Number(params.subLessonId)
+                      ) ===
+                      Object.values(course.lessonSequence[lessonId]).length - 1
+                    ) {
+                      return `Next Lesson`;
+                    } else {
+                      return `Next Sub-lesson`;
+                    }
+                  }
+                })}
+          </Button>
+        )}
       </Flex>
       <Footer />
       <Modal

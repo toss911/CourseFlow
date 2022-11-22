@@ -244,10 +244,22 @@ export const getLearningById = async (req, res) => {
       LEFT JOIN users_assignments
       ON users_assignments.assignment_id = assignments.assignment_id
       WHERE courses.course_id=$1
-      order by lessons.sequence ASC, sub_lessons.sequence ASC`,
+      ORDER BY lessons.sequence ASC, sub_lessons.sequence ASC`,
       [courseId]
     );
     lessons = lessons.rows;
+
+    const lessonSequence = {};
+    lessons.map((lesson) => {
+      if (lesson.lesson_id in lessonSequence) {
+        if (!lessonSequence[lesson.lesson_id].includes(lesson.sub_lesson_id)) {
+          lessonSequence[lesson.lesson_id].push(lesson.sub_lesson_id);
+        }
+      } else {
+        lessonSequence[lesson.lesson_id] = [];
+        lessonSequence[lesson.lesson_id].push(lesson.sub_lesson_id);
+      }
+    });
 
     course_data.lessons = {};
     lessons.map((lesson) => {
@@ -361,7 +373,11 @@ export const getLearningById = async (req, res) => {
     }
 
     return res.json({
-      data: { ...course_data, percentProgress: res.locals.percentProgress },
+      data: {
+        ...course_data,
+        percentProgress: res.locals.percentProgress,
+        lessonSequence,
+      },
     });
   } catch (error) {
     return res.sendStatus(500);
