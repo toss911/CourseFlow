@@ -15,7 +15,7 @@ import { useAuth } from "../contexts/authentication";
 
 export function Sidebar() {
   const navigate = useNavigate();
-  const { isAuthenticated, logoutAdmin, contextState } = useAuth();
+  const {logoutAdmin } = useAuth();
   return (
     <Box >
       <Flex
@@ -73,7 +73,9 @@ export function Sidebar() {
             </Tab>
           </TabList>
         </Tabs>
-        <Box as="b" ml="-45%" mt="60vh">
+        <Box as="b" ml="-45%" mt="60vh" onClick={() => {
+                    logoutAdmin();
+                  }}>
           <Button variant="gray" w="100%">
             <Image src="/assets/admin-page/Vector.svg" pr="19px" />
             Log out

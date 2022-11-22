@@ -9,9 +9,7 @@ function App() {
   return (
     <>
     {isAuthenticated ? <AuthenticatedApp /> : <UnauthenticatedApp />}
-    <AuthenticatedAdmin />
     </>
-    
     );
 }
 

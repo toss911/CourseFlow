@@ -7,8 +7,8 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { AuthProvider } from "./contexts/authentication.js";
 import theme from "./configs/theme.js";
 import jwtInterceptor from "./utils/jwtInterceptors.js";
-import { BrowserRouter } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route, } from "react-router-dom";
+import AppAdmin from "./AppAdmin.js";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 jwtInterceptor();
@@ -17,7 +17,10 @@ root.render(
     <BrowserRouter>
       <ChakraProvider theme={theme}>
         <AuthProvider>
-          <App />
+        <Routes>
+          <Route path="/*" element={<App />}/>
+          <Route path="/admin/*" element={<AppAdmin/>}/>
+        </Routes>
         </AuthProvider>
       </ChakraProvider>
     </BrowserRouter>

@@ -13,7 +13,7 @@ import {
     Center,
   } from "@chakra-ui/react";
   import { useNavigate } from "react-router-dom";
-  import { useAuth } from "../contexts/authentication.js";
+  import { useAuth } from "../../contexts/authentication.js";
   import { Field, Form, Formik } from "formik";
   
   function LoginAdminPage() {

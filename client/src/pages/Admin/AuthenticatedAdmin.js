@@ -4,8 +4,8 @@ import AdminAddLesson from "./AdminAddLessonPage";
 function AuthenticatedAdmin() {
   return (
     <Routes>
-      <Route path="/admin/courses" element={<AdminViewCourses />} />
-      <Route path="/admin/courses/add-lesson" element={<AdminAddLesson />} />
+      <Route path="/" element={<AdminViewCourses />} />
+      <Route path="/add-lesson" element={<AdminAddLesson />} />
     </Routes>
   );
 }
