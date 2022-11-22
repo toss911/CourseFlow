@@ -15,7 +15,7 @@ const AdminAddCoursesPage = () => {
     <>
       <Flex>
         <Sidebar />
-        <Flex flexDirection="column" w="vw" backgroundColor="gray.100">
+        <Flex flexDirection="column" w="vw" >
           <AdminNavbarAdd
             heading="Add Course"
             action="Cancel"
@@ -29,6 +29,7 @@ const AdminAddCoursesPage = () => {
               pt="40px"
               h="vh"
               bg="white"
+              borderRadius="16px"
             >
               <Flex>
                 <Stack
@@ -63,8 +64,8 @@ const AdminAddCoursesPage = () => {
                 </Stack>
               </Flex>
             </Box>
+            <LessonTable/>
           </Box>
-          <LessonTable/>
           
         </Flex>
       </Flex>
