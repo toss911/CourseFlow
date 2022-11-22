@@ -106,7 +106,7 @@ const AdminAddCoursesPage = () => {
                     <Input placeholder="" h="192px" w="920px" />
                   </Box>
                   <Flex display="column" flexWrap="wrap" w="920px">
-                    <Text variant="body2" mt="40px">
+                    <Text variant="body2" mt="40px" w="fit-content">
                       Cover Image *
                       <label>
                         <Input type="file" hidden onChange={handleFileChange} />
@@ -127,7 +127,7 @@ const AdminAddCoursesPage = () => {
                         </Flex>
                       </label>
                     </Text>
-                    <Text variant="body2">
+                    <Text variant="body2" w="fit-content">
                       Video Trailer *
                       <label w="250px">
                         <Input type="file" hidden onChange={handleFileChange} />
@@ -148,7 +148,7 @@ const AdminAddCoursesPage = () => {
                         </Flex>
                       </label>
                     </Text>
-                    <Text variant="body2">
+                    <Text variant="body2" w="fit-content">
                       Attach File (Optional)
                       <label w="250px">
                         <Input type="file" hidden onChange={handleFileChange} />
