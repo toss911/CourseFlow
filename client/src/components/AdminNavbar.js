@@ -6,6 +6,7 @@ import {
   InputLeftElement,
   Button,
   Image,
+  InputRightElement,
 } from "@chakra-ui/react";
 
 const AdminNavbar = (props) => {
@@ -29,6 +30,7 @@ const AdminNavbar = (props) => {
             }
           />
           <Input
+            pl="40px"
             type="text"
             w="320px"
             placeholder="Search..."
