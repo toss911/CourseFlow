@@ -15,17 +15,18 @@ const AdminNavbarAdd = (props) => {
       borderColor="gray.400"
       alignItems="center"
       h="92px"
-      w="100vw"
+      w="vw"
     >
-      <Heading variant="headline3" w="596px" ml="40px">
+      <Heading variant="headline3" w="852px" ml="40px">
         {props.heading}
       </Heading>
-      <Flex gap="16px" justifyContent="start" w="252px">
-        <Button w="172px" h="60px">
+
+      <Flex gap="16px" w="252px">
+        <Button variant="secondary" w="172px" h="60px">
           {props.action}
         </Button>
         <Button w="172px" h="60px">
-          {props.action}
+          {props.action2}
         </Button>
       </Flex>
     </Flex>
