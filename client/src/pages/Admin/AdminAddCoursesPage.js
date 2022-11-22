@@ -127,7 +127,7 @@ const AdminAddCoursesPage = () => {
                     <Input placeholder="" h="192px" w="920px" />
                   </Box>
                   <Flex display="column" flexWrap="wrap" w="920px">
-                    <Text variant="body2" mt="40px">
+                    <Text variant="body2" mt="40px" w="fit-content">
                       Cover Image *
                     </Text>
                     <Flex
