@@ -58,6 +58,31 @@ function AuthProvider(props) {
     }
   };
 
+  
+
+  // -------------------------------------Admin Login-------------------------------
+  const loginAdmin = async (data) => {
+    try {
+      const result = await axios.post("http://localhost:4000/auth/loginAdmin", data);
+      if (result.data.token) {
+        const token = result.data.token;
+        localStorage.setItem("token", token);
+        const userDataFromToken = jwtDecode(token);
+        setContextState({ ...contextState, user: userDataFromToken });
+        if (contextState.previousUrl) {
+          navigate(contextState.previousUrl);
+        } else {
+          navigate("/courselist");
+        }
+      } else {
+        return result.data.message;
+      }
+      console.log("result.data.token: ", result.data.token);
+    } catch (error) {
+      alert(`ERROR: Please try again later`);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setContextState({ ...contextState, user: null });
@@ -87,7 +112,8 @@ function AuthProvider(props) {
         logout,
         register,
         isAuthenticated,
-        logoutAdmin
+        logoutAdmin,
+        loginAdmin
       }}
     >
       {props.children}
@@ -97,4 +123,4 @@ function AuthProvider(props) {
 
 const useAuth = () => React.useContext(AuthContext);
 
-export { AuthProvider, useAuth };
+export { AuthProvider, useAuth};

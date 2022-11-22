@@ -87,3 +87,41 @@ export const login = async (req, res) => {
     return res.sendStatus(500);
   }
 };
+
+export const loginAdmin = async (req, res) => {
+  try {
+    const loginInfo = { ...req.body };
+    const admin = await pool.query(`select * from admins where username ilike $1 `, [
+      loginInfo.username,
+    ] );
+  
+    if (admin.rows[0].length === 0) {
+      return res.json({
+        message: "Couldn't find your account",
+      });
+    }
+    if (loginInfo.password !== admin.rows[0].password) { 
+      return res.json({
+        message: "Wrong password. Please try again.",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        admin_id: admin.rows[0].admin_id,
+        username: admin.rows[0].username
+      },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "3600000",
+      }
+    );
+
+    return res.json({
+      message: "Login successfully",
+      token,
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
