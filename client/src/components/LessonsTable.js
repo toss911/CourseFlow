@@ -1,5 +1,4 @@
 import {
-  Box,
   Heading,
   Button,
   Flex,
@@ -15,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 
 const LessonTable = () => {
+
   return (
     <>
       <Flex flexDirection="column" mt="29px" ml="39px">
