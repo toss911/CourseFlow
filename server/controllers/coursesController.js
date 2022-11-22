@@ -547,6 +547,27 @@ export const getAdminCourses = async (req, res) => {
   searchText = "\\m" + searchText;
   const adminId = req.query.adminId;
 
+  // Change ISO date to normal date before sending data to FE
+  const changeDateFormat = (iso_Date) => {
+    const isoDate = new Date(iso_Date);
+    let year = isoDate.getFullYear();
+    let month = isoDate.getMonth();
+    let date = isoDate.getDate();
+    let time = isoDate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true});
+
+    if (date < 10) {
+      date = '0' + date;
+    }
+
+    if (month < 10) {
+      month = '0' + month;
+    }
+
+    let normalDate = date + '-' + month + '-' + year + ' ' + time
+
+    return normalDate;
+  }
+
   const results = await pool.query(
     `
       SELECT courses.course_id, courses.course_name, courses.cover_image_directory, count(lessons.lesson_id) as lessons_count, courses.price, courses.created_date, courses.updated_date
@@ -560,12 +581,10 @@ export const getAdminCourses = async (req, res) => {
     [searchText, adminId]
   );
 
-  // for (let course of results.rows) {
-  //   course.created_date = new Date(course.created_date);
-  //   course.updated_date = new Date(course.updated_date);
-  // }
-
-  // console.log(results.rows);
+  for (let course of results.rows) {
+    course.created_date = changeDateFormat(course.created_date);
+    course.updated_date = changeDateFormat(course.updated_date);
+  }
 
   return res.json({
     data: results.rows,
