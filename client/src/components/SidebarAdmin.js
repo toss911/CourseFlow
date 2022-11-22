@@ -35,7 +35,7 @@ export function Sidebar() {
         </Flex>
         <Tabs orientation="vertical" w="240px" isManual variant="enclosed">
           <TabList>
-            <Tab
+            <Tab onClick={() => navigate("/admin")}
               justifyContent="start"
               _selected={{
                 color: "gray.800",
@@ -67,6 +67,7 @@ export function Sidebar() {
               }}
               w="240px"
               h="56px"
+              onClick={() => navigate("/admin/assignment")}
             >
               <Image src="/assets/admin-page/assign.svg" pr="19.75" />
               Assignments
