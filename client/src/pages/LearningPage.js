@@ -271,19 +271,28 @@ function LearningPage() {
                                           : "white"
                                       }
                                     >
-                                      {lesson.sub_lessons[subLessonId]
-                                        .watched_status == true ? (
+                                      {(lesson.sub_lessons[subLessonId]
+                                        .watched_status === "watched" &&
+                                        lesson.sub_lessons[subLessonId]
+                                          .assign_status === "completed") ||
+                                      (lesson.sub_lessons[subLessonId]
+                                        .watched_status === "watched" &&
+                                        lesson.sub_lessons[subLessonId]
+                                          .assign_status ===
+                                          "no-assignment") ? (
                                         <Image
                                           src="/assets/learning-page/success-circle.svg"
-                                          alt="empty-circle"
+                                          alt="success-circle"
                                           mt="3px"
                                           mr="15px"
                                         />
                                       ) : lesson.sub_lessons[subLessonId]
-                                          .watched_status == true ? (
+                                          .watched_status === "watched" ||
+                                        lesson.sub_lessons[subLessonId]
+                                          .assign_status === "completed" ? (
                                         <Image
                                           src="/assets/learning-page/half-circle.svg"
-                                          alt="empty-circle"
+                                          alt="half-circle"
                                           mt="3px"
                                           mr="15px"
                                         />

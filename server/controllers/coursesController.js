@@ -257,8 +257,10 @@ export const getLearningById = async (req, res) => {
           [lesson.sub_lesson_id]: {
             sub_lesson_name: lesson.sub_lesson_name,
             video_directory: lesson.video_directory,
-            watched_status: false,
-            assign_status: false,
+            watched_status: "unwatched",
+            assign_status: Boolean(lesson.assignment_id)
+              ? "incompleted"
+              : "no-assignment",
           },
         };
       } else {
@@ -268,8 +270,10 @@ export const getLearningById = async (req, res) => {
             [lesson.sub_lesson_id]: {
               sub_lesson_name: lesson.sub_lesson_name,
               video_directory: lesson.video_directory,
-              watched_status: false,
-              assign_status: false,
+              watched_status: "unwatched",
+              assign_status: Boolean(lesson.assignment_id)
+                ? "incompleted"
+                : "no-assignment",
             },
           },
         };
@@ -288,68 +292,73 @@ export const getLearningById = async (req, res) => {
       [userId, courseId]
     );
     checkWatchedStatus = checkWatchedStatus.rows;
-    //console.log("checkWatchedStatus: ", checkWatchedStatus);
 
     for (let i = 0; i < checkWatchedStatus.length; i++) {
       course_data.lessons[String(checkWatchedStatus[i].lesson_id)].sub_lessons[
         String(checkWatchedStatus[i].sub_lesson_id)
-      ].watched_status = true;
+      ].watched_status = "watched";
     }
 
     let checkAssignStatus = await pool.query(
       `
-      select users_assignments.user_id, users_assignments.submitted_date, sub_lessons.sub_lesson_id, lessons.lesson_id , assignments.assignment_id
-      from lessons
-      inner join sub_lessons
-      on lessons.lesson_id = sub_lessons.lesson_id
-      inner join assignments
-      on sub_lessons.sub_lesson_id = assignments.sub_lesson_id
-      inner join users_assignments
-      on assignments.assignment_id = users_assignments.assignment_id
-      where users_assignments.user_id = $1 and lessons.course_id = $2
+      SELECT lessons.lesson_id, sub_lessons.sub_lesson_id, assignments.assignment_id, users_assignments.submitted_date
+      FROM lessons
+      INNER JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      INNER JOIN assignments
+      ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+      INNER JOIN users_assignments
+      ON assignments.assignment_id = users_assignments.assignment_id
+      WHERE users_assignments.user_id = $1 AND lessons.course_id = $2
+      ORDER BY lessons.sequence ASC, sub_lessons.sequence ASC
       `,
       [userId, courseId]
     );
     checkAssignStatus = checkAssignStatus.rows;
-    //console.log("checkAssignStatus: ", checkAssignStatus);
-
-    let assign_data = {};
-    checkAssignStatus.map((lesson) => {
-      // console.log("lessons ", lessons);
-
-      if (lesson.submitted_date != null) {
-        assign_data[lesson.sub_lesson_id] = {
-          ...assign_data[lesson.sub_lesson_id],
-          [lesson.assignment_id]: true,
-        };
+    const assignStatus = {};
+    for (let i = 0; i < checkAssignStatus.length; i++) {
+      if (checkAssignStatus[i].lesson_id in assignStatus) {
+        if (
+          checkAssignStatus[i].sub_lesson_id in
+          assignStatus[checkAssignStatus[i].lesson_id]
+        ) {
+          assignStatus[checkAssignStatus[i].lesson_id][
+            checkAssignStatus[i].sub_lesson_id
+          ] = {
+            ...assignStatus[checkAssignStatus[i].lesson_id][
+              checkAssignStatus[i].sub_lesson_id
+            ],
+            [checkAssignStatus[i].assignment_id]:
+              checkAssignStatus[i].submitted_date,
+          };
+        } else {
+          assignStatus[checkAssignStatus[i].lesson_id][
+            checkAssignStatus[i].sub_lesson_id
+          ] = {
+            [checkAssignStatus[i].assignment_id]:
+              checkAssignStatus[i].submitted_date,
+          };
+        }
       } else {
-        assign_data[lesson.sub_lesson_id] = {
-          ...assign_data[lesson.sub_lesson_id],
-          [lesson.assignment_id]: false,
+        assignStatus[checkAssignStatus[i].lesson_id] = {
+          [checkAssignStatus[i].sub_lesson_id]: {
+            [checkAssignStatus[i].assignment_id]:
+              checkAssignStatus[i].submitted_date,
+          },
         };
       }
-    });
+    }
 
-    //console.log("assign_data: ", assign_data);
-
-    // assign_data:  {
-    // '1001': { '1518': true },
-    // '1002': { '1030': true },
-    // '1003': { '1057': true, '1356': false },
-    // '1004': { '1529': true }
-    // }
-
-    // todo: ทำเงื่อนไขเช็ค assign_data -> ทำให้ data เป็น '1001': false; -> เอาค่าที่ได้ไปแมพใส่ไปใน assign_status
-
-    Object.keys(assign_data).map((subLessonId) => {
-      Object.values(assign_data[subLessonId]).map((status) => {
-        //กรณีที่ sub_lesson นั้น มี status แค่อันนึงเป็น false
-        if (status === false) {
-          console.log(assign_data[subLessonId]);
+    for (let lessonId in assignStatus) {
+      for (let subLessonId in assignStatus[lessonId]) {
+        if (
+          !Object.values(assignStatus[lessonId][subLessonId]).includes(null)
+        ) {
+          course_data.lessons[lessonId].sub_lessons[subLessonId].assign_status =
+            "completed";
         }
-        //กรณีที่ sub_lesson นั้น ไม่มี assign
-      });
-    });
+      }
+    }
 
     return res.json({
       data: { ...course_data, percentProgress: res.locals.percentProgress },
