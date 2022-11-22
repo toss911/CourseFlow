@@ -5,6 +5,8 @@ import { checkSubscription } from "../middlewares/checkSubscription.js";
 
 const assignmentRouter = Router();
 
+assignmentRouter.get("/", protect, assignment_controller.getAllHomework);
+
 assignmentRouter.put(
   "/:courseId/submit/:assignmentId",
   protect,

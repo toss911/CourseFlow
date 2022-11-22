@@ -137,7 +137,7 @@ function LearningPage() {
   const handleSaveDraft = async (assignmentId, status) => {
     setIsLoading(true);
     const body = { answer: answer[assignmentId], status: status };
-    if (body.answer === "") {
+    if (!Boolean(body.answer)) {
       alert(`Please fill out the answer`);
       setIsLoading(false);
       return;
@@ -151,9 +151,8 @@ function LearningPage() {
 
   const handleSubmit = async (assignmentId, status) => {
     setIsLoading(true);
-
     const body = { answer: answer[assignmentId], status: status };
-    if (body.answer === "") {
+    if (!Boolean(body.answer)) {
       alert(`Please fill out the answer`);
       setIsLoading(false);
       return;

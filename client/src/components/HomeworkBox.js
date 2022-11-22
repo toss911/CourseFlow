@@ -165,7 +165,14 @@ const HomeworkBox = (props) => {
               pr="10px"
               size="xs"
               mt="5px"
-              onClick={() => props.saveAnswerDraft(props.assignmentId, answer)}
+              onClick={() =>
+                props.saveAnswerDraft(
+                  props.assignmentId,
+                  answer,
+                  props.status,
+                  props.courseId
+                )
+              }
               visibility={props.submittedDate ? "hidden" : "visible"}
             >
               Save draft
@@ -174,7 +181,14 @@ const HomeworkBox = (props) => {
           <Flex flexDirection="column" gap="16px" w="137px" h="108px" mt="40px">
             <Button
               p="4px"
-              onClick={() => props.submitHomework(props.assignmentId, answer)}
+              onClick={() =>
+                props.submitHomework(
+                  props.assignmentId,
+                  answer,
+                  props.status,
+                  props.courseId
+                )
+              }
               display={props.submittedDate ? "none" : "block"}
             >
               Submit

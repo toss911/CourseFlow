@@ -28,26 +28,38 @@ function MyHomework() {
   // *- Get homework details function-* //
   const getHomeworkDetails = async () => {
     setIsLoading(true);
-    const results = await axios.get(`http://localhost:4000/homework/${userId}`);
+    const results = await axios.get(
+      `http://localhost:4000/assignment?byUser=${userId}`
+    );
     setHomework(results.data.data);
     setIsLoading(false);
   };
 
   // *- Submit homework function-* //
-  const submitHomework = async (assignmentId, answer) => {
-    const result = await axios.put(
-      `http://localhost:4000/homework/submit/${assignmentId}?userId=${userId}`,
-      answer
+  const submitHomework = async (assignmentId, answer, status, courseId) => {
+    const body = { ...answer, status: status };
+    if (!Boolean(body.answer)) {
+      alert(`Please fill out the answer`);
+      return;
+    }
+    await axios.put(
+      `http://localhost:4000/assignment/${courseId}/submit/${assignmentId}?byUser=${userId}`,
+      body
     );
     window.location.reload();
     getHomeworkDetails();
   };
 
   // *- Save answer draft-* //
-  const saveAnswerDraft = async (assignmentId, answer) => {
-    const result = await axios.put(
-      `http://localhost:4000/homework/save/${assignmentId}?userId=${userId}`,
-      answer
+  const saveAnswerDraft = async (assignmentId, answer, status, courseId) => {
+    const body = { ...answer, status: status };
+    if (!Boolean(body.answer)) {
+      alert(`Please fill out the answer`);
+      return;
+    }
+    await axios.put(
+      `http://localhost:4000/assignment/${courseId}/save/${assignmentId}?byUser=${userId}`,
+      body
     );
     window.location.reload();
     getHomeworkDetails();

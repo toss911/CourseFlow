@@ -602,10 +602,10 @@ export const getSubLesson = async (req, res) => {
             pool.query(
               `
             UPDATE users_assignments
-            SET status = 'overdue'
-            WHERE user_assignment_id = $1
+            SET status = 'overdue', updated_date = $1
+            WHERE user_assignment_id = $2
             `,
-              [assignment.user_assignment_id]
+              [new Date(), assignment.user_assignment_id]
             );
           }
           subLessonData.assignments[String(assignment.assignment_id)].status =
