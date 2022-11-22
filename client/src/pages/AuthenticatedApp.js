@@ -19,7 +19,7 @@ function AuthenticatedApp() {
       <Route path="/desire" element={<DesireCourse />} />
       <Route path="/profile" element={<UserProfile />} />
       <Route path="/courses/:courseId/learning" element={<LearningPage />} />
-      <Route path="/admin" element={<LoginAdminPage />} />
+     
     </Routes>
   );
 }
