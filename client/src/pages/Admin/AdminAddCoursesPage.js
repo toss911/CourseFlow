@@ -105,59 +105,70 @@ const AdminAddCoursesPage = () => {
                     <Text variant="body2">Course detail</Text>
                     <Input placeholder="" h="192px" w="920px" />
                   </Box>
-                  <Flex
-                    align="start"
-                    flexWrap="wrap"
-                    //    w="920px"
-                  >
-                    <label>
-                      <Input type="file" hidden onChange={handleFileChange} />
-                      <Flex
-                        w="240px"
-                        h="240px"
-                        direction="column"
-                        justify="center"
-                        align="center"
-                        color="blue.400"
-                        cursor="pointer"
-                        bg="gray.100"
-                      >
-                        <Text fontSize="36px">+</Text>
-                        <Text variant="body2">Upload Image</Text>
-                      </Flex>
-                    </label>
-                    <label w="250px">
-                      <Input type="file" hidden onChange={handleFileChange} />
-                      <Flex
-                        w="240px"
-                        h="240px"
-                        direction="column"
-                        justify="center"
-                        align="center"
-                        color="blue.400"
-                        cursor="pointer"
-                        bg="gray.100"
-                      >
-                        <Text fontSize="36px">+</Text>
-                        <Text variant="body2">Upload Image</Text>
-                      </Flex>
-                    </label>
-                    <label w="250px">
-                      <Input type="file" hidden onChange={handleFileChange} />
-                      <Flex
-                        w="240px"
-                        h="240px"
-                        direction="column"
-                        justify="center"
-                        align="center"
-                        color="blue.400"
-                        cursor="pointer"
-                        bg="gray.100"
-                      >
-                        <Text fontSize="36px">+</Text>
-                        <Text variant="body2">Upload Image</Text>
-                      </Flex>
-                    </label>
+                  <Flex display="column" flexWrap="wrap" w="920px">
+                    <Text variant="body2" mt="40px">
+                      Cover Image *
+                      <label>
+                        <Input type="file" hidden onChange={handleFileChange} />
+                        <Flex
+                          w="240px"
+                          h="240px"
+                          direction="column"
+                          justify="center"
+                          align="center"
+                          color="blue.400"
+                          cursor="pointer"
+                          bg="gray.100"
+                          mb="40px"
+                          mt="8px"
+                        >
+                          <Text fontSize="36px">+</Text>
+                          <Text variant="body2">Upload Image</Text>
+                        </Flex>
+                      </label>
+                    </Text>
+                    <Text variant="body2">
+                      Video Trailer *
+                      <label w="250px">
+                        <Input type="file" hidden onChange={handleFileChange} />
+                        <Flex
+                          w="240px"
+                          h="240px"
+                          direction="column"
+                          justify="center"
+                          align="center"
+                          color="blue.400"
+                          cursor="pointer"
+                          bg="gray.100"
+                          mb="40px"
+                          mt="8px"
+                        >
+                          <Text fontSize="36px">+</Text>
+                          <Text variant="body2">Upload Image</Text>
+                        </Flex>
+                      </label>
+                    </Text>
+                    <Text variant="body2">
+                      Attach File (Optional)
+                      <label w="250px">
+                        <Input type="file" hidden onChange={handleFileChange} />
+                        <Flex
+                          w="160px"
+                          h="160px"
+                          direction="column"
+                          justify="center"
+                          align="center"
+                          color="blue.400"
+                          cursor="pointer"
+                          bg="gray.100"
+                          mb="40px"
+                          mt="8px"
+                        >
+                          <Text fontSize="36px">+</Text>
+                          <Text variant="body2">Upload Image</Text>
+                        </Flex>
+                      </label>
+                    </Text>
                   </Flex>
                 </Stack>
               </Flex>
