@@ -39,8 +39,16 @@ const AdminAddCoursesPage = () => {
     const currentFile = event.target.files[0];
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
-        action = "change";
-        setVideo(URL.createObjectURL(currentFile));
+        if (currentFile.size <= 1.2e9) {
+          action = "change";
+          setVideo(URL.createObjectURL(currentFile));
+        } else {
+          return toast({
+            title: "Video size must be less than 1.2GB!",
+            status: "error",
+            isClosable: true,
+          });
+        }
       } else {
         return toast({
           title: "File type must be .mp4 only!",
