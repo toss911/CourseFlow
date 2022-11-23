@@ -38,7 +38,7 @@ const AdminNavbar = (props) => {
           />
         </InputGroup>
 
-        <Button w="172px" h="60px">
+        <Button>
           {props.action}
         </Button>
       </Flex>
