@@ -17,8 +17,29 @@ import {
   FormHelperText,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/authentication.js";
 
 function AdminAddAssignment() {
+  const [courseData, setCourseData] = useState();
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
+
+  useEffect(() => {});
+
+  /* Querying a course data (course, lesson, sub-lesson) to display in drop-down box */
+  const getCourseData = async () => {
+    let result = await axios.get(
+      `http://localhost:4000/admin/assignments?byAdmin=${adminId}`
+    );
+    setCourseData(result.data.data);
+  };
+
+  const handleSubmit = async (value) => {
+    console.log(value);
+  };
+
   return (
     <Formik
       initialValues={{
@@ -27,7 +48,7 @@ function AdminAddAssignment() {
         subLesson: "",
         assignment: "",
       }}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={handleSubmit}
     >
       {(props) => (
         <Form>

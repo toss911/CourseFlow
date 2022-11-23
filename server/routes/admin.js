@@ -11,5 +11,10 @@ const videoSubLessonUpload = multerUpload.fields([
 
 adminRouter.post("/add-course", protect, admin_controller.addCourse);
 adminRouter.put("/add-lesson", protect, admin_controller.videoSubLessonUpload);
+adminRouter.get(
+  "/assignment",
+  protect,
+  admin_controller.getAllCoursesDataByAdmin
+);
 
 export default adminRouter;
