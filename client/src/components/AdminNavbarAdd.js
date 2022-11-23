@@ -1,31 +1,23 @@
-import {
-  Flex,
-  Heading,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Button,
-  Image,
-} from "@chakra-ui/react";
+import { Flex, Heading, Button } from "@chakra-ui/react";
 
 const AdminNavbarAdd = (props) => {
   return (
     <Flex
+      w="100%"
+      h="92px"
+      bg="white"
+      justify="space-between"
+      align="center"
+      px="40px"
       borderBottom="1px"
       borderColor="gray.400"
-      alignItems="center"
-      h="92px"
-      w="vw"
     >
-      <Heading variant="headline3" w="852px" ml="40px">
-        {props.heading}
-      </Heading>
-
-      <Flex gap="16px" w="252px">
-        <Button variant="secondary" w="172px" h="60px">
+      <Heading variant="headline3">{props.heading}</Heading>
+      <Flex>
+        <Button variant="secondary" mr="16px">
           {props.action}
         </Button>
-        <Button w="172px" h="60px">
+        <Button variant="primary" type={props.formAction}>
           {props.action2}
         </Button>
       </Flex>
