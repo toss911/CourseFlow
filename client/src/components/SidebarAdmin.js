@@ -17,7 +17,7 @@ export function Sidebar() {
   const navigate = useNavigate();
   const {logoutAdmin } = useAuth();
   return (
-    <Box >
+    <Box>
       <Flex
         w="240px"
         h="100vh"
