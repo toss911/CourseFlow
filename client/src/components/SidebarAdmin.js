@@ -20,7 +20,7 @@ export function Sidebar() {
     <Box>
       <Flex
         w="240px"
-        h="100vh"
+        h="100%"
         bgColor="white"
         flexDirection="column"
         borderRight="1px"

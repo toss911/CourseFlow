@@ -9,6 +9,7 @@ import {
   FormLabel,
   FormErrorMessage,
   Textarea,
+  Select
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import React from "react";
@@ -143,6 +144,14 @@ const AdminAddCoursesPage = () => {
     let error;
     if (!value) {
       error = "Course detail cannot be empty";
+    } 
+    return error;
+  };
+
+  const validateCategory = (value) => {
+    let error;
+    if (!value) {
+      error = "Category cannot be empty";
     } 
     return error;
   };
@@ -324,6 +333,37 @@ const AdminAddCoursesPage = () => {
                               />
                               <FormErrorMessage>
                                 {form.errors.course_detail}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="category" validate={validateCategory}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.category &&
+                                form.touched.category
+                              }
+                              isRequired
+                            >
+                              <FormLabel
+                                variant="body2"
+                                color="black"
+                                mt="40px"
+                              >
+                                Category
+                              </FormLabel>
+                              <Select 
+                                w="920px"
+                             
+                                {...field}>
+                                  <option value='category1'>Science</option>
+                                  <option value='category2'>Business</option>
+                                  <option value='category3'>Software development</option>
+                                
+                                </Select>
+                              <FormErrorMessage>
+                                {form.errors.category}
                               </FormErrorMessage>
                             </FormControl>
                           )}
