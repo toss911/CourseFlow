@@ -92,14 +92,14 @@ function AuthProvider(props) {
 
     const logoutAdmin = () => {
     localStorage.removeItem("adminToken");
-    setContextState({ ...contextAdminState, user: null });
+    setContextAdminState({ ...contextAdminState, user: null });
     navigate("/admin");
   };
   const isAdminAuthenticated = Boolean(localStorage.getItem("adminToken"));
   if (isAdminAuthenticated && !contextAdminState.user) {
     const adminToken = localStorage.getItem("adminToken");
     const userDataFromToken = jwtDecode(adminToken);
-    setContextAdminState({ ...contextState, user: userDataFromToken });
+    setContextAdminState({ ...contextAdminState, user: userDataFromToken });
   }
 
   return (
@@ -107,6 +107,7 @@ function AuthProvider(props) {
       value={{
         contextState,
         setContextState,
+        contextAdminState,
         login,
         logout,
         register,

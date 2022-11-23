@@ -39,6 +39,17 @@ const AdminAddCoursesPage = () => {
     const result = await axios.post("", courseData);
   };
 
+  const handleSubmit = () => {
+    // check if user has added all info
+    if (true) {
+      addCourse();
+      // pop up modal
+      // navigate to view courses page
+    } else {
+      
+    }
+  }
+
   const handleVideoChange = (event) => {
     const currentFile = event.target.files[0];
     if (currentFile) {
