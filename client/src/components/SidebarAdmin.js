@@ -20,12 +20,11 @@ export function Sidebar() {
     <Box >
       <Flex
         w="240px"
-        h="100vh"
         bgColor="white"
         flexDirection="column"
         borderRight="1px"
         borderColor="gray.400"
-        position="sticky"
+        h='100vh'
       >
         <Flex flexDirection="column" alignItems="center" mt="40px">
           <Image src="/assets/admin-page/CourseFlow.svg" w="174px" h="19px" />
