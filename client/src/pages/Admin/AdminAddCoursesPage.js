@@ -369,8 +369,10 @@ const AdminAddCoursesPage = () => {
                           )}
                         </Field>
                         {/* File Uploads */}
+                        
                         <Flex display="column" flexWrap="wrap" w="920px">
                           {/* Cover Image Upload */}
+                      
                           <Text variant="body2" mt="40px" w="fit-content">
                             Cover Image *
                           </Text>
@@ -385,6 +387,7 @@ const AdminAddCoursesPage = () => {
                             bg="gray.100"
                             mb="40px"
                             mt="8px"
+                        
                           >
                             {coverImage ? (
                               <Flex w="100%" h="100%" position="relative">
@@ -428,6 +431,7 @@ const AdminAddCoursesPage = () => {
                                   type="file"
                                   hidden
                                   onChange={handleCoverImageChange}
+                                  isRequired
                                 />
                                 <Flex
                                   w="358px"
@@ -443,7 +447,9 @@ const AdminAddCoursesPage = () => {
                                 </Flex>
                               </label>
                             )}
+                       
                           </Flex>
+                          
                           {/* Video Upload */}
                           <Text variant="body2">Video Trailer *</Text>
                           <Flex
@@ -496,6 +502,7 @@ const AdminAddCoursesPage = () => {
                                   type="file"
                                   hidden
                                   onChange={handleVideoChange}
+                                  isRequired
                                 />
                                 <Flex
                                   w="358px"
