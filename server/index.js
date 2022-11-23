@@ -4,7 +4,6 @@ import cors from "cors";
 import authRouter from "./routes/auth.js";
 import coursesRouter from "./routes/courses.js";
 import userRouter from "./routes/user.js";
-import homeworkRouter from "./routes/homework.js";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
 import assignmentRouter from "./routes/assignment.js";
