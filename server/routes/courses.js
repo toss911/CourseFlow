@@ -30,6 +30,13 @@ coursesRouter.get(
 );
 
 coursesRouter.get(
+  "/:courseId/learning/latest",
+  protect,
+  checkSubscription,
+  courses_controller.getLatestSubLesson
+);
+
+coursesRouter.get(
   "/:courseId/learning/:subLessonId",
   protect,
   checkSubscription,

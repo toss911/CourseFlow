@@ -25,10 +25,12 @@ import {
   ModalBody,
   useDisclosure,
   Skeleton,
+  Link,
 } from "@chakra-ui/react";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useCourses from "../hooks/useCourses";
 import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
@@ -38,6 +40,9 @@ function LearningPage() {
   const [userAssignment, setUserAssignment] = useState({});
   const [subLessonData, setSubLessonData] = useState({});
   const [answer, setAnswer] = useState("");
+  const [isCourseLoading, setIsCourseLoading] = useState(false);
+  const [sequence, setSequence] = useState([]);
+  const [openAccordionIndex, setOpenAccordionIndex] = useState();
   const {
     isOpen: isAcceptOpen,
     onOpen: onAcceptOpen,
@@ -52,17 +57,45 @@ function LearningPage() {
     useCourses();
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
+  const params = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    getCourseLearningById(userId);
-    /* getCourseLearningById ส่ง sub_lesson_id บทล่าสุดที่เรียนมา หลังจากนั้นนำ sub_lesson_id นั้นไป fetch ขอข้อมูลของ sub_lesson_id นั้น ๆ (ทั้ง sub_lesson และ assignment) */
-    // handleSubLesson(lastest_sub_lesson_id)
+    async function fetchCourseData() {
+      setIsCourseLoading(true);
+      const result = await getCourseLearningById(userId);
+      let i = 0;
+      for (let lessonId in result.lessons) {
+        for (let subLessonId in result.lessons[lessonId].sub_lessons) {
+          if (subLessonId == params.subLessonId) {
+            setOpenAccordionIndex([Number(i)]);
+            break;
+          }
+        }
+        i++;
+      }
+      let subLessonSequence = [];
+      Object.values(result.lessonSequence).map((subLessonIDs) => {
+        subLessonSequence.push(...subLessonIDs);
+      });
+      setSequence(subLessonSequence);
+      setIsCourseLoading(false);
+    }
+    fetchCourseData();
   }, []);
+
+  useEffect(() => {
+    async function fetchSubLessonData() {
+      await handleSubLesson(params.subLessonId);
+    }
+    fetchSubLessonData();
+  }, [location.pathname]);
 
   const handleSubLesson = async (subLessonId) => {
     setIsLoading(true);
     const result = await axios.get(
-      `http://localhost:4000/courses/${course.course_id}/learning/${subLessonId}?byUser=${userId}`
+      `http://localhost:4000/courses/${params.courseId}/learning/${subLessonId}?byUser=${userId}`
     );
     setUserAssignment({
       assignment_status: result.data.data.assignment_status,
@@ -102,11 +135,9 @@ function LearningPage() {
   };
 
   const handleSaveDraft = async (assignmentId, status) => {
-    // หลังบ้านต้องมีการเปลี่ยนสถานะเป็น in progress ด้วย เพราะ API เดิมของอายยังไม่มีใส่ status เข้าไป (ในกรณีที่สเตตัสเดิมเป็น overdue ก็จะยังคงเป็น overdue เหมือนเดิม)
     setIsLoading(true);
-    console.log(`answer[${assignmentId}]: `, answer[assignmentId]);
     const body = { answer: answer[assignmentId], status: status };
-    if (body.answer === "") {
+    if (!Boolean(body.answer)) {
       alert(`Please fill out the answer`);
       setIsLoading(false);
       return;
@@ -119,12 +150,9 @@ function LearningPage() {
   };
 
   const handleSubmit = async (assignmentId, status) => {
-    // หลังบ้านต้องมีการเปลี่ยนสถานะเป็น sumitted ด้วย เพราะ API เดิมของอายยังไม่มีใส่ status เข้าไป (ในกรณีที่สเตตัสเดิมเป็น overdue ก็จะยังคงเป็น overdue เหมือนเดิม)
     setIsLoading(true);
-    console.log(`answer[${assignmentId}]: `, answer[assignmentId]);
-
     const body = { answer: answer[assignmentId], status: status };
-    if (body.answer === "") {
+    if (!Boolean(body.answer)) {
       alert(`Please fill out the answer`);
       setIsLoading(false);
       return;
@@ -140,365 +168,389 @@ function LearningPage() {
   return (
     <>
       <Navbar />
-
-      <Flex
-        mt="100px"
-        flexDirection="row"
-        alignItems="start"
-        justifyContent="center"
-      >
-        {/* //------------------------- Left Column ----------------------// */}
+      <Skeleton isLoaded={!isCourseLoading}>
         <Flex
-          flexDirection="column"
+          pt="100px"
+          flexDirection="row"
           alignItems="start"
-          justifyContent="start"
-          width="372px"
-          height="1035px"
-          shadow="shadow1"
-          mr="25px"
-          pl="24px"
-          overflowY="auto"
+          justifyContent="center"
         >
-          <Text mt="32px" color="orange.500" fontSize="14px" fontWeight="400">
-            Course
-          </Text>
-
-          <Heading variant="headline3" mt="24px">
-            {course.course_name}
-          </Heading>
-          <Text variant="body2" color="gray.700" mt="8px">
-            {course.summary}
-          </Text>
-          <Text variant="body3" mt="24px">
-            {course.percentProgress}% Complete
-          </Text>
-          <Box>
-            <Progress
-              mt="8px"
-              height="10px"
-              width="309px"
-              value={course.percentProgress}
-              sx={{
-                ".css-1jrtelv": {
-                  background:
-                    "linear-gradient(109.54deg, #95BEFF 18.21%, #0040E6 95.27%)",
-                  borderRadius: "full",
-                },
-              }}
-            />
-          </Box>
-          {Object.keys(course).length === 0
-            ? null
-            : Object.values(course.lessons).map((lesson, key) => {
-                let numberLesson = null;
-                if (key < 10) {
-                  numberLesson = "0" + (key + 1);
-                } else {
-                  numberLesson = key + 1;
-                }
-                return (
-                  <Accordion
-                    key={key}
-                    defaultIndex={[1]}
-                    allowMultiple
-                    w="300px"
-                    mt="24px"
-                  >
-                    <AccordionItem border="0px">
-                      <h2>
-                        <AccordionButton
-                          _hover={{ backgroundColor: "gray.100" }}
-                          borderBottom="1px solid #D6D9E4"
-                          pl="0"
-                        >
-                          <Box
-                            flex="1"
-                            textAlign="left"
-                            display="flex"
-                            color="black"
-                          >
-                            <Text
-                              color="gray.700"
-                              display="flex"
-                              variant="body2"
-                            >
-                              {numberLesson}
-                            </Text>
-                            <Text ml="24px" variant="body2">
-                              {lesson.lesson_name}
-                            </Text>
-                          </Box>
-                          <AccordionIcon />
-                        </AccordionButton>
-                      </h2>
-                      <AccordionPanel pb={4}>
-                        <UnorderedList>
-                          {Object.keys(lesson.sub_lessons).map(
-                            (subLessonId, key) => {
-                              return (
-                                <Flex
-                                  flexDirection="row"
-                                  alignItems="start"
-                                  justifyContent="start"
-                                  mt="24px"
-                                  key={key}
-                                  _hover={{ backgroundColor: "gray.100" }}
-                                >
-                                  {lesson.sub_lessons[subLessonId]
-                                    .watched_status == true ? (
-                                    <Image
-                                      src="/assets/learning-page/success-circle.svg"
-                                      alt="empty-circle"
-                                      mt="3px"
-                                      mr="15px"
-                                    />
-                                  ) : lesson.sub_lessons[subLessonId]
-                                      .watched_status == true ? (
-                                    <Image
-                                      src="/assets/learning-page/half-circle.svg"
-                                      alt="empty-circle"
-                                      mt="3px"
-                                      mr="15px"
-                                    />
-                                  ) : (
-                                    <Image
-                                      src="/assets/learning-page/circle.svg"
-                                      alt="empty-circle"
-                                      mt="3px"
-                                      mr="15px"
-                                    />
-                                  )}
-
-                                  <Text
-                                    cursor="pointer"
-                                    variant="body2"
-                                    onClick={() => {
-                                      handleSubLesson(subLessonId);
-                                    }}
-                                  >
-                                    {
-                                      lesson.sub_lessons[subLessonId]
-                                        .sub_lesson_name
-                                    }
-                                  </Text>
-                                </Flex>
-                              );
-                            }
-                          )}
-                        </UnorderedList>
-                      </AccordionPanel>
-                    </AccordionItem>
-                  </Accordion>
-                );
-              })}
-        </Flex>
-        {/* //---------------------------- Right Column -----------------------// */}
-
-        <Skeleton isLoaded={!isLoading}>
+          {/* //------------------------- Left Column ----------------------// */}
           <Flex
             flexDirection="column"
             alignItems="start"
-            width="770px"
+            justifyContent="start"
+            width="372px"
             height="1035px"
+            shadow="shadow1"
+            mr="25px"
+            pl="24px"
             overflowY="auto"
           >
-            <Heading mb="33px" variant="headline2">
-              {subLessonData.sub_lesson_name}
+            <Text mt="32px" color="orange.500" fontSize="14px" fontWeight="400">
+              Course
+            </Text>
+
+            <Heading variant="headline3" mt="24px">
+              {course.course_name}
             </Heading>
-            <AspectRatio w="739px" ratio={16 / 9} mb="80px">
-              <video
-                controls
-                onEnded={() => handleVideoEnded(subLessonData.sub_lesson_id)}
+            <Text variant="body2" color="gray.700" mt="8px">
+              {course.summary}
+            </Text>
+            <Text variant="body3" mt="24px">
+              {course.percentProgress}% Complete
+            </Text>
+            <Box>
+              <Progress
+                mt="8px"
+                height="10px"
+                width="309px"
+                value={course.percentProgress}
+                sx={{
+                  ".css-1jrtelv": {
+                    background:
+                      "linear-gradient(109.54deg, #95BEFF 18.21%, #0040E6 95.27%)",
+                    borderRadius: "full",
+                  },
+                }}
+              />
+            </Box>
+            {!Boolean(openAccordionIndex) ? null : (
+              <Accordion
+                defaultIndex={openAccordionIndex}
+                allowMultiple
+                w="300px"
+                mt="24px"
               >
-                <source
-                  // src={subLessonData.video_directory}
-                  src="https://res.cloudinary.com/dxk5mdqoz/video/upload/v1668525048/Countdown_amqcom.mp4"
-                  type="video/mp4"
-                />
-              </video>
-            </AspectRatio>
-            {Object.keys(userAssignment).length ===
-            0 ? null : !/^accepted/i.test(userAssignment.assignment_status) ? (
-              <Flex
-                bg="blue.100"
-                width="739px"
-                flexDirection="column"
-                alignItems="start"
-                pl="24px"
-                borderRadius="8px"
-              >
-                <Text variant="body1" mt="25px">
-                  Assignment
-                </Text>
-                <Text variant="body2" mt="25px">
-                  There are {Object.keys(userAssignment.assignments).length}{" "}
-                  assignments in this sub lesson.
-                </Text>
-                <Flex
-                  direction="rows"
-                  justify="space-between"
-                  width="691px"
-                  my="25px"
-                >
-                  <Button
-                    height="60px"
-                    onClick={() => {
-                      onAcceptOpen();
-                    }}
-                  >
-                    Accept Assignment
-                  </Button>
-                  <Text color="gray.700" alignSelf="end">
-                    After accepted the assignment, you need to complete within
-                    10 days
-                  </Text>
-                </Flex>
-              </Flex>
-            ) : userAssignment.assignments === null ? (
-              <Text variant="body2" as="i">
-                No assignment in this sub lesson
-              </Text>
-            ) : (
-              Object.keys(userAssignment.assignments).map(
-                (assignmentId, key) => {
-                  return (
-                    <Flex
-                      bg="blue.100"
-                      width="739px"
-                      flexDirection="column"
-                      alignItems="start"
-                      pl="24px"
-                      mb={
-                        key ===
-                        Object.keys(userAssignment.assignments).length - 1
-                          ? "60px"
-                          : "15px"
+                {Object.keys(course).length === 0
+                  ? null
+                  : Object.values(course.lessons).map((lesson, key) => {
+                      let numberLesson = null;
+                      if (key < 10) {
+                        numberLesson = "0" + (key + 1);
+                      } else {
+                        numberLesson = key + 1;
                       }
-                      borderRadius="8px"
-                      key={key}
+                      return (
+                        <AccordionItem border="0px" key={key}>
+                          <AccordionButton
+                            _hover={{ backgroundColor: "gray.100" }}
+                            borderBottom="1px solid #D6D9E4"
+                            pl="0"
+                            pt="12px"
+                          >
+                            <Box
+                              flex="1"
+                              textAlign="left"
+                              display="flex"
+                              color="black"
+                            >
+                              <Text
+                                color="gray.700"
+                                display="flex"
+                                variant="body2"
+                              >
+                                {numberLesson}
+                              </Text>
+                              <Text ml="24px" variant="body2">
+                                {lesson.lesson_name}
+                              </Text>
+                            </Box>
+                            <AccordionIcon />
+                          </AccordionButton>
+                          <AccordionPanel pb={4}>
+                            <UnorderedList>
+                              {Object.keys(lesson.sub_lessons).map(
+                                (subLessonId, keySub) => {
+                                  return (
+                                    <Flex
+                                      flexDirection="row"
+                                      alignItems="start"
+                                      justifyContent="start"
+                                      mt="24px"
+                                      key={keySub}
+                                      _hover={{ backgroundColor: "gray.100" }}
+                                      _active={{ backgroundColor: "gray.200" }}
+                                      bg={
+                                        subLessonId === params.subLessonId
+                                          ? "gray.200"
+                                          : "white"
+                                      }
+                                    >
+                                      {(lesson.sub_lessons[subLessonId]
+                                        .watched_status === "watched" &&
+                                        lesson.sub_lessons[subLessonId]
+                                          .assign_status === "completed") ||
+                                      (lesson.sub_lessons[subLessonId]
+                                        .watched_status === "watched" &&
+                                        lesson.sub_lessons[subLessonId]
+                                          .assign_status ===
+                                          "no-assignment") ? (
+                                        <Image
+                                          src="/assets/learning-page/success-circle.svg"
+                                          alt="success-circle"
+                                          mt="3px"
+                                          mr="15px"
+                                        />
+                                      ) : lesson.sub_lessons[subLessonId]
+                                          .watched_status === "watched" ||
+                                        lesson.sub_lessons[subLessonId]
+                                          .assign_status === "completed" ? (
+                                        <Image
+                                          src="/assets/learning-page/half-circle.svg"
+                                          alt="half-circle"
+                                          mt="3px"
+                                          mr="15px"
+                                        />
+                                      ) : (
+                                        <Image
+                                          src="/assets/learning-page/circle.svg"
+                                          alt="empty-circle"
+                                          mt="3px"
+                                          mr="15px"
+                                        />
+                                      )}
+
+                                      <Text
+                                        cursor="pointer"
+                                        variant="body2"
+                                        onClick={() => {
+                                          navigate(
+                                            `/courses/${params.courseId}/learning/${subLessonId}`
+                                          );
+                                        }}
+                                      >
+                                        {
+                                          lesson.sub_lessons[subLessonId]
+                                            .sub_lesson_name
+                                        }
+                                      </Text>
+                                    </Flex>
+                                  );
+                                }
+                              )}
+                            </UnorderedList>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      );
+                    })}
+              </Accordion>
+            )}
+          </Flex>
+          {/* //---------------------------- Right Column -----------------------// */}
+
+          <Skeleton isLoaded={!isLoading}>
+            <Flex
+              flexDirection="column"
+              alignItems="start"
+              width="770px"
+              height="1035px"
+              overflowY="auto"
+            >
+              <Heading mb="33px" variant="headline2">
+                {subLessonData.sub_lesson_name}
+              </Heading>
+              <AspectRatio w="739px" ratio={16 / 9} mb="80px">
+                <video
+                  controls
+                  onEnded={() => handleVideoEnded(subLessonData.sub_lesson_id)}
+                >
+                  <source
+                    // src={subLessonData.video_directory}
+                    src="https://res.cloudinary.com/dxk5mdqoz/video/upload/v1668525048/Countdown_amqcom.mp4"
+                    type="video/mp4"
+                  />
+                </video>
+              </AspectRatio>
+              {Object.keys(userAssignment).length ===
+              0 ? null : !/^accepted/i.test(
+                  userAssignment.assignment_status
+                ) ? (
+                <Flex
+                  bg="blue.100"
+                  width="739px"
+                  flexDirection="column"
+                  alignItems="start"
+                  pl="24px"
+                  borderRadius="8px"
+                >
+                  <Text variant="body1" mt="25px">
+                    Assignment
+                  </Text>
+                  <Text variant="body2" mt="25px">
+                    There are {Object.keys(userAssignment.assignments).length}{" "}
+                    assignments in this sub lesson.
+                  </Text>
+                  <Flex
+                    direction="rows"
+                    justify="space-between"
+                    width="691px"
+                    my="25px"
+                  >
+                    <Button
+                      height="60px"
+                      onClick={() => {
+                        onAcceptOpen();
+                      }}
                     >
+                      Accept Assignment
+                    </Button>
+                    <Text color="gray.700" alignSelf="end">
+                      After accepted the assignment, you need to complete within
+                      10 days
+                    </Text>
+                  </Flex>
+                </Flex>
+              ) : userAssignment.assignments === null ? (
+                <Text variant="body2" as="i">
+                  No assignment in this sub lesson
+                </Text>
+              ) : (
+                Object.keys(userAssignment.assignments).map(
+                  (assignmentId, key) => {
+                    return (
                       <Flex
-                        flexDirection="row"
+                        bg="blue.100"
+                        width="739px"
+                        flexDirection="column"
                         alignItems="start"
-                        mt="24px"
-                        width="691px"
-                      >
-                        <Text variant="body1" color="black">
-                          Assignment
-                        </Text>
-                        <Spacer />
-                        <Badge
-                          variant={
-                            userAssignment.assignments[assignmentId].status
-                          }
-                          textTransform="capitalize"
-                          fontWeight="500"
-                        >
-                          {userAssignment.assignments[assignmentId].status}
-                        </Badge>
-                      </Flex>
-                      <Text variant="body2" mt="25px" color="black">
-                        {userAssignment.assignments[assignmentId].detail}
-                      </Text>
-                      <Textarea
-                        mt="4px"
-                        width="691px"
-                        height="100px"
-                        resize="none"
-                        placeholder="Answer..."
-                        size="16px"
-                        fontWeight="400"
-                        fontStyle={
-                          userAssignment.assignments[assignmentId]
-                            .submitted_date === null
-                            ? "normal"
-                            : "italic"
+                        pl="24px"
+                        mb={
+                          key ===
+                          Object.keys(userAssignment.assignments).length - 1
+                            ? "60px"
+                            : "15px"
                         }
-                        color={
-                          userAssignment.assignments[assignmentId]
-                            .submitted_date === null
-                            ? "black"
-                            : "gray.600"
-                        }
-                        bg={
-                          userAssignment.assignments[assignmentId]
-                            .submitted_date === null
-                            ? "white"
-                            : "blue.100"
-                        }
-                        p="12px 16px 12px 12px"
-                        border={
-                          userAssignment.assignments[assignmentId]
-                            .submitted_date === null
-                            ? "1px solid"
-                            : "0px"
-                        }
-                        borderColor="gray.400"
                         borderRadius="8px"
-                        _focus={{ borderColor: "gray.100" }}
-                        value={answer[assignmentId]}
-                        onChange={(e) =>
-                          setAnswer({
-                            ...answer,
-                            [assignmentId]: e.target.value,
-                          })
-                        }
-                        isReadOnly={
-                          userAssignment.assignments[assignmentId]
-                            .submitted_date === null
-                            ? false
-                            : true
-                        }
-                      />
-                      {userAssignment.assignments[assignmentId]
-                        .submitted_date === null ? (
+                        key={key}
+                      >
                         <Flex
                           flexDirection="row"
                           alignItems="start"
-                          justifyContent="center"
+                          mt="24px"
                           width="691px"
-                          mt="25px"
-                          mb="24px"
                         >
-                          <Button
-                            height="60px"
-                            onClick={() => {
-                              assignment_id = assignmentId;
-                              onSubmitOpen();
-                            }}
-                          >
-                            Send Assignment
-                          </Button>
-                          <Button
-                            variant="save draft"
-                            ml="20px"
-                            height="60px"
-                            onClick={() => {
-                              handleSaveDraft(
-                                assignmentId,
-                                userAssignment.assignments[assignmentId].status
-                              );
-                            }}
-                            isLoading={isLoading}
-                          >
-                            Save Draft
-                          </Button>
-                          <Spacer />
-                          <Text pt="20px" color="gray.700">
-                            Submit within{" "}
-                            {userAssignment.assignments[assignmentId].duration}{" "}
-                            days
+                          <Text variant="body1" color="black">
+                            Assignment
                           </Text>
+                          <Spacer />
+                          <Badge
+                            variant={
+                              userAssignment.assignments[assignmentId].status
+                            }
+                            textTransform="capitalize"
+                            fontWeight="500"
+                          >
+                            {userAssignment.assignments[assignmentId].status}
+                          </Badge>
                         </Flex>
-                      ) : null}
-                    </Flex>
-                  );
-                }
-              )
-            )}
-          </Flex>
-        </Skeleton>
-      </Flex>
+                        <Text variant="body2" mt="25px" color="black">
+                          {userAssignment.assignments[assignmentId].detail}
+                        </Text>
+                        <Textarea
+                          mt="4px"
+                          width="691px"
+                          height="100px"
+                          resize="none"
+                          placeholder="Answer..."
+                          size="16px"
+                          fontWeight="400"
+                          fontStyle={
+                            userAssignment.assignments[assignmentId]
+                              .submitted_date === null
+                              ? "normal"
+                              : "italic"
+                          }
+                          color={
+                            userAssignment.assignments[assignmentId]
+                              .submitted_date === null
+                              ? "black"
+                              : "gray.600"
+                          }
+                          bg={
+                            userAssignment.assignments[assignmentId]
+                              .submitted_date === null
+                              ? "white"
+                              : "blue.100"
+                          }
+                          p="12px 16px 12px 12px"
+                          border={
+                            userAssignment.assignments[assignmentId]
+                              .submitted_date === null
+                              ? "1px solid"
+                              : "0px"
+                          }
+                          borderColor="gray.400"
+                          borderRadius="8px"
+                          _focus={{ borderColor: "gray.100" }}
+                          value={answer[assignmentId]}
+                          onChange={(e) =>
+                            setAnswer({
+                              ...answer,
+                              [assignmentId]: e.target.value,
+                            })
+                          }
+                          isReadOnly={
+                            userAssignment.assignments[assignmentId]
+                              .submitted_date === null
+                              ? false
+                              : true
+                          }
+                        />
+                        {userAssignment.assignments[assignmentId]
+                          .submitted_date === null ? (
+                          <Flex
+                            flexDirection="row"
+                            alignItems="start"
+                            justifyContent="center"
+                            width="691px"
+                            mt="25px"
+                            mb="24px"
+                          >
+                            <Button
+                              height="60px"
+                              onClick={() => {
+                                assignment_id = assignmentId;
+                                onSubmitOpen();
+                              }}
+                            >
+                              Send Assignment
+                            </Button>
+                            <Button
+                              variant="save draft"
+                              ml="20px"
+                              height="60px"
+                              onClick={() => {
+                                handleSaveDraft(
+                                  assignmentId,
+                                  userAssignment.assignments[assignmentId]
+                                    .status
+                                );
+                              }}
+                              isLoading={isLoading}
+                            >
+                              Save Draft
+                            </Button>
+                            <Spacer />
+                            <Text pt="20px" color="gray.700">
+                              Submit within{" "}
+                              {
+                                userAssignment.assignments[assignmentId]
+                                  .duration
+                              }{" "}
+                              days
+                            </Text>
+                          </Flex>
+                        ) : null}
+                      </Flex>
+                    );
+                  }
+                )
+              )}
+            </Flex>
+          </Skeleton>
+        </Flex>
+      </Skeleton>
       <Flex
         flexDirection="row"
         alignItems="center"
@@ -507,20 +559,75 @@ function LearningPage() {
         width="100vw"
         height="100px"
       >
-        <Text
-          cursor="pointer"
-          color="blue.500"
-          fontWeight="700"
-          fontSize="16px"
-          ml="68px"
-        >
-          Previous Sub-lesson
-        </Text>
+        {/* If the sub lesson was the first one of a course, there will be no previous sub lesson button */}
+        {sequence.indexOf(Number(params.subLessonId)) === 0 ? null : (
+          <Link
+            ml="68px"
+            onClick={() => {
+              let prevLessonId =
+                sequence[sequence.indexOf(Number(params.subLessonId)) - 1];
+              navigate(`/courses/${params.courseId}/learning/${prevLessonId}`);
+              window.scrollTo(0, 150);
+            }}
+          >
+            {Object.keys(course).length === 0
+              ? null
+              : Object.keys(course.lessonSequence).map((lessonId) => {
+                  if (
+                    course.lessonSequence[lessonId].includes(
+                      Number(params.subLessonId)
+                    )
+                  ) {
+                    if (
+                      Object.values(course.lessonSequence[lessonId]).indexOf(
+                        Number(params.subLessonId)
+                      ) === 0
+                    ) {
+                      return `Previous Lesson`;
+                    } else {
+                      return `Previous Sub-lesson`;
+                    }
+                  }
+                })}
+          </Link>
+        )}
 
         <Spacer />
-        <Button width="200px" height="60px" mr="68px">
-          Next Sub-lesson
-        </Button>
+        {/* If the sub lesson was the last one of a course, there will be no next sub lesson button */}
+        {sequence.indexOf(Number(params.subLessonId)) ===
+        sequence.length - 1 ? null : (
+          <Button
+            height="60px"
+            mr="68px"
+            onClick={() => {
+              let nextLessonId =
+                sequence[sequence.indexOf(Number(params.subLessonId)) + 1];
+              navigate(`/courses/${params.courseId}/learning/${nextLessonId}`);
+              window.scrollTo(0, 150);
+            }}
+          >
+            {Object.keys(course).length === 0
+              ? null
+              : Object.keys(course.lessonSequence).map((lessonId) => {
+                  if (
+                    course.lessonSequence[lessonId].includes(
+                      Number(params.subLessonId)
+                    )
+                  ) {
+                    if (
+                      Object.values(course.lessonSequence[lessonId]).indexOf(
+                        Number(params.subLessonId)
+                      ) ===
+                      Object.values(course.lessonSequence[lessonId]).length - 1
+                    ) {
+                      return `Next Lesson`;
+                    } else {
+                      return `Next Sub-lesson`;
+                    }
+                  }
+                })}
+          </Button>
+        )}
       </Flex>
       <Footer />
       <Modal

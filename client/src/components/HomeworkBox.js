@@ -6,6 +6,7 @@ import {
   Heading,
   Button,
   Textarea,
+  Link,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -164,7 +165,14 @@ const HomeworkBox = (props) => {
               pr="10px"
               size="xs"
               mt="5px"
-              onClick={() => props.saveAnswerDraft(props.assignmentId, answer)}
+              onClick={() =>
+                props.saveAnswerDraft(
+                  props.assignmentId,
+                  answer,
+                  props.status,
+                  props.courseId
+                )
+              }
               visibility={props.submittedDate ? "hidden" : "visible"}
             >
               Save draft
@@ -173,17 +181,33 @@ const HomeworkBox = (props) => {
           <Flex flexDirection="column" gap="16px" w="137px" h="108px" mt="40px">
             <Button
               p="4px"
-              onClick={() => props.submitHomework(props.assignmentId, answer)}
-              visibility={props.submittedDate ? "hidden" : "visible"}
+              onClick={() =>
+                props.submitHomework(
+                  props.assignmentId,
+                  answer,
+                  props.status,
+                  props.courseId
+                )
+              }
+              display={props.submittedDate ? "none" : "block"}
             >
               Submit
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => navigate(`/courses/${props.courseId}/learning`)}
+            <Flex
+              justify="center"
+              align="center"
+              h={props.submittedDate ? "100%" : "20%"}
             >
-              Open in course
-            </Button>
+              <Link
+                onClick={() =>
+                  navigate(
+                    `/courses/${props.courseId}/learning?subLessonId=${props.subLessonId}`
+                  )
+                }
+              >
+                Open in course
+              </Link>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>

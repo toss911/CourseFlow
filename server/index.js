@@ -27,7 +27,6 @@ async function init() {
   app.use("/auth", authRouter);
   app.use("/courses", coursesRouter);
   app.use("/user", userRouter);
-  app.use("/homework", homeworkRouter);
   app.use("/assignment", assignmentRouter);
 
   app.get("*", (req, res) => {

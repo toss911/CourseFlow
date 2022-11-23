@@ -522,7 +522,7 @@ function HomePage() {
         />
       </Flex>
       {/* //-----------------------End Review section-------------------------// */}
-      1 {/* //Pre-Footer section */}
+      {/* //Pre-Footer section */}
       <PreFooter />
       {/* //-----------------------End Pre-Footer section-------------------------// */}
       {/* //Footer section  */}

@@ -85,7 +85,7 @@ export const Navbar = () => {
                     w="15px"
                     h="15px"
                   />
-                  My courses
+                  My Courses
                 </MenuItem>
                 <MenuItem onClick={() => navigate("/homework")}>
                   <Image
@@ -107,7 +107,7 @@ export const Navbar = () => {
                     w="15px"
                     h="15px"
                   />
-                  My Desire Courses
+                  My Desired Courses
                 </MenuItem>
                 <MenuDivider />
                 <MenuItem
