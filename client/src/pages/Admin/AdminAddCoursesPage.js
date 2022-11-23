@@ -17,6 +17,7 @@ import LessonTable from "../../components/LessonsTable";
 import AdminNavbarAdd from "../../components/AdminNavbarAdd";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../../contexts/authentication";
 
 // Steps:
 // 1. Check if the user (admin) added at least one lesson and one sub-lesson:
@@ -32,6 +33,8 @@ const AdminAddCoursesPage = () => {
   const [video, setVideo] = useState();
   const [files, setFiles] = useState();
   const toast = useToast();
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
   let action;
 
   // this function will be triggered after user clicks on 'create course' button

@@ -15,9 +15,11 @@ import {
 import AdminNavbar from "../../components/AdminNavbar";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useAuth } from "../../contexts/authentication";
 
 function AdminViewCourses() {
-  const adminId = 3; // Get the ID from the context
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
   const [adminCourses, setAdminCourses] = useState([]);
   const [searchText, setSearchText] = useState("");
   const columnNames = [
