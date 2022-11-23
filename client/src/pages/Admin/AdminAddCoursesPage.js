@@ -102,6 +102,49 @@ const AdminAddCoursesPage = () => {
     }
   };
 
+  // *- input validation -* //
+  const validateCourseName = (value) => {
+    let error;
+    if (!value) {
+      error = "Course name cannot be empty";
+    } 
+    return error;
+  };
+
+  const validatePrice = (value) => {
+    let error;
+    if (!value) {
+      error = "Please specify price";
+    } else if (!/^(?:[1-9]\d*|\d)$/i.test(value)) {
+      error = `Price cannot be below 0`;
+    }
+    return error;
+  };
+
+  const validateLearningTime = (value) => {
+    let error;
+    if (!value) {
+      error = "Please specify learning time";
+    } 
+    return error;
+  };
+
+  const validateCourseSummary = (value) => {
+    let error;
+    if (!value) {
+      error = "Course summary cannot be empty";
+    } 
+    return error;
+  };
+
+  const validateCourseDetail = (value) => {
+    let error;
+    if (!value) {
+      error = "Course detail cannot be empty";
+    } 
+    return error;
+  };
+
   return (
     <>
       <Flex>
@@ -143,7 +186,7 @@ const AdminAddCoursesPage = () => {
                         flexDirection="column"
                       >
                         {/* Course name field */}
-                        <Field name="course_name">
+                        <Field name="course_name" validate={validateCourseName}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -162,14 +205,14 @@ const AdminAddCoursesPage = () => {
                                 {...field}
                               />
                               <FormErrorMessage>
-                                {form.errors.full_name}
+                                {form.errors.course_name}
                               </FormErrorMessage>
                             </FormControl>
                           )}
                         </Field>
                         <Flex>
                           {/* Price field */}
-                          <Field name="price">
+                          <Field name="price" validate={validatePrice}>
                             {({ field, form }) => (
                               <FormControl
                                 isInvalid={
@@ -186,6 +229,7 @@ const AdminAddCoursesPage = () => {
                                 </FormLabel>
                                 <Input
                                   type="number"
+                                  min="0"
                                   w="420px"
                                   h="48px"
                                   {...field}
@@ -197,7 +241,7 @@ const AdminAddCoursesPage = () => {
                             )}
                           </Field>
                           {/* Total Learning Time field */}
-                          <Field name="learning_time">
+                          <Field name="learning_time" validate={validateLearningTime}>
                             {({ field, form }) => (
                               <FormControl
                                 isInvalid={
@@ -226,7 +270,7 @@ const AdminAddCoursesPage = () => {
                             )}
                           </Field>
                         </Flex>
-                        <Field name="course_summary">
+                        <Field name="course_summary" validate={validateCourseSummary}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -254,7 +298,7 @@ const AdminAddCoursesPage = () => {
                             </FormControl>
                           )}
                         </Field>
-                        <Field name="course_detail">
+                        <Field name="course_detail" validate={validateCourseDetail}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
