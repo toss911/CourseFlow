@@ -18,28 +18,18 @@ import { Field, Form, Formik } from "formik";
 let action;
 
 function AdminAddLesson() {
-  const [avatar, setAvatar] = useState();
-  const [avatarFile, setAvatarFile] = useState();
+  const [video, setVideo] = useState();
   const toast = useToast();
 
-  const handleFileChange = (event) => {
+  const handleVideoChange = (event) => {
     const currentFile = event.target.files[0];
     if (currentFile) {
-      if (/jpeg|png/gi.test(currentFile.type)) {
-        if (currentFile.size <= 2e6) {
-          action = "change";
-          setAvatarFile(currentFile);
-          setAvatar(URL.createObjectURL(currentFile));
-        } else {
-          return toast({
-            title: "File size must be less than 2MB!",
-            status: "error",
-            isClosable: true,
-          });
-        }
+      if (/video/gi.test(currentFile.type)) {
+        action = "change";
+        setVideo(URL.createObjectURL(currentFile));
       } else {
         return toast({
-          title: "File type must be JPG/PNG only!",
+          title: "File type must be .mp4 only!",
           status: "error",
           isClosable: true,
         });
@@ -82,7 +72,7 @@ function AdminAddLesson() {
                     Course
                   </Text>
                   <Text ml="8px" variant="body3" color="black">
-                    'Service Design Essentials'Introduction
+                    'Service Design Essentials'
                   </Text>
                 </Flex>
                 <Heading variant="headline3" w="796px">
@@ -175,28 +165,66 @@ function AdminAddLesson() {
                     <FormLabel fontSize="16px" fontWeight="400" mt="24px">
                       Video *
                     </FormLabel>
-                    <label>
-                      <Input type="file" hidden onChange={handleFileChange} />
-                      <Flex
-                        w="160px"
-                        h="160px"
-                        direction="column"
-                        justify="center"
-                        align="center"
-                        color="blue.400"
-                        cursor="pointer"
-                        bgColor="gray.200"
-                        borderRadius="8px"
-                        mb="24px"
-                      >
-                        <Text fontSize="36px" fontWeight="200">
-                          +
-                        </Text>
-                        <Text fontSize="14px" fontWeight="500">
-                          Upload Video
-                        </Text>
+                    {video ? (
+                      <Flex w="100%" h="100%" position="relative" mb="24px">
+                        <iframe w="100%" src={video} fit="contain" />
+                        <Flex
+                          w="32px"
+                          h="32px"
+                          borderRadius="full"
+                          position="absolute"
+                          top="-10%"
+                          right="63%"
+                          bg="purple"
+                          justify="center"
+                          align="center"
+                          sx={{
+                            "&:hover": {
+                              opacity: 0.5,
+                            },
+                          }}
+                          cursor="pointer"
+                          onClick={() => {
+                            setVideo();
+                            action = "delete";
+                          }}
+                        >
+                          <Image
+                            src="/assets/misc/close-button.svg"
+                            alt="close button"
+                            w="11px"
+                            h="11px"
+                          />
+                        </Flex>
                       </Flex>
-                    </label>
+                    ) : (
+                      <label>
+                        <Input
+                          type="file"
+                          hidden
+                          onChange={handleVideoChange}
+                        />
+                        <Flex
+                          w="160px"
+                          h="160px"
+                          direction="column"
+                          justify="center"
+                          align="center"
+                          color="blue.400"
+                          cursor="pointer"
+                          bgColor="gray.200"
+                          borderRadius="8px"
+                          mb="24px"
+                        >
+                          <Text fontSize="36px" fontWeight="200">
+                            +
+                          </Text>
+                          <Text fontSize="14px" fontWeight="500">
+                            Upload Video
+                          </Text>
+                        </Flex>
+                      </label>
+                    )}
                   </FormControl>
                 </Flex>
                 <Button
