@@ -54,6 +54,7 @@ export function Sidebar() {
               Courses
             </Tab>
             <Tab
+              onClick={() => navigate("/admin/assignment")}
               justifyContent="start"
               _selected={{
                 color: "gray.800",
@@ -66,9 +67,7 @@ export function Sidebar() {
                 borderRadius: "0px",
               }}
               w="240px"
-              h="56px"
-              onClick={() => navigate("/admin/assignment")}
-            >
+              h="56px">
               <Image src="/assets/admin-page/assign.svg" pr="19.75" />
               Assignments
             </Tab>

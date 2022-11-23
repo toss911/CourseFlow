@@ -3,21 +3,24 @@ import {
   Box,
   Flex,
   Table,
+  Text,
+  Image,
+  Button,
+  Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
   TableContainer,
-  Text,
-  Image,
-  Button,
 } from "@chakra-ui/react";
-import AdminNavbar from "../../components/AdminNavbar";
-import axios from "axios";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
-function AdminAssignmentList() {
+function AdminAssignmentList(props) {
   const adminId = 3; // Get the ID from the context
   const [adminCourses, setAdminCourses] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -52,18 +55,38 @@ function AdminAssignmentList() {
 
     return () => clearTimeout(getCourses);
   }, [searchText]);
-
   return (
-    <Box h="100vh">
-      <Flex>
-        <Sidebar />
-        <Flex flexDirection="column">
-          <AdminNavbar
-            heading="Assignment"
-            action="+ Add Assignment"
-            handleSearchText={handleTextChange}
-          />
-          <Box backgroundColor="gray.100" h="100vh">
+    <Flex>
+     <Sidebar/>
+     <Flex flexDirection='column'>
+    <Flex w='100vw' h='92px' 
+    border='1px' 
+    borderColor="gray.400" 
+    alignItems='center' 
+    justifyContent='space-between'> 
+    <Heading variant="headline3"  ml="40px" w='60%'>
+    Assignment
+    </Heading>
+    <Flex >
+    <InputGroup>
+            <InputLeftElement
+              pointerEvents="none"
+              children={
+                <Image src="../../assets/admin-page/search.svg" alt="search" />
+              }
+            />
+            <Input
+              pl="40px"
+              w='320px'
+              type="text"
+              placeholder="Search..."
+              onChange={props.handleSearchText}
+            />
+          </InputGroup>
+          </Flex>
+          <Button w='209px' h='60px' mr='40px'>+ Add Assignment</Button>
+    </Flex>
+    <Box backgroundColor="gray.100" h="100vh">
             <TableContainer borderRadius="8px" mt="48px" ml="48px" w="1120px" h="650px" overflowY="scroll">
               <Table variant="simple" backgroundColor="white" size="md">
                 <Thead backgroundColor="gray.300" h="41px">
@@ -138,9 +161,8 @@ function AdminAssignmentList() {
               </Table>
             </TableContainer>
           </Box>
-        </Flex>
-      </Flex>
-    </Box>
+          </Flex>
+    </Flex>
   );
 }
 
