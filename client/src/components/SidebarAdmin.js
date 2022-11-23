@@ -15,7 +15,7 @@ import { useAuth } from "../contexts/authentication";
 
 export function Sidebar() {
   const navigate = useNavigate();
-  const {logoutAdmin } = useAuth();
+  const { logoutAdmin } = useAuth();
   return (
     <Box>
       <Flex
@@ -29,7 +29,7 @@ export function Sidebar() {
       >
         <Flex flexDirection="column" alignItems="center" mt="40px">
           <Image src="/assets/admin-page/CourseFlow.svg" w="174px" h="19px" />
-          <Text variant="body2" mt="24px" mb="64px">
+          <Text variant="body2" mt="24px" mb="64px" color="gray.700">
             Admin Panel Control
           </Text>
         </Flex>
@@ -73,9 +73,14 @@ export function Sidebar() {
             </Tab>
           </TabList>
         </Tabs>
-        <Box as="b" ml="-45%" mt="60vh" onClick={() => {
-                    logoutAdmin();
-                  }}>
+        <Box
+          as="b"
+          ml="-45%"
+          mt="60vh"
+          onClick={() => {
+            logoutAdmin();
+          }}
+        >
           <Button variant="gray" w="100%">
             <Image src="/assets/admin-page/Vector.svg" pr="19px" />
             Log out
