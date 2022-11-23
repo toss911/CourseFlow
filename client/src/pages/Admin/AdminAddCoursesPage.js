@@ -1,12 +1,16 @@
 import {
   Box,
   Flex,
-  Stack,
   Input,
   Text,
   useToast,
   Image,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Textarea,
 } from "@chakra-ui/react";
+import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import LessonTable from "../../components/LessonsTable";
@@ -83,6 +87,7 @@ const AdminAddCoursesPage = () => {
       }
     }
   };
+
   return (
     <>
       <Flex>
@@ -103,199 +108,336 @@ const AdminAddCoursesPage = () => {
               bg="white"
               borderRadius="16px"
             >
-              <Flex>
-                <Stack
-                  spacing="28px"
-                  flexDirection="row"
-                  justifyContent="center"
-                  flexWrap="wrap"
-                >
-                  <Box>
-                    <Text variant="body2">Course name *</Text>
-                    <Input placeholder="" size="lg" w="920px" />
-                  </Box>
-
-                  <Flex justifyContent="space-between" w="920px">
-                    <Box>
-                      <Text variant="body2">Price *</Text>
-                      <Input placeholder="" size="lg" w="420px" />
-                    </Box>
-                    <Box>
-                      <Text variant="body2">Total learning time *</Text>
-                      <Input placeholder="" size="lg" w="420px" />
-                    </Box>
-                  </Flex>
-                  <Box>
-                    <Text variant="body2">Course summary</Text>
-                    <Input placeholder="" h="72px" w="920px" />
-                  </Box>
-                  <Box>
-                    <Text variant="body2">Course detail</Text>
-                    <Input placeholder="" h="192px" w="920px" />
-                  </Box>
-                  <Flex display="column" flexWrap="wrap" w="920px">
-                    <Text variant="body2" mt="40px" w="fit-content">
-                      Cover Image *
-                    </Text>
-                    <Flex
-                      w="240px"
-                      h="240px"
-                      direction="column"
-                      justify="center"
-                      align="center"
-                      color="blue.400"
-                      cursor="pointer"
-                      bg="gray.100"
-                      mb="40px"
-                      mt="8px"
-                    >
-                      {coverImage ? (
-                        <Flex w="100%" h="100%" position="relative">
-                          <Image w="100%" src={coverImage} fit="contain" />
-                          <Flex
-                            w="32px"
-                            h="32px"
-                            borderRadius="full"
-                            position="absolute"
-                            top="-18px"
-                            right="-18px"
-                            bg="purple"
-                            justify="center"
-                            align="center"
-                            sx={{
-                              "&:hover": {
-                                opacity: 0.5,
-                              },
-                            }}
-                            cursor="pointer"
-                            onClick={() => {
-                              setCoverImage();
-                              action = "delete";
-                            }}
-                          >
-                            <Image
-                              src="/assets/misc/close-button.svg"
-                              alt="close button"
-                              w="11px"
-                              h="11px"
-                            />
-                          </Flex>
+              <Formik
+                initialValues={{
+                  course_name: "",
+                  price: null,
+                  total_learning_time: 0,
+                  course_summary: "",
+                  course_detail: "",
+                }}
+                enableReinitialize
+                // onSubmit={handleSubmit}
+              >
+                {(props) => (
+                  <Form>
+                    <Flex>
+                      <Flex
+                        className="Input-fields"
+                        w="920px"
+                        bg="white"
+                        flexDirection="column"
+                      >
+                        {/* Course name field */}
+                        <Field name="course_name">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.course_name &&
+                                form.touched.course_name
+                              }
+                              isRequired
+                            >
+                              <FormLabel variant="body2" color="black">
+                                Course name
+                              </FormLabel>
+                              <Input
+                                type="text"
+                                w="920px"
+                                h="48px"
+                                {...field}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.full_name}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Flex>
+                          {/* Price field */}
+                          <Field name="price">
+                            {({ field, form }) => (
+                              <FormControl
+                                isInvalid={
+                                  form.errors.price && form.touched.price
+                                }
+                                isRequired
+                              >
+                                <FormLabel
+                                  variant="body2"
+                                  color="black"
+                                  mt="40px"
+                                >
+                                  Price
+                                </FormLabel>
+                                <Input
+                                  type="number"
+                                  w="420px"
+                                  h="48px"
+                                  {...field}
+                                />
+                                <FormErrorMessage>
+                                  {form.errors.price}
+                                </FormErrorMessage>
+                              </FormControl>
+                            )}
+                          </Field>
+                          {/* Total Learning Time field */}
+                          <Field name="learning_time">
+                            {({ field, form }) => (
+                              <FormControl
+                                isInvalid={
+                                  form.errors.learning_time &&
+                                  form.touched.learning_time
+                                }
+                                isRequired
+                              >
+                                <FormLabel
+                                  variant="body2"
+                                  color="black"
+                                  mt="40px"
+                                >
+                                  Learning time
+                                </FormLabel>
+                                <Input
+                                  type="number"
+                                  w="420px"
+                                  h="48px"
+                                  {...field}
+                                />
+                                <FormErrorMessage>
+                                  {form.errors.learning_time}
+                                </FormErrorMessage>
+                              </FormControl>
+                            )}
+                          </Field>
                         </Flex>
-                      ) : (
-                        <label>
-                          <Input
-                            type="file"
-                            hidden
-                            onChange={handleCoverImageChange}
-                          />
+                        <Field name="course_summary">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.course_summary &&
+                                form.touched.course_summary
+                              }
+                              isRequired
+                            >
+                              <FormLabel
+                                variant="body2"
+                                color="black"
+                                mt="40px"
+                              >
+                                Course summary
+                              </FormLabel>
+                              <Textarea
+                                type="text"
+                                w="920px"
+                                h="72px"
+                                {...field}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.course_summary}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="course_detail">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.course_detail &&
+                                form.touched.course_detail
+                              }
+                              isRequired
+                            >
+                              <FormLabel
+                                variant="body2"
+                                color="black"
+                                mt="40px"
+                              >
+                                Course detail
+                              </FormLabel>
+                              <Textarea
+                                type="text"
+                                w="920px"
+                                h="192px"
+                                {...field}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.course_detail}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        {/* File Uploads */}
+                        <Flex display="column" flexWrap="wrap" w="920px">
+                          {/* Cover Image Upload */}
+                          <Text variant="body2" mt="40px" w="fit-content">
+                            Cover Image *
+                          </Text>
                           <Flex
-                            w="358px"
-                            h="358px"
+                            w="240px"
+                            h="240px"
                             direction="column"
                             justify="center"
                             align="center"
                             color="blue.400"
                             cursor="pointer"
+                            bg="gray.100"
+                            mb="40px"
+                            mt="8px"
                           >
-                            <Text fontSize="36px">+</Text>
-                            <Text variant="body2">Upload Image</Text>
+                            {coverImage ? (
+                              <Flex w="100%" h="100%" position="relative">
+                                <Image
+                                  w="100%"
+                                  src={coverImage}
+                                  fit="contain"
+                                />
+                                <Flex
+                                  w="32px"
+                                  h="32px"
+                                  borderRadius="full"
+                                  position="absolute"
+                                  top="-18px"
+                                  right="-18px"
+                                  bg="purple"
+                                  justify="center"
+                                  align="center"
+                                  sx={{
+                                    "&:hover": {
+                                      opacity: 0.5,
+                                    },
+                                  }}
+                                  cursor="pointer"
+                                  onClick={() => {
+                                    setCoverImage();
+                                    action = "delete";
+                                  }}
+                                >
+                                  <Image
+                                    src="/assets/misc/close-button.svg"
+                                    alt="close button"
+                                    w="11px"
+                                    h="11px"
+                                  />
+                                </Flex>
+                              </Flex>
+                            ) : (
+                              <label>
+                                <Input
+                                  type="file"
+                                  hidden
+                                  onChange={handleCoverImageChange}
+                                />
+                                <Flex
+                                  w="358px"
+                                  h="358px"
+                                  direction="column"
+                                  justify="center"
+                                  align="center"
+                                  color="blue.400"
+                                  cursor="pointer"
+                                >
+                                  <Text fontSize="36px">+</Text>
+                                  <Text variant="body2">Upload Image</Text>
+                                </Flex>
+                              </label>
+                            )}
                           </Flex>
-                        </label>
-                      )}
-                    </Flex>
-
-                    <Text variant="body2">Video Trailer *</Text>
-                    <Flex
-                      w="240px"
-                      h="240px"
-                      direction="column"
-                      justify="center"
-                      align="center"
-                      color="blue.400"
-                      cursor="pointer"
-                      bg="gray.100"
-                      mb="40px"
-                      mt="8px"
-                    >
-                      {video ? (
-                        <Flex w="100%" h="100%" position="relative">
-                          <iframe w="100%" src={video} fit="contain" />
+                          {/* Video Upload */}
+                          <Text variant="body2">Video Trailer *</Text>
                           <Flex
-                            w="32px"
-                            h="32px"
-                            borderRadius="full"
-                            position="absolute"
-                            top="-18px"
-                            right="-18px"
-                            bg="purple"
-                            justify="center"
-                            align="center"
-                            sx={{
-                              "&:hover": {
-                                opacity: 0.5,
-                              },
-                            }}
-                            cursor="pointer"
-                            onClick={() => {
-                              setVideo();
-                              action = "delete";
-                            }}
-                          >
-                            <Image
-                              src="/assets/misc/close-button.svg"
-                              alt="close button"
-                              w="11px"
-                              h="11px"
-                            />
-                          </Flex>
-                        </Flex>
-                      ) : (
-                        <label>
-                          <Input
-                            type="file"
-                            hidden
-                            onChange={handleVideoChange}
-                          />
-                          <Flex
-                            w="358px"
-                            h="358px"
+                            w="240px"
+                            h="240px"
                             direction="column"
                             justify="center"
                             align="center"
                             color="blue.400"
                             cursor="pointer"
+                            bg="gray.100"
+                            mb="40px"
+                            mt="8px"
                           >
-                            <Text fontSize="36px">+</Text>
-                            <Text variant="body2">Upload Video</Text>
+                            {video ? (
+                              <Flex w="100%" h="100%" position="relative">
+                                <iframe w="100%" src={video} fit="contain" />
+                                <Flex
+                                  w="32px"
+                                  h="32px"
+                                  borderRadius="full"
+                                  position="absolute"
+                                  top="-18px"
+                                  right="-18px"
+                                  bg="purple"
+                                  justify="center"
+                                  align="center"
+                                  sx={{
+                                    "&:hover": {
+                                      opacity: 0.5,
+                                    },
+                                  }}
+                                  cursor="pointer"
+                                  onClick={() => {
+                                    setVideo();
+                                    action = "delete";
+                                  }}
+                                >
+                                  <Image
+                                    src="/assets/misc/close-button.svg"
+                                    alt="close button"
+                                    w="11px"
+                                    h="11px"
+                                  />
+                                </Flex>
+                              </Flex>
+                            ) : (
+                              <label>
+                                <Input
+                                  type="file"
+                                  hidden
+                                  onChange={handleVideoChange}
+                                />
+                                <Flex
+                                  w="358px"
+                                  h="358px"
+                                  direction="column"
+                                  justify="center"
+                                  align="center"
+                                  color="blue.400"
+                                  cursor="pointer"
+                                >
+                                  <Text fontSize="36px">+</Text>
+                                  <Text variant="body2">Upload Video</Text>
+                                </Flex>
+                              </label>
+                            )}
                           </Flex>
-                        </label>
-                      )}
-                    </Flex>
-
-                    <Text variant="body2">
-                      Attach File (Optional)
-                      <label w="250px">
-                        <Input type="file" hidden />
-                        <Flex
-                          w="160px"
-                          h="160px"
-                          direction="column"
-                          justify="center"
-                          align="center"
-                          color="blue.400"
-                          cursor="pointer"
-                          bg="gray.100"
-                          mb="40px"
-                          mt="8px"
-                        >
-                          <Text fontSize="36px">+</Text>
-                          <Text variant="body2">Upload Image</Text>
+                          {/* Attach File Upload */}
+                          <Text variant="body2">Attach File (Optional)</Text>
+                          <label w="250px">
+                            <Input type="file" hidden />
+                            <Flex
+                              w="160px"
+                              h="160px"
+                              direction="column"
+                              justify="center"
+                              align="center"
+                              color="blue.400"
+                              cursor="pointer"
+                              bg="gray.100"
+                              mb="40px"
+                              mt="8px"
+                            >
+                              <Text fontSize="36px">+</Text>
+                              <Text variant="body2">Upload File</Text>
+                            </Flex>
+                          </label>
                         </Flex>
-                      </label>
-                    </Text>
-                  </Flex>
-                </Stack>
-              </Flex>
+                      </Flex>
+                    </Flex>
+                  </Form>
+                )}
+              </Formik>
             </Box>
             <LessonTable />
           </Box>
