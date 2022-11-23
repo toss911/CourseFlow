@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Box,
@@ -15,10 +15,15 @@ import {
 } from "@chakra-ui/react";
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik } from "formik";
+import { useAdmin } from "../../contexts/admin.js";
 let action;
 
 function AdminAddLesson() {
+  // todo: ทำ context API เก็บ video sub-lesson , lesson-name , sub-lesson-name , seq. , duration ส่งไปให้ หน้า add-courses
+  const { addLesson, setAddLesson } = useAdmin();
+  // todo: add effect when press add sub-lesson button
   const [video, setVideo] = useState();
+
   const toast = useToast();
 
   const handleVideoChange = (event) => {
@@ -36,6 +41,7 @@ function AdminAddLesson() {
       }
     }
   };
+  const handleSubmit = () => {};
   return (
     <>
       {/* ------------- Wrap all ------------------ */}
@@ -84,7 +90,13 @@ function AdminAddLesson() {
               <Button w="119px" h="60px" variant="secondary" shadow="shadow1">
                 Cancel
               </Button>
-              <Button w="117px" h="60px" shadow="shadow1" mr="40px">
+              <Button
+                type="submit"
+                w="117px"
+                h="60px"
+                shadow="shadow1"
+                mr="40px"
+              >
                 Create
               </Button>
             </Flex>
@@ -102,7 +114,7 @@ function AdminAddLesson() {
             bgColor="white"
           >
             <Formik>
-              <Form>
+              <Form onSubmit={handleSubmit}>
                 <FormControl>
                   <FormLabel mt="40px" fontSize="16px" fontWeight="400">
                     Lesson name *
@@ -123,6 +135,7 @@ function AdminAddLesson() {
                 >
                   Sub-Lesson
                 </Text>
+                {/* ! --------------- Add Form START----------------  */}
                 <Flex
                   flexDirection="column"
                   alignItems="center"
@@ -159,6 +172,12 @@ function AdminAddLesson() {
                       fontSize="16px"
                     />
                     <Input type="text" w="530px" h="48px" />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel fontSize="16px" fontWeight="400" mt="24px">
+                      Duration of assignment (day)
+                    </FormLabel>
+                    <Input type="number" w="265px" h="48px" />
                   </FormControl>
 
                   <FormControl>
@@ -227,6 +246,7 @@ function AdminAddLesson() {
                     )}
                   </FormControl>
                 </Flex>
+                {/* ! --------------- Add Form END----------------  */}
                 <Button
                   mt="24px"
                   mb="60px"
@@ -234,6 +254,7 @@ function AdminAddLesson() {
                   h="60px"
                   variant="secondary"
                   shadow="shadow1"
+                  onClick={() => {}}
                 >
                   + Add Sub-lesson
                 </Button>

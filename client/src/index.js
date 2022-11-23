@@ -5,9 +5,10 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ChakraProvider } from "@chakra-ui/react";
 import { AuthProvider } from "./contexts/authentication.js";
+import { AdminProvider } from "./contexts/admin.js";
 import theme from "./configs/theme.js";
 import jwtInterceptor from "./utils/jwtInterceptors.js";
-import { BrowserRouter, Routes, Route, } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppAdmin from "./AppAdmin.js";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -16,12 +17,14 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <ChakraProvider theme={theme}>
-        <AuthProvider>
-        <Routes>
-          <Route path="/*" element={<App />}/>
-          <Route path="/admin/*" element={<AppAdmin/>}/>
-        </Routes>
-        </AuthProvider>
+        <AdminProvider>
+          <AuthProvider>
+            <Routes>
+              <Route path="/*" element={<App />} />
+              <Route path="/admin/*" element={<AppAdmin />} />
+            </Routes>
+          </AuthProvider>
+        </AdminProvider>
       </ChakraProvider>
     </BrowserRouter>
   </React.StrictMode>
