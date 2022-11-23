@@ -4,8 +4,10 @@ import { cloudinaryUpload } from "../utils/upload.js";
 export const videoSubLessonUpload = async (req, res) => {};
 
 export const addCourse = async (req, res) => {
-  const adminId = req.params.adminId;
+  const adminId = req.query.adminId;
   const createdDate = new Date();
+
+  console.log(req.files);
 
   const newCourse = {
     courseName: req.body.course_name,
@@ -27,22 +29,22 @@ export const addCourse = async (req, res) => {
   };
 
   newCourse.courseCoverImage = await cloudinaryUpload(
-    ...req.files.course_cover_image,
+    ...req.files.course_cover_images,
     "upload",
     "course_cover_images"
   );
   newCourse.courseVideoTrailer = await cloudinaryUpload(
-    ...req.files.course_video_trailer,
+    ...req.files.course_video_trailers,
     "upload",
     "course_video_trailers"
   );
   newCourse.courseAttachFiles = await cloudinaryUpload(
-    ...req.files.course_attach_files,
+    ...req.files.course_attached_files,
     "upload",
     "course_attached_files"
   );
   newSubLesson.subLessonVideo = await cloudinaryUpload(
-    ...req.files.subLessonVideo,
+    ...req.files.sub_lesson_videos,
     "upload",
     "sub_lesson_videos"
   );
@@ -81,4 +83,8 @@ export const addCourse = async (req, res) => {
       newSubLesson.sequence
     ]
   );
+
+  return res.json({
+    message: "Course created successfully"
+  })
 };
