@@ -125,7 +125,9 @@ const AdminAddCoursesPage = () => {
     let error;
     if (!value) {
       error = "Please specify learning time";
-    } 
+    } else if (!/^(?:[1-9]\d*|\d)$/i.test(value)) {
+      error = `Learning time cannot be less than 0`;
+    }
     return error;
   };
 
