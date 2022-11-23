@@ -4,6 +4,7 @@ import AdminAddAssignment from "./AdminAddAssignment";
 import AdminEditAssignment from "./AdminEditAssignment";
 import AdminAddLesson from "./AdminAddLessonPage";
 import AdminAddCoursesPage from "./AdminAddCoursesPage";
+import AdminError from "./AdminErrorPage";
 
 function AuthenticatedAdmin() {
   return (
@@ -18,6 +19,7 @@ function AuthenticatedAdmin() {
         path="/assignment/edit/:assignmentId"
         element={<AdminEditAssignment />}
       />
+      <Route path="*" element={<AdminError />} />
     </Routes>
   );
 }
