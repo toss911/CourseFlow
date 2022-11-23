@@ -71,15 +71,16 @@ export const updateProfile = async (req, res) => {
       } else {
         if (/change/i.test(action)) {
           if (prevAvatar !== null) {
-            await cloudinaryUpload(prevAvatar, "delete");
+            await cloudinaryUpload(prevAvatar, "delete", "avatar");
           }
           updatedUser.avatar = await cloudinaryUpload(
             ...req.files.avatar,
-            "upload"
+            "upload",
+            "avatar"
           );
         } else if (/delete/.test(action)) {
           if (prevAvatar !== null) {
-            await cloudinaryUpload(prevAvatar, "delete");
+            await cloudinaryUpload(prevAvatar, "delete", "avatar");
           }
           updatedUser.avatar = null;
         }
@@ -135,15 +136,16 @@ export const updateProfile = async (req, res) => {
         } else {
           if (/change/i.test(action)) {
             if (prevAvatar !== null) {
-              await cloudinaryUpload(prevAvatar, "delete");
+              await cloudinaryUpload(prevAvatar, "delete", "avatar");
             }
             updatedUser.avatar = await cloudinaryUpload(
               ...req.files.avatar,
-              "upload"
+              "upload",
+              "avatar"
             );
           } else if (/delete/.test(action)) {
             if (prevAvatar !== null) {
-              await cloudinaryUpload(prevAvatar, "delete");
+              await cloudinaryUpload(prevAvatar, "delete", "avatar");
             }
             updatedUser.avatar = null;
           }
