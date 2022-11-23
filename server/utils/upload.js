@@ -1,11 +1,11 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs/promises";
 
-const cloudinaryUpload = async (file, action) => {
+const cloudinaryUpload = async (file, action, nameFolder) => {
   try {
     if (/upload/i.test(action)) {
       const result = await cloudinary.uploader.upload(file.path, {
-        folder: "courseflow/avatar",
+        folder: `courseflow/${nameFolder}`,
         type: "private",
       });
       await fs.unlink(file.path);
