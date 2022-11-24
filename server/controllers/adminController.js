@@ -7,7 +7,21 @@ export const addCourse = async (req, res) => {
   const adminId = req.query.adminId;
   const createdDate = new Date();
 
-  console.log(req.files);
+  let fileName = [];
+  let fileType = [];
+  let fileSize = [];
+
+  console.log(req.files.course_attached_files);
+
+  for (let file of req.files.course_attached_files) {
+    fileName.push(file.originalname);
+    fileType.push(file.mimetype);
+    fileSize.push(file.size);
+  }
+
+  console.log(fileName);
+  console.log(fileType);
+  console.log(fileSize);
 
   const newCourse = {
     courseName: req.body.course_name,
@@ -16,6 +30,7 @@ export const addCourse = async (req, res) => {
     courseSummary: req.body.course_summary,
     detail: req.body.course_detail,
     category: req.body.category,
+    courseAttachFiles: [],
   };
 
   const newLesson = {
@@ -38,16 +53,21 @@ export const addCourse = async (req, res) => {
     "upload",
     "course_video_trailers"
   );
-  newCourse.courseAttachFiles = await cloudinaryUpload(
-    ...req.files.course_attached_files,
-    "upload",
-    "course_attached_files"
-  );
+  for (let file of req.files.course_attached_files) {
+    newCourse.courseAttachFiles.push(
+      JSON.stringify(
+        await cloudinaryUpload(file, "upload", "course_attached_files")
+      )
+    );
+  }
+
   newSubLesson.subLessonVideo = await cloudinaryUpload(
     ...req.files.sub_lesson_videos,
     "upload",
     "sub_lesson_videos"
   );
+
+  console.log(newCourse.courseAttachFiles);
 
   await pool.query(
     `
@@ -61,10 +81,18 @@ export const addCourse = async (req, res) => {
        VALUES
        ( (select course_id from first_insert), $11, $12)
        RETURNING lesson_id
-     )
-     INSERT INTO sub_lessons ( lesson_id , sub_lesson_name, video_directory, sequence) 
+     ),
+     third_insert as (
+        INSERT INTO sub_lessons ( lesson_id , sub_lesson_name, video_directory, sequence) 
      VALUES 
-     ( (select lesson_id from second_insert), $13, $14, $15);`,
+     ( (select lesson_id from second_insert), $13, $14, $15)
+        
+     )
+     insert into files (course_id, file_name, type, size, directory)
+     VALUES ( (select course_id from first_insert), unnest($16::text[]), unnest($17::text[]), unnest($18::int[]), unnest($19::text[]));
+     
+
+     `,
     [
       adminId,
       newCourse.courseName,
@@ -80,11 +108,15 @@ export const addCourse = async (req, res) => {
       newLesson.sequence,
       newSubLesson.subLessonName,
       newSubLesson.subLessonVideo,
-      newSubLesson.sequence
+      newSubLesson.sequence,
+      fileName,
+      fileType,
+      fileSize,
+      newCourse.courseAttachFiles,
     ]
   );
 
   return res.json({
-    message: "Course created successfully"
-  })
+    message: "Course created successfully",
+  });
 };

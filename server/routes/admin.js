@@ -5,9 +5,6 @@ import { protect } from "../middlewares/protect.js";
 
 const adminRouter = Router();
 const multerUpload = multer({ dest: "uploads/" });
-// const videoSubLessonUpload = multerUpload.fields([
-//   { name: "video", maxCount: 1 },
-// ]);
 
 const courseUpload = multerUpload.fields([
   { name: "course_cover_images", maxCount: 1},
