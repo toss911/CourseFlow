@@ -20,6 +20,7 @@ import AdminNavbarAdd from "../../components/AdminNavbarAdd";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
+import e from "cors";
 
 // Steps:
 // 1. Check if the user (admin) added at least one lesson and one sub-lesson:
@@ -106,9 +107,28 @@ const AdminAddCoursesPage = () => {
 
   const handleFilesChange = (event) => {
     const newFiles = event.target.files;
-    // console.log(event.target.files);
-    setFiles([...newFiles]);
+    console.log(event.target.files);
+    if (files) {
+      setFiles([...files, ...newFiles]);
+      
+    } else {
+      setFiles([...newFiles]);
+    }
+    
   };
+  console.log(files);
+
+  const handleDeleteFiles = (uniqueIdentifier) => {
+
+    let filesLeftAfterDelete = files.filter((file) => {
+      return file.lastModified != uniqueIdentifier
+    })
+
+    setFiles([...filesLeftAfterDelete]);
+    
+  }
+
+  console.log(files);
 
   // *- input validation -* //
   const validateCourseName = (value) => {
@@ -532,10 +552,11 @@ const AdminAddCoursesPage = () => {
                           </Flex>
                           {/* Attach Files Upload */}
                           <Text variant="body2">Attach File (Optional)</Text>
-                          {files ? (
+                          <Flex></Flex>
+                          {files.length > 0 ? (
                             files.map((file, key) => {
                               return (
-                                <Flex flexDirection="column">
+                                <>
                                   <Flex
                                     key={key}
                                     position="relative"
@@ -606,7 +627,8 @@ const AdminAddCoursesPage = () => {
                                       }}
                                       cursor="pointer"
                                       onClick={() => {
-                                        setFiles();
+                                        // setFiles();
+                                        handleDeleteFiles(file.lastModified);
                                         action = "delete";
                                       }}
                                     >
@@ -618,32 +640,36 @@ const AdminAddCoursesPage = () => {
                                       />
                                     </Flex>
                                   </Flex>
+                                  {/* Add more files */}
                                   <label w="250px">
-                                  <Input
+                                    <Input
                                       type="file"
                                       hidden
                                       onChange={handleFilesChange}
                                       multiple
                                     />
-                                  <Box
-                                    border="1px"
-                                    textAlign="center"
-                                    w="110px"
-                                    mt="10px"
-                                    borderRadius="12px"
-                                    borderColor="blue.300"
-                                    sx={{
-                                      "&:hover": {
-                                        bgColor: "blue.200",
-                                        border: "solid 1px white",
-                                      },
-                                    }}
-                                    cursor="pointer"
-                                  >
-                                    <Text variant="body3">Add more files</Text>
-                                  </Box>
+                                    <Box
+                                      border="1px"
+                                      textAlign="center"
+                                      w="110px"
+                                      mt="10px"
+                                      borderRadius="12px"
+                                      borderColor="blue.300"
+                                      sx={{
+                                        "&:hover": {
+                                          bgColor: "blue.200",
+                                          border: "solid 1px white",
+                                        },
+                                      }}
+                                      cursor="pointer"
+                                    >
+                                      <Text variant="body3">
+                                        Add more files
+                                      </Text>
+                                    </Box>
                                   </label>
-                                </Flex>
+                                  {/* End of Add more files */}
+                                </>
                               );
                             })
                           ) : (
