@@ -55,6 +55,8 @@ export const getAllCoursesDataByAdmin = async (req, res) => {
       [adminId]
     );
     fetchAllCoursesData = fetchAllCoursesData.rows;
+
+    /* Transform data structure from array of objects to purely object */
     const allCoursesData = {};
     fetchAllCoursesData.map((item) => {
       if (item.course_id in allCoursesData) {
@@ -96,6 +98,59 @@ export const getAllCoursesDataByAdmin = async (req, res) => {
       }
     });
     return res.json({ data: allCoursesData });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+export const postNewAssignment = async (req, res) => {
+  try {
+    const admin_id = req.query.byAdmin;
+    const sub_lesson_id = req.body.sub_lesson_id;
+    const detail = req.body.detail;
+    const duration = req.body.duration;
+
+    /* Validate whether this admin owned the course or not */
+    let doesAdminOwnThisCourse = await pool.query(
+      `
+      SELECT EXISTS 
+      (SELECT *
+        FROM courses
+      INNER JOIN lessons
+      ON courses.course_id = lessons.course_id
+      INNER JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      WHERE courses.admin_id = $1 AND sub_lessons.sub_lesson_id = $2)
+      `,
+      [admin_id, sub_lesson_id]
+    );
+    doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+    if (!doesAdminOwnThisCourse) {
+      return res
+        .status(403)
+        .json({ message: "You have no permission to edit this course" });
+    }
+
+    /* Update duration of assignments in "sub_lessons" table */
+    await pool.query(
+      `
+      UPDATE sub_lessons
+      SET duration = $1
+      WHERE sub_lesson_id = $2
+      `,
+      [duration, sub_lesson_id]
+    );
+
+    /* Insert new assignment into "assignments" table */
+    await pool.query(
+      `
+      INSERT INTO assignments(sub_lesson_id, detail, created_date, updated_date)
+      VALUES ($1, $2, $3, $4)
+      `,
+      [sub_lesson_id, detail, new Date(), new Date()]
+    );
+
+    return res.json({ message: "Assignment has been successfully added" });
   } catch (error) {
     return res.sendStatus(500);
   }

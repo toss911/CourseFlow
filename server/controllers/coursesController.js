@@ -629,7 +629,6 @@ export const getSubLesson = async (req, res) => {
 
 // Admin
 export const getAdminCourses = async (req, res) => {
-
   let searchText = req.query.searchText || "";
   searchText = "\\m" + searchText;
   const adminId = req.query.adminId;
@@ -640,20 +639,24 @@ export const getAdminCourses = async (req, res) => {
     let year = isoDate.getFullYear();
     let month = isoDate.getMonth();
     let date = isoDate.getDate();
-    let time = isoDate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true});
+    let time = isoDate.toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
 
     if (date < 10) {
-      date = '0' + date;
+      date = "0" + date;
     }
 
     if (month < 10) {
-      month = '0' + month;
+      month = "0" + month;
     }
 
-    let normalDate = date + '-' + month + '-' + year + ' ' + time
+    let normalDate = date + "-" + month + "-" + year + " " + time;
 
     return normalDate;
-  }
+  };
 
   const results = await pool.query(
     `
