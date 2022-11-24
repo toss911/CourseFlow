@@ -105,6 +105,7 @@ function LearningPage() {
       sub_lesson_id: result.data.data.sub_lesson_id,
       sub_lesson_name: result.data.data.sub_lesson_name,
       video_directory: result.data.data.video_directory,
+      duration: result.data.data.duration,
     });
     if (result.data.data.assignments !== null) {
       const allAnswer = {};
@@ -396,8 +397,8 @@ function LearningPage() {
                       Accept Assignment
                     </Button>
                     <Text color="gray.700" alignSelf="end">
-                      After accepted the assignment, you need to complete within
-                      10 days
+                      After accepted the assignment, you need to complete within{" "}
+                      {subLessonData.duration} days
                     </Text>
                   </Flex>
                 </Flex>
@@ -533,12 +534,7 @@ function LearningPage() {
                             </Button>
                             <Spacer />
                             <Text pt="20px" color="gray.700">
-                              Submit within{" "}
-                              {
-                                userAssignment.assignments[assignmentId]
-                                  .duration
-                              }{" "}
-                              days
+                              Submit within {subLessonData.duration} days
                             </Text>
                           </Flex>
                         ) : null}
