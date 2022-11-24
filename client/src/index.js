@@ -17,14 +17,14 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <ChakraProvider theme={theme}>
-        <AdminProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <AdminProvider>
             <Routes>
               <Route path="/*" element={<App />} />
               <Route path="/admin/*" element={<AppAdmin />} />
             </Routes>
-          </AuthProvider>
-        </AdminProvider>
+          </AdminProvider>
+        </AuthProvider>
       </ChakraProvider>
     </BrowserRouter>
   </React.StrictMode>

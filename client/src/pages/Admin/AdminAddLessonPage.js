@@ -19,9 +19,13 @@ import { useAdmin } from "../../contexts/admin.js";
 let action;
 
 function AdminAddLesson() {
-  // todo: ทำ context API เก็บ video sub-lesson , lesson-name , sub-lesson-name , seq. , duration ส่งไปให้ หน้า add-courses
+  // todo1 ทำ context API เก็บ video sub-lesson
+  // todo2 lesson-name , sub-lesson-name , seq.
+  // todo3 duration ส่งไปให้ หน้า add-courses
+  // todo4 add effect when press add sub-lesson button
+  // todo5 add delete button
+  // todo6 drag and drop
   const { addLesson, setAddLesson } = useAdmin();
-  // todo: add effect when press add sub-lesson button
   const [video, setVideo] = useState();
 
   const toast = useToast();
@@ -174,76 +178,71 @@ function AdminAddLesson() {
                     <Input type="text" w="530px" h="48px" />
                   </FormControl>
                   <FormControl>
-                    <FormLabel fontSize="16px" fontWeight="400" mt="24px">
-                      Duration of assignment (day)
-                    </FormLabel>
-                    <Input type="number" w="265px" h="48px" />
-                  </FormControl>
-
-                  <FormControl>
-                    <FormLabel fontSize="16px" fontWeight="400" mt="24px">
+                    <Text fontSize="16px" fontWeight="400" mt="24px" mb="8px">
                       Video *
-                    </FormLabel>
-                    {video ? (
-                      <Flex w="100%" h="100%" position="relative" mb="24px">
-                        <iframe w="100%" src={video} fit="contain" />
-                        <Flex
-                          w="32px"
-                          h="32px"
-                          borderRadius="full"
-                          position="absolute"
-                          top="5%"
-                          right="65.5%"
-                          bg="purple"
-                          justify="center"
-                          align="center"
-                          sx={{
-                            "&:hover": {
-                              opacity: 0.5,
-                            },
-                          }}
-                          cursor="pointer"
-                          onClick={() => {
-                            setVideo();
-                            action = "delete";
-                          }}
-                        >
-                          <Image
-                            src="/assets/misc/close-button.svg"
-                            alt="close button"
-                            w="11px"
-                            h="11px"
+                    </Text>
+                    <FormLabel>
+                      {video ? (
+                        <Flex w="100%" h="100%" position="relative" mb="24px">
+                          <iframe w="100%" src={video} fit="contain" />
+                          <Flex
+                            w="32px"
+                            h="32px"
+                            borderRadius="full"
+                            position="absolute"
+                            top="5%"
+                            right="65.5%"
+                            bg="purple"
+                            justify="center"
+                            align="center"
+                            sx={{
+                              "&:hover": {
+                                opacity: 0.5,
+                              },
+                            }}
+                            cursor="pointer"
+                            onClick={() => {
+                              setVideo();
+                              action = "delete";
+                            }}
+                          >
+                            <Image
+                              src="/assets/misc/close-button.svg"
+                              alt="close button"
+                              w="11px"
+                              h="11px"
+                            />
+                          </Flex>
+                        </Flex>
+                      ) : (
+                        <>
+                          <Input
+                            type="file"
+                            hidden
+                            onChange={handleVideoChange}
                           />
-                        </Flex>
-                      </Flex>
-                    ) : (
-                      <label>
-                        <Input
-                          type="file"
-                          hidden
-                          onChange={handleVideoChange}
-                        />
-                        <Flex
-                          w="160px"
-                          h="160px"
-                          direction="column"
-                          justify="center"
-                          align="center"
-                          color="blue.400"
-                          cursor="pointer"
-                          bgColor="gray.200"
-                          borderRadius="8px"
-                          mb="24px"
-                        >
-                          <Text fontSize="36px" fontWeight="200">
-                            +
-                          </Text>
-                          <Text fontSize="14px" fontWeight="500">
-                            Upload Video
-                          </Text>
-                        </Flex>
-                      </label>
-                    )}
+                          <Flex
+                            w="160px"
+                            h="160px"
+                            direction="column"
+                            justify="center"
+                            align="center"
+                            color="blue.400"
+                            cursor="pointer"
+                            bgColor="gray.200"
+                            borderRadius="8px"
+                            mb="24px"
+                          >
+                            <Text fontSize="36px" fontWeight="200">
+                              +
+                            </Text>
+                            <Text fontSize="14px" fontWeight="500">
+                              Upload Video
+                            </Text>
+                          </Flex>
+                        </>
+                      )}
+                    </FormLabel>
                   </FormControl>
                 </Flex>
                 {/* ! --------------- Add Form END----------------  */}

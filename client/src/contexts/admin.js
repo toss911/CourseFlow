@@ -4,11 +4,10 @@ export const AdminContext = React.createContext();
 
 function AdminProvider(props) {
   const [addLesson, setAddLesson] = useState({
-    order: 0,
+    sequence: 0,
     lesson_name: "",
     sub_lesson_name: "",
     video_directory: "",
-    duration: "",
   });
   return (
     <AdminContext.Provider value={{ addLesson, setAddLesson }}>
