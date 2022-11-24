@@ -10,6 +10,7 @@ import {
   FormErrorMessage,
   Textarea,
   Select,
+  Button,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import React from "react";
@@ -107,9 +108,7 @@ const AdminAddCoursesPage = () => {
     const newFiles = event.target.files;
     // console.log(event.target.files);
     setFiles([...newFiles]);
-    
   };
-
 
   // *- input validation -* //
   const validateCourseName = (value) => {
@@ -536,87 +535,114 @@ const AdminAddCoursesPage = () => {
                           {files ? (
                             files.map((file, key) => {
                               return (
-                                <Flex
-                                  key={key}
-                                  position="relative"
-                                  display="flex"
-                                  alignItems="center"
-                                  w="45%"
-                                  h="82px"
-                                  bg="blue.100"
-                                  mt={3}
-                                  borderRadius="8px"
-                                  sx={{
-                                    "&:hover": {
-                                      bg: "blue.200",
-                                    },
-                                  }}
-                                >
+                                <Flex flexDirection="column">
                                   <Flex
-                                    w="50px"
-                                    h="50px"
-                                    m="16px 29px 16px 16px"
-                                    bg="white"
-                                    borderRadius="4px"
-                                    justify="center"
-                                    align="center"
-                                  >
-                                    <Box w="20px">
-                                      {/^image/i.test(file.type) ? (
-                                        <Image
-                                          src="../../../assets/course-detail-page/image-icon.svg"
-                                          alt="image icon"
-                                        />
-                                      ) : /^audio/i.test(file.type) ? (
-                                        <Image
-                                          src="../../../assets/course-detail-page/audio-icon.svg"
-                                          alt="audio icon"
-                                        />
-                                      ) : /^video/i.test(file.type) ? (
-                                        <Image
-                                          src="../../../assets/course-detail-page/video-icon.svg"
-                                          alt="video icon"
-                                        />
-                                      ) : (
-                                        <Image
-                                          src="/assets/course-detail-page/file-icon.svg"
-                                          alt="file icon"
-                                        />
-                                      )}
-                                    </Box>
-                                  </Flex>
-                                  <Text variant="body3" fontSize="xl">
-                                    {file.name}
-                                  </Text>
-
-                                  <Flex
-                                    w="32px"
-                                    h="32px"
-                                    borderRadius="full"
-                                    position="absolute"
-                                    top="-18px"
-                                    right="-18px"
-                                    bg="purple"
-                                    justify="center"
-                                    align="center"
+                                    key={key}
+                                    position="relative"
+                                    display="flex"
+                                    alignItems="center"
+                                    w="45%"
+                                    h="82px"
+                                    bg="blue.100"
+                                    mt={3}
+                                    borderRadius="8px"
                                     sx={{
                                       "&:hover": {
-                                        opacity: 0.5,
+                                        bg: "blue.200",
+                                      },
+                                    }}
+                                  >
+                                    <Flex
+                                      w="50px"
+                                      h="50px"
+                                      m="16px 29px 16px 16px"
+                                      bg="white"
+                                      borderRadius="4px"
+                                      justify="center"
+                                      align="center"
+                                    >
+                                      <Box w="20px">
+                                        {/^image/i.test(file.type) ? (
+                                          <Image
+                                            src="../../../assets/course-detail-page/image-icon.svg"
+                                            alt="image icon"
+                                          />
+                                        ) : /^audio/i.test(file.type) ? (
+                                          <Image
+                                            src="../../../assets/course-detail-page/audio-icon.svg"
+                                            alt="audio icon"
+                                          />
+                                        ) : /^video/i.test(file.type) ? (
+                                          <Image
+                                            src="../../../assets/course-detail-page/video-icon.svg"
+                                            alt="video icon"
+                                          />
+                                        ) : (
+                                          <Image
+                                            src="/assets/course-detail-page/file-icon.svg"
+                                            alt="file icon"
+                                          />
+                                        )}
+                                      </Box>
+                                    </Flex>
+                                    <Text variant="body3" fontSize="xl">
+                                      {file.name}
+                                    </Text>
+
+                                    <Flex
+                                      w="32px"
+                                      h="32px"
+                                      borderRadius="full"
+                                      position="absolute"
+                                      top="-18px"
+                                      right="-18px"
+                                      bg="purple"
+                                      justify="center"
+                                      align="center"
+                                      sx={{
+                                        "&:hover": {
+                                          opacity: 0.5,
+                                        },
+                                      }}
+                                      cursor="pointer"
+                                      onClick={() => {
+                                        setFiles();
+                                        action = "delete";
+                                      }}
+                                    >
+                                      <Image
+                                        src="../../../assets/misc/close-button.svg"
+                                        alt="close button"
+                                        w="11px"
+                                        h="11px"
+                                      />
+                                    </Flex>
+                                  </Flex>
+                                  <label w="250px">
+                                  <Input
+                                      type="file"
+                                      hidden
+                                      onChange={handleFilesChange}
+                                      multiple
+                                    />
+                                  <Box
+                                    border="1px"
+                                    textAlign="center"
+                                    w="110px"
+                                    mt="10px"
+                                    borderRadius="12px"
+                                    borderColor="blue.300"
+                                    sx={{
+                                      "&:hover": {
+                                        bgColor: "blue.200",
+                                        border: "solid 1px white",
                                       },
                                     }}
                                     cursor="pointer"
-                                    onClick={() => {
-                                      setFiles();
-                                      action = "delete";
-                                    }}
                                   >
-                                    <Image
-                                      src="../../../assets/misc/close-button.svg"
-                                      alt="close button"
-                                      w="11px"
-                                      h="11px"
-                                    />
-                                  </Flex>
+                                    <Text variant="body3">Add more files</Text>
+                                  </Box>
+                                  </label>
                                 </Flex>
                               );
                             })
