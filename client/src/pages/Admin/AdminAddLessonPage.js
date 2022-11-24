@@ -12,21 +12,28 @@ import {
   FormErrorMessage,
   Input,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { DragHandleIcon } from "@chakra-ui/icons";
+import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
 let action;
 
 function AdminAddLesson() {
   // * ทำ context API เก็บ data
-  // todo2 get data form in state lesson-name,sub-lesson-name,seq.,video_directory
-  // todo3 add effect when press add sub-lesson button
-  // todo4 add delete button
-  // todo5 drag and drop
+  // * ไม่สามารถ create ได้ถ้า input และ video ไม่ถูกใส่
+  // todo get data form in state lesson-name,sub-lesson-name,seq.,video_directory
+  // todo add effect when press add sub-lesson button
+  // todo add delete button
+  // todo drag and drop
   const { addLesson, setAddLesson } = useAdmin();
   const [video, setVideo] = useState();
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
   const handleVideoChange = (event) => {
@@ -44,14 +51,13 @@ function AdminAddLesson() {
       }
     }
   };
+
   let handleSubmit = (event) => {
-    //event.preventDefault();
-    //setAddLesson([...addLesson, dataLesson]);
-    console.log(event);
+    event.video_directory = video;
+    setAddLesson(addLesson.push(event));
+    console.log("lesson", addLesson);
   };
-  let handleChange = (e) => {
-    console.log("testChange");
-  };
+
   return (
     <>
       {/* ------------- Wrap all ------------------ */}
@@ -64,7 +70,6 @@ function AdminAddLesson() {
             initialValues={{
               lesson_name: "",
               sub_lesson_name: "",
-              video_directory: "",
             }}
           >
             {(props) => (
@@ -116,15 +121,52 @@ function AdminAddLesson() {
                     >
                       Cancel
                     </Button>
-                    <Button
-                      type="submit"
-                      w="117px"
-                      h="60px"
-                      shadow="shadow1"
-                      mr="40px"
-                    >
-                      Create
-                    </Button>
+                    {video ? (
+                      <Button
+                        type="submit"
+                        w="117px"
+                        h="60px"
+                        shadow="shadow1"
+                        mr="40px"
+                      >
+                        Create
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={onOpen}
+                          w="117px"
+                          h="60px"
+                          shadow="shadow1"
+                          mr="40px"
+                        >
+                          Create
+                        </Button>
+                        <Modal isCentered isOpen={isOpen} onClose={onClose}>
+                          <ModalOverlay />
+                          <ModalContent borderRadius="24px">
+                            <ModalHeader
+                              bg="#E53E3E"
+                              color="white"
+                              textAlign="center"
+                              borderRadius="24px 24px 0px 0px"
+                              fontSize="1.5rem"
+                            >
+                              <WarningIcon mr="0.5em" />
+                              Warning
+                            </ModalHeader>
+                            <ModalBody
+                              textAlign="center"
+                              my="2em"
+                              color="#E53E3E"
+                              fontSize="1rem"
+                            >
+                              Upload video on your lesson !!
+                            </ModalBody>
+                          </ModalContent>
+                        </Modal>
+                      </>
+                    )}
                   </Flex>
                 </Flex>
                 {/* -------------Form add-lesson -----------------*/}
@@ -230,6 +272,7 @@ function AdminAddLesson() {
                           </FormControl>
                         )}
                       </Field>
+
                       <Text fontSize="16px" fontWeight="400" mt="24px" mb="8px">
                         Video
                         <Text as="span" color="#E53E3E">
