@@ -34,7 +34,7 @@ const AdminAddCoursesPage = () => {
   let courseData = [];
   const [coverImage, setCoverImage] = useState();
   const [video, setVideo] = useState();
-  const [files, setFiles] = useState();
+  const [files, setFiles] = useState([]);
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
