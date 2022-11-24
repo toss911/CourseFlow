@@ -9,7 +9,7 @@ import {
   FormLabel,
   FormErrorMessage,
   Textarea,
-  Select
+  Select,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import React from "react";
@@ -50,9 +50,8 @@ const AdminAddCoursesPage = () => {
       // pop up modal
       // navigate to view courses page
     } else {
-      
     }
-  }
+  };
 
   const handleVideoChange = (event) => {
     const currentFile = event.target.files[0];
@@ -86,6 +85,7 @@ const AdminAddCoursesPage = () => {
         if (currentFile.size <= 2e6) {
           action = "change";
           setCoverImage(URL.createObjectURL(currentFile));
+          console.log(coverImage);
         } else {
           return toast({
             title: "File size must be less than 2MB!",
@@ -103,12 +103,20 @@ const AdminAddCoursesPage = () => {
     }
   };
 
+  const handleFilesChange = (event) => {
+    const newFiles = event.target.files;
+    // console.log(event.target.files);
+    setFiles([...newFiles]);
+    
+  };
+
+
   // *- input validation -* //
   const validateCourseName = (value) => {
     let error;
     if (!value) {
       error = "Course name cannot be empty";
-    } 
+    }
     return error;
   };
 
@@ -136,7 +144,7 @@ const AdminAddCoursesPage = () => {
     let error;
     if (!value) {
       error = "Course summary cannot be empty";
-    } 
+    }
     return error;
   };
 
@@ -144,7 +152,7 @@ const AdminAddCoursesPage = () => {
     let error;
     if (!value) {
       error = "Course detail cannot be empty";
-    } 
+    }
     return error;
   };
 
@@ -152,7 +160,7 @@ const AdminAddCoursesPage = () => {
     let error;
     if (!value) {
       error = "Category cannot be empty";
-    } 
+    }
     return error;
   };
 
@@ -252,7 +260,10 @@ const AdminAddCoursesPage = () => {
                             )}
                           </Field>
                           {/* Total Learning Time field */}
-                          <Field name="learning_time" validate={validateLearningTime}>
+                          <Field
+                            name="learning_time"
+                            validate={validateLearningTime}
+                          >
                             {({ field, form }) => (
                               <FormControl
                                 isInvalid={
@@ -281,7 +292,10 @@ const AdminAddCoursesPage = () => {
                             )}
                           </Field>
                         </Flex>
-                        <Field name="course_summary" validate={validateCourseSummary}>
+                        <Field
+                          name="course_summary"
+                          validate={validateCourseSummary}
+                        >
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -309,7 +323,10 @@ const AdminAddCoursesPage = () => {
                             </FormControl>
                           )}
                         </Field>
-                        <Field name="course_detail" validate={validateCourseDetail}>
+                        <Field
+                          name="course_detail"
+                          validate={validateCourseDetail}
+                        >
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -341,8 +358,7 @@ const AdminAddCoursesPage = () => {
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
-                                form.errors.category &&
-                                form.touched.category
+                                form.errors.category && form.touched.category
                               }
                               isRequired
                             >
@@ -353,15 +369,13 @@ const AdminAddCoursesPage = () => {
                               >
                                 Category
                               </FormLabel>
-                              <Select 
-                                w="920px"
-                             
-                                {...field}>
-                                  <option value='category1'>Science</option>
-                                  <option value='category2'>Business</option>
-                                  <option value='category3'>Software development</option>
-                                
-                                </Select>
+                              <Select w="920px" {...field}>
+                                <option value="category1">Science</option>
+                                <option value="category2">Business</option>
+                                <option value="category3">
+                                  Software development
+                                </option>
+                              </Select>
                               <FormErrorMessage>
                                 {form.errors.category}
                               </FormErrorMessage>
@@ -369,10 +383,10 @@ const AdminAddCoursesPage = () => {
                           )}
                         </Field>
                         {/* File Uploads */}
-                        
+
                         <Flex display="column" flexWrap="wrap" w="920px">
                           {/* Cover Image Upload */}
-                      
+
                           <Text variant="body2" mt="40px" w="fit-content">
                             Cover Image *
                           </Text>
@@ -387,7 +401,6 @@ const AdminAddCoursesPage = () => {
                             bg="gray.100"
                             mb="40px"
                             mt="8px"
-                        
                           >
                             {coverImage ? (
                               <Flex w="100%" h="100%" position="relative">
@@ -447,9 +460,8 @@ const AdminAddCoursesPage = () => {
                                 </Flex>
                               </label>
                             )}
-                       
                           </Flex>
-                          
+
                           {/* Video Upload */}
                           <Text variant="body2">Video Trailer *</Text>
                           <Flex
@@ -519,26 +531,120 @@ const AdminAddCoursesPage = () => {
                               </label>
                             )}
                           </Flex>
-                          {/* Attach File Upload */}
+                          {/* Attach Files Upload */}
                           <Text variant="body2">Attach File (Optional)</Text>
-                          <label w="250px">
-                            <Input type="file" hidden />
-                            <Flex
-                              w="160px"
-                              h="160px"
-                              direction="column"
-                              justify="center"
-                              align="center"
-                              color="blue.400"
-                              cursor="pointer"
-                              bg="gray.100"
-                              mb="40px"
-                              mt="8px"
-                            >
-                              <Text fontSize="36px">+</Text>
-                              <Text variant="body2">Upload File</Text>
-                            </Flex>
-                          </label>
+                          {files ? (
+                            files.map((file, key) => {
+                              return (
+                                <Flex
+                                  key={key}
+                                  position="relative"
+                                  display="flex"
+                                  alignItems="center"
+                                  w="45%"
+                                  h="82px"
+                                  bg="blue.100"
+                                  mt={3}
+                                  borderRadius="8px"
+                                  sx={{
+                                    "&:hover": {
+                                      bg: "blue.200",
+                                    },
+                                  }}
+                                >
+                                  <Flex
+                                    w="50px"
+                                    h="50px"
+                                    m="16px 29px 16px 16px"
+                                    bg="white"
+                                    borderRadius="4px"
+                                    justify="center"
+                                    align="center"
+                                  >
+                                    <Box w="20px">
+                                      {/^image/i.test(file.type) ? (
+                                        <Image
+                                          src="../../../assets/course-detail-page/image-icon.svg"
+                                          alt="image icon"
+                                        />
+                                      ) : /^audio/i.test(file.type) ? (
+                                        <Image
+                                          src="../../../assets/course-detail-page/audio-icon.svg"
+                                          alt="audio icon"
+                                        />
+                                      ) : /^video/i.test(file.type) ? (
+                                        <Image
+                                          src="../../../assets/course-detail-page/video-icon.svg"
+                                          alt="video icon"
+                                        />
+                                      ) : (
+                                        <Image
+                                          src="/assets/course-detail-page/file-icon.svg"
+                                          alt="file icon"
+                                        />
+                                      )}
+                                    </Box>
+                                  </Flex>
+                                  <Text variant="body3" fontSize="xl">
+                                    {file.name}
+                                  </Text>
+
+                                  <Flex
+                                    w="32px"
+                                    h="32px"
+                                    borderRadius="full"
+                                    position="absolute"
+                                    top="-18px"
+                                    right="-18px"
+                                    bg="purple"
+                                    justify="center"
+                                    align="center"
+                                    sx={{
+                                      "&:hover": {
+                                        opacity: 0.5,
+                                      },
+                                    }}
+                                    cursor="pointer"
+                                    onClick={() => {
+                                      setFiles();
+                                      action = "delete";
+                                    }}
+                                  >
+                                    <Image
+                                      src="../../../assets/misc/close-button.svg"
+                                      alt="close button"
+                                      w="11px"
+                                      h="11px"
+                                    />
+                                  </Flex>
+                                </Flex>
+                              );
+                            })
+                          ) : (
+                            <label w="250px">
+                              <Input
+                                type="file"
+                                hidden
+                                onChange={handleFilesChange}
+                                multiple
+                              />
+                              <Flex
+                                w="160px"
+                                h="160px"
+                                direction="column"
+                                justify="center"
+                                align="center"
+                                color="blue.400"
+                                cursor="pointer"
+                                bg="gray.100"
+                                mb="40px"
+                                mt="8px"
+                              >
+                                <Text fontSize="36px">+</Text>
+                                <Text variant="body2">Upload File</Text>
+                              </Flex>
+                            </label>
+                          )}
                         </Flex>
                       </Flex>
                     </Flex>
