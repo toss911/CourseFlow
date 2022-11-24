@@ -62,7 +62,7 @@ function AdminAssignmentList() {
   };
   return (
     <Flex backgroundColor="gray.100" >
-      <Sidebar />
+      <Sidebar index="1"/>
       <Flex flexDirection="column">
         <Flex flexDirection="column">
           <Flex

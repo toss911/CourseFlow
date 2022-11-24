@@ -55,7 +55,7 @@ function AdminViewCourses() {
   return (
     <Box h="100vh">
       <Flex>
-        <Sidebar />
+        <Sidebar index="0" />
         <Flex flexDirection="column">
           <AdminNavbar
             heading="Courses"
