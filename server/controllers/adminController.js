@@ -37,7 +37,7 @@ export const addCourse = async (req, res) => {
   await pool.query(``);
 };
 
-export const getAllCoursesDataByAdmin = async (req, res) => {
+export const getAllCoursesData = async (req, res) => {
   try {
     const adminId = req.query.byAdmin;
 
@@ -128,7 +128,7 @@ export const postNewAssignment = async (req, res) => {
     if (!doesAdminOwnThisCourse) {
       return res
         .status(403)
-        .json({ message: "You have no permission to edit this course" });
+        .json({ message: "You have no permission to manipulate this course" });
     }
 
     /* Update duration of assignments in "sub_lessons" table */
@@ -151,6 +151,158 @@ export const postNewAssignment = async (req, res) => {
     );
 
     return res.json({ message: "Assignment has been successfully added" });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+export const getAssignmentById = async (req, res) => {
+  const admin_id = req.query.byAdmin;
+  const assignment_id = req.params.assignmentId;
+
+  /* Validate whether this admin owned the course or not */
+  let doesAdminOwnThisCourse = await pool.query(
+    `
+  SELECT EXISTS 
+  (SELECT *
+    FROM courses
+  INNER JOIN lessons
+  ON courses.course_id = lessons.course_id
+  INNER JOIN sub_lessons
+  ON lessons.lesson_id = sub_lessons.lesson_id
+  INNER JOIN assignments
+  ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+  WHERE courses.admin_id = $1 AND assignments.assignment_id = $2)
+  `,
+    [admin_id, assignment_id]
+  );
+  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+  if (!doesAdminOwnThisCourse) {
+    return res
+      .status(403)
+      .json({ message: "You have no permission to delete this assignment" });
+  }
+
+  let data = await pool.query(
+    `
+    SELECT courses.course_id, lessons.lesson_id, sub_lessons.sub_lesson_id, assignments.detail
+    FROM courses
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    INNER JOIN sub_lessons
+    ON lessons.lesson_id = sub_lessons.lesson_id
+    INNER JOIN assignments
+    ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+    WHERE courses.admin_id = $1 AND assignments.assignment_id = $2
+    `,
+    [admin_id, assignment_id]
+  );
+
+  data = data.rows[0];
+  data = {
+    ...data,
+    course_id: String(data.course_id),
+    lesson_id: String(data.lesson_id),
+    sub_lesson_id: String(data.sub_lesson_id),
+  };
+  return res.json({ data });
+};
+
+export const editAssignment = async (req, res) => {
+  try {
+    const admin_id = req.query.byAdmin;
+    const assignment_id = req.params.assignmentId;
+    const sub_lesson_id = req.body.sub_lesson_id;
+    const detail = req.body.detail;
+    const duration = req.body.duration;
+
+    /* Validate whether this admin owned the course or not */
+    let doesAdminOwnThisCourse = await pool.query(
+      `
+    SELECT EXISTS 
+    (SELECT *
+      FROM courses
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    INNER JOIN sub_lessons
+    ON lessons.lesson_id = sub_lessons.lesson_id
+    WHERE courses.admin_id = $1 AND sub_lessons.sub_lesson_id = $2)
+    `,
+      [admin_id, sub_lesson_id]
+    );
+    doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+    if (!doesAdminOwnThisCourse) {
+      return res
+        .status(403)
+        .json({ message: "You have no permission to edit this course" });
+    }
+
+    /* Update duration of assignments in "sub_lessons" table */
+    await pool.query(
+      `
+    UPDATE sub_lessons
+    SET duration = $1
+    WHERE sub_lesson_id = $2
+    `,
+      [duration, sub_lesson_id]
+    );
+
+    /* Update an assignment in "assignments" table */
+    await pool.query(
+      `
+    UPDATE assignments
+    SET sub_lesson_id = $1,
+        detail = $2,
+        updated_date = $3
+    WHERE assignment_id = $4
+    `,
+      [sub_lesson_id, detail, new Date(), assignment_id]
+    );
+
+    return res.json({ message: "Assignment has been successfully edited" });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+export const deleteAssignment = async (req, res) => {
+  try {
+    const admin_id = req.query.byAdmin;
+    const assignment_id = req.params.assignmentId;
+
+    /* Validate whether this admin owned the course or not */
+    let doesAdminOwnThisCourse = await pool.query(
+      `
+    SELECT EXISTS 
+    (SELECT *
+      FROM courses
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    INNER JOIN sub_lessons
+    ON lessons.lesson_id = sub_lessons.lesson_id
+    INNER JOIN assignments
+    ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+    WHERE courses.admin_id = $1 AND assignments.assignment_id = $2)
+    `,
+      [admin_id, assignment_id]
+    );
+    doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+    if (!doesAdminOwnThisCourse) {
+      return res
+        .status(403)
+        .json({ message: "You have no permission to delete this assignment" });
+    }
+
+    /* Delete an assignment from "assignments" table */
+    await pool.query(
+      `
+    DELETE FROM assignments
+    WHERE assignment_id = $1
+    `,
+      [assignment_id]
+    );
+
+    return res.json({ message: "Assignment has been successfully deleted" });
   } catch (error) {
     return res.sendStatus(500);
   }

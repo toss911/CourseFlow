@@ -514,6 +514,7 @@ function AdminAddAssignment() {
                 props.setFieldValue("assignment", "");
                 props.setFieldTouched("assignment", false);
               }}
+              preserveScrollBarGap
             >
               <ModalOverlay />
               <ModalContent borderRadius="24px">
@@ -537,7 +538,6 @@ function AdminAddAssignment() {
                 </ModalBody>
               </ModalContent>
             </Modal>
-            ;
           </Form>
         );
       }}

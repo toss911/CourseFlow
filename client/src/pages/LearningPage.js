@@ -631,6 +631,7 @@ function LearningPage() {
         isOpen={isAcceptOpen}
         onClose={onAcceptClose}
         closeOnOverlayClick={false}
+        preserveScrollBarGap
       >
         <ModalOverlay />
         <ModalContent borderRadius="24px">
@@ -669,6 +670,7 @@ function LearningPage() {
         isOpen={isSubmitOpen}
         onClose={onSubmitClose}
         closeOnOverlayClick={false}
+        preserveScrollBarGap
       >
         <ModalOverlay />
         <ModalContent borderRadius="24px">
