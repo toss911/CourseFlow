@@ -3,6 +3,9 @@ import { cloudinaryUpload } from "../utils/upload.js";
 
 export const videoSubLessonUpload = async (req, res) => {};
 
+
+// POST course
+
 export const addCourse = async (req, res) => {
   const adminId = req.query.adminId;
   const createdDate = new Date();
@@ -120,3 +123,39 @@ export const addCourse = async (req, res) => {
     message: "Course created successfully",
   });
 };
+
+// GET course
+
+export const getCourse = async (req, res) => {
+  
+  const courseId = req.params.courseId;
+  const adminId = req.query.adminId;
+
+  const courseData = await pool.query(`
+  SELECT courses.course_name, courses.summary, courses.detail, courses.price,
+  courses.learning_time, courses.cover_image_directory, courses.video_trailer_directory,
+  courses.created_date, courses.category, lessons.lesson_name, lessons.sequence,
+  sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
+  FROM courses
+  INNER JOIN lessons
+  ON lessons.course_id = courses.course_id
+  INNER JOIN sub_lessons
+  ON sub_lessons.lesson_id = lessons.lesson_id
+  WHERE courses.course_id = $1 AND courses.admin_id = $2`,
+  [courseId, adminId]);
+
+  const courseAttachedFiles = await pool.query(`
+  SELECT * from files where course_id = $1
+  `,
+  [courseId]);
+
+  return res.json({
+    data: courseData.rows[0],
+    attachedFiles: courseAttachedFiles.rows
+  })
+
+}
+
+
+
+
