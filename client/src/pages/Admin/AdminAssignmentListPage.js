@@ -104,10 +104,8 @@ function AdminAssignmentList() {
           </Flex>
         </Flex>
 
-       
-        
         {/* ถ้าวางตรงนี้มันจะกระพริบทั้งหน้า */}
-        <Skeleton isLoaded={!isLoading}>
+        <Skeleton isLoaded={!isLoading}  startColor='gray.400' endColor='gray.500' >
           <TableContainer
             borderRadius="8px"
             mt="48px"
@@ -130,7 +128,7 @@ function AdminAssignmentList() {
               >
                 <Tr>
                 
-                  {/* {columnNames.map((columnName, key) => {
+                  {columnNames.map((columnName, key) => {
                     return (
                       <Th key={key}>
                         <Text
@@ -142,69 +140,7 @@ function AdminAssignmentList() {
                         </Text>
                       </Th>
                     );
-                  })} */}
-                  <Th>
-                    <Text
-                      variant="body3"
-                      textTransform="capitalize"
-                      textColor="gray.800">
-                      Assignment detail
-                    </Text>
-                  </Th>
-                  <Th>
-                    <Text
-                      variant="body3"
-                      textTransform="capitalize"
-                      textColor="gray.800"
-                    >
-                      Course
-                    </Text>
-                  </Th>
-                  <Th>
-                    <Text
-                      variant="body3"
-                      textTransform="capitalize"
-                      textColor="gray.800"
-                    >
-                      Lesson
-                    </Text>
-                  </Th>
-                  <Th>
-                    <Text
-                      variant="body3"
-                      textTransform="capitalize"
-                      textColor="gray.800"
-                    >
-                      Sub-lesson
-                    </Text>
-                  </Th>
-                  <Th>
-                    <Text
-                      variant="body3"
-                      textTransform="capitalize"
-                      textColor="gray.800"
-                    >
-                      Created date
-                    </Text>
-                  </Th>
-                  <Th>
-                    <Text
-                      variant="body3"
-                      textTransform="capitalize"
-                      textColor="gray.800"
-                    >
-                      Updatedate
-                    </Text>
-                  </Th>
-                  <Th>
-                    <Text
-                      variant="body3"
-                      textTransform="capitalize"
-                      textColor="gray.800"
-                    >
-                      Action
-                    </Text>
-                  </Th>
+                  })}
                 </Tr>
               </Thead>
               {/* กระพริบส่วนบอดี้แต่โพสิชั่นแปลกๆ */}
@@ -219,7 +155,6 @@ function AdminAssignmentList() {
                     </Td>
                   </Tr>
                   {/* ถ้าวางตรงนี้มันจะกระพริบส่วนบอดี้แต่ข้อมูลข้างในจะเรียงแบบพิลึก */}
-                  
                   {adminAssignment.map((assignment) => {
                     return (
                      
