@@ -62,7 +62,7 @@ function OurCourses() {
           <Box mb="100px">
             <InputGroup w="357px">
               <Input
-                type="string"
+                type="text"
                 placeholder="Search..."
                 pl="40px"
                 onChange={handleSearchTextChange}
