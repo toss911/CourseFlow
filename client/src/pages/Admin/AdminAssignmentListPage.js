@@ -16,17 +16,17 @@ import {
   InputLeftElement,
   InputGroup,
   Button,
-  Center,
+  Skeleton,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
 
 function AdminAssignmentList() {
-  // const adminId = 1
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
   const [adminAssignment, setAdminAssignment] = useState([]);
+  const [isLoading, setIsLoadeing] = useState();
   const [searchText, setSearchText] = useState("");
   const columnNames = [
     "Assignment detail",
@@ -39,11 +39,12 @@ function AdminAssignmentList() {
   ];
 
   useEffect(() => {
-    const getCourses = setTimeout(() => {
+    setIsLoadeing(true);
+    const assignmentData = setTimeout(() => {
       getAdminAssignment(searchText);
+      setIsLoadeing(false);
     }, 1000);
-
-    return () => clearTimeout(getCourses);
+    return () => clearTimeout(assignmentData);
   }, [searchText]);
 
   const getAdminAssignment = async () => {
@@ -61,8 +62,8 @@ function AdminAssignmentList() {
     console.log(contextAdminState);
   };
   return (
-    <Flex backgroundColor="gray.100" >
-      <Sidebar index="1"/>
+    <Flex backgroundColor="gray.100">
+      <Sidebar index="1" />
       <Flex flexDirection="column">
         <Flex flexDirection="column">
           <Flex
@@ -71,13 +72,13 @@ function AdminAssignmentList() {
             border="1px"
             borderColor="gray.400"
             alignItems="center"
-            justifyContent="space-between"
-            bg='white'
+            justifyContent="flex-start"
+            bg="white"
           >
-            <Heading variant="headline3" ml="40px" w="50%">
+            <Heading variant="headline3" ml="40px" w="559px">
               Assignment
             </Heading>
-            <Flex>
+            <Flex mr="16px" w="360px">
               <InputGroup>
                 <InputLeftElement
                   pointerEvents="none"
@@ -102,21 +103,34 @@ function AdminAssignmentList() {
             </Button>
           </Flex>
         </Flex>
-          <Flex >
+
+       
+        
+        {/* ถ้าวางตรงนี้มันจะกระพริบทั้งหน้า */}
+        <Skeleton isLoaded={!isLoading}>
           <TableContainer
             borderRadius="8px"
             mt="48px"
             ml="48px"
-            w='80vw'
-            h='80vh'
+            w="1120px"
+            h="80vh"
             overflowY="scroll"
           >
+            {/* ถ้าวางตรงนี้มันจะกระพริบทั้งตาราง */}
+            
             <Table variant="simple" backgroundColor="white">
-              <Thead backgroundColor="gray.300" h="41px" 
-              sx={{ position: '-webkit-sticky', position: 'sticky', top: '0', }}>
+              <Thead
+                backgroundColor="gray.300"
+                h="41px"
+                sx={{
+                  position: "-webkit-sticky",
+                  position: "sticky",
+                  top: "0",
+                }}
+              >
                 <Tr>
-                  <Th></Th>
-                  {columnNames.map((columnName, key) => {
+                
+                  {/* {columnNames.map((columnName, key) => {
                     return (
                       <Th key={key}>
                         <Text
@@ -128,84 +142,154 @@ function AdminAssignmentList() {
                         </Text>
                       </Th>
                     );
-                  })}
+                  })} */}
+                  <Th>
+                    <Text
+                      variant="body3"
+                      textTransform="capitalize"
+                      textColor="gray.800">
+                      Assignment detail
+                    </Text>
+                  </Th>
+                  <Th>
+                    <Text
+                      variant="body3"
+                      textTransform="capitalize"
+                      textColor="gray.800"
+                    >
+                      Course
+                    </Text>
+                  </Th>
+                  <Th>
+                    <Text
+                      variant="body3"
+                      textTransform="capitalize"
+                      textColor="gray.800"
+                    >
+                      Lesson
+                    </Text>
+                  </Th>
+                  <Th>
+                    <Text
+                      variant="body3"
+                      textTransform="capitalize"
+                      textColor="gray.800"
+                    >
+                      Sub-lesson
+                    </Text>
+                  </Th>
+                  <Th>
+                    <Text
+                      variant="body3"
+                      textTransform="capitalize"
+                      textColor="gray.800"
+                    >
+                      Created date
+                    </Text>
+                  </Th>
+                  <Th>
+                    <Text
+                      variant="body3"
+                      textTransform="capitalize"
+                      textColor="gray.800"
+                    >
+                      Updatedate
+                    </Text>
+                  </Th>
+                  <Th>
+                    <Text
+                      variant="body3"
+                      textTransform="capitalize"
+                      textColor="gray.800"
+                    >
+                      Action
+                    </Text>
+                  </Th>
                 </Tr>
               </Thead>
+              {/* กระพริบส่วนบอดี้แต่โพสิชั่นแปลกๆ */}
               <Tbody>
-                <Tr hidden={adminAssignment.length > 0} >
-                  <Td colSpan="7">
-                    <Text textAlign="center">Not Found !!</Text>
-                  </Td>
-                </Tr>
-                {adminAssignment.map((assignment, key) => {
-                  return (
-                    <Tr key={key}>
-                      <Td>{key + 1}</Td>
-                      <Td>
-                        <Text
-                          whiteSpace="nowrap"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          maxWidth="170px"
-                        >
-                          {assignment.detail}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <Text
-                          whiteSpace="nowrap"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          maxWidth="176px"
-                        >
-                          {assignment.course_name}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <Text
-                          whiteSpace="nowrap"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          maxWidth="92px"
-                        >
-                          {assignment.lesson_name}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <Text
-                          whiteSpace="nowrap"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          maxWidth="173px"
-                        >
-                          {assignment.sub_lesson_name}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <Text>{assignment.created_date}</Text>
-                      </Td>
-                      <Td>
-                        <Text>{assignment.updated_date}</Text>
-                      </Td>
-                      <Td>
-                        <Flex gap="20px" w="120px">
-                          <Image
-                            src="../../../assets/admin-page/bin.svg"
-                            alt="bin"
-                          ></Image>
-                          <Image
-                            src="../../../assets/admin-page/edit.svg"
-                            alt="edit"
-                          ></Image>
-                        </Flex>
-                      </Td>
-                    </Tr>
-                  );
-                })}
+              {/* เหมียนกับอีอันบน!!!!!!!! */}
+            
+                  <Tr hidden={adminAssignment.length > 0 }>
+                    <Td colSpan="7">
+                      
+                      <Text textAlign="center">Not Found !!</Text>
+
+                    </Td>
+                  </Tr>
+                  {/* ถ้าวางตรงนี้มันจะกระพริบส่วนบอดี้แต่ข้อมูลข้างในจะเรียงแบบพิลึก */}
+                  
+                  {adminAssignment.map((assignment) => {
+                    return (
+                     
+                      <Tr>
+                        <Td w="200px">
+                          <Text
+                            overflow="hidden"
+                            textOverflow="ellipsis"
+                            maxWidth="200px"
+                          >
+                            {assignment.detail}
+                          </Text>
+                        </Td>
+                        <Td w="200px">
+                          <Text
+                          
+                            overflow="hidden"
+                            textOverflow="ellipsis"
+                            maxWidth="200px"
+                          >
+                            {assignment.course_name}
+                          </Text>
+                        </Td>
+                        <Td w="200px">
+                          <Text
+                           
+                            overflow="hidden"
+                            textOverflow="ellipsis"
+                            maxWidth="200px"
+                          >
+                            {assignment.lesson_name}
+                          </Text>
+                        </Td>
+                        <Td w="200px">
+                          <Text
+                        
+                            overflow="hidden"
+                            textOverflow="ellipsis"
+                            maxWidth="200px"
+                          >
+                            {assignment.sub_lesson_name}
+                          </Text>
+                        </Td>
+                        <Td>
+                          <Text>{assignment.created_date}</Text>
+                        </Td>
+                        <Td>
+                          <Text>{assignment.updated_date}</Text>
+                        </Td>
+                        <Td w="120px">
+                          <Flex gap="20px" w="120px">
+                            <Image
+                              src="../../../assets/admin-page/bin.svg"
+                              alt="bin"
+                            ></Image>
+                            <Image
+                              src="../../../assets/admin-page/edit.svg"
+                              alt="edit"
+                            ></Image>
+                          </Flex>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
               </Tbody>
+              
             </Table>
+           
           </TableContainer>
-        </Flex>
+          </Skeleton>
       </Flex>
     </Flex>
   );

@@ -15,8 +15,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authentication";
 
-
-
 export function Sidebar(props) {
   const {index} = props
   const navigate = useNavigate();
