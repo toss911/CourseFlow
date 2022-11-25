@@ -1,10 +1,7 @@
 import { pool } from "../utils/db.js";
 import { cloudinaryUpload } from "../utils/upload.js";
 
-export const videoSubLessonUpload = async (req, res) => {};
-
-
-// POST course
+// POST course // check if there are attached files or not
 
 export const addCourse = async (req, res) => {
   const adminId = req.query.adminId;
@@ -112,7 +109,7 @@ export const addCourse = async (req, res) => {
       newSubLesson.subLessonName,
       newSubLesson.subLessonVideo,
       newSubLesson.sequence,
-      fileName,
+      fileName, 
       fileType,
       fileSize,
       newCourse.courseAttachFiles,
@@ -149,13 +146,138 @@ export const getCourse = async (req, res) => {
   `,
   [courseId]);
 
+  let arrOfFilesDirectory = [];
+  for (let file of courseAttachedFiles.rows) {
+    arrOfFilesDirectory.push(file.directory);
+  }
+
   return res.json({
     data: courseData.rows[0],
-    attachedFiles: courseAttachedFiles.rows
-  })
+    attachedFiles: courseAttachedFiles.rows,
+    allMediaFiles: [courseData.rows[0].cover_image_directory, courseData.rows[0].video_trailer_directory,
+    courseData.rows[0].video_directory, ...arrOfFilesDirectory] // create a file object out of these media urls.
+  });
 
-}
+};
 
+
+// PUT course
+
+// export const updateCourse = async (req, res) => {
+//   const courseId = req.params.courseId;
+//   const adminId = req.query.adminId;
+//   const action = req.body.action;
+//   const mediaFiles = req.body.files;
+  
+//   const  updatedCourse = {
+//     courseName: req.body.course_name,
+//     price: req.body.price,
+//     learningTime: req.body.learning_time,
+//     courseSummary: req.body.course_summary,
+//     detail: req.body.course_detail,
+//     category: req.body.category,
+//     courseAttachFiles: [],
+//   }
+
+//   const updatedLesson = {
+//     lessonName: req.body.lesson_name,
+//     sequence: req.body.lesson_sequence,
+//   };
+
+//   const updatedSubLesson = {
+//     subLessonName: req.body.sub_lesson_name,
+//     sequence: req.body.sub_lesson_sequence,
+//   };
+
+//   if (!action) { // if admin did not change any media
+//     await pool.query(
+//       `
+//       with course_update as (
+//         UPDATE courses
+//          SET course_name = $1, summary = $2,
+//         detail = $3, price = $4, learning_time = $5,
+//         updated_date= $6, category = $7
+//         WHERE course_id = $8 AND admin_id = $9
+//         returning course_id
+//       ),
+//       lesson_update as (
+//         UPDATE lessons
+//           SET lesson_name = $10, sequence = $11
+//         WHERE course_id IN (SELECT course_id FROM course_update)
+//         RETURNING lesson_id
+//       ),
+//       sub_lesson_update as (
+//         UPDATE sub_lessons
+//         SET sub_lesson_name = $12, 
+//         sequence = $13
+//         WHERE lesson_id IN (SELECT lesson_id FROM lesson_update)
+//       )`,
+//       [
+//         // array of values here 
+//       ]
+//     );
+//   } else {
+//       for (let file of mediaFiles) {
+//         await cloudinaryUpload(file, "delete", "course_cover_images");
+//       }
+      
+     
+//     } }
+
+//   updatedCourse.courseCoverImage = await cloudinaryUpload(
+//     ...req.files.course_cover_images,
+//     "upload",
+//     "course_cover_images"
+//   );
+//   updatedCourse.courseVideoTrailer = await cloudinaryUpload(
+//     ...req.files.course_video_trailers,
+//     "upload",
+//     "course_video_trailers"
+//   );
+//   for (let file of req.files.course_attached_files) {
+//     newCourse.courseAttachFiles.push(
+//       JSON.stringify(
+//         await cloudinaryUpload(file, "upload", "course_attached_files")
+//       )
+//     );
+//   }
+
+//   updatedSubLesson.subLessonVideo = await cloudinaryUpload(
+//     ...req.files.sub_lesson_videos,
+//     "upload",
+//     "sub_lesson_videos"
+//   );
+
+//   const result = await pool.query(`
+//   with course_update as (
+//     UPDATE courses
+//      SET course_name = $1, summary = $2,
+//     detail = $3, price = $4, learning_time = $5,
+//     cover_image_directory = $6, video_trailer_directory = $7,
+//     created_date = $8, updated_date= $9, category = $10
+//     WHERE course_id = $11 AND admin_id = $12
+//     returning course_id
+//   ),
+//   lesson_update as (
+//     UPDATE lessons
+//       SET lesson_name = $13, sequence = $14
+//     WHERE course_id IN (SELECT course_id FROM course_update)
+//     RETURNING lesson_id
+//   ),
+//   sub_lesson_update as (
+//     UPDATE sub_lessons
+//     SET sub_lesson_name = $15, video_directory = $16,
+//     sequence = $17
+//     WHERE lesson_id IN (SELECT lesson_id FROM lesson_update)
+//   )
+//   UPDATE files
+//   SET file_name = $18, type = $19, size = $20, directory = $21
+//   WHERE course_id IN (SELECT course_id FROM course_update) AND file_id = $22`,
+//   [
+    
+//   ]);
+
+  
 
 
 
