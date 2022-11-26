@@ -21,7 +21,4 @@ assignmentRouter.put(
   assignment_controller.putSaveDraftAssignment
 );
 
-//Admin
-assignmentRouter.get("/admin", assignment_controller.getAdminAssignment);
-
 export default assignmentRouter;

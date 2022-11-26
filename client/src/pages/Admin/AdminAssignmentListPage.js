@@ -63,9 +63,9 @@ function AdminAssignmentList() {
     setIsLoadeing(true);
     const query = new URLSearchParams();
     query.append("searchText", searchText);
-    query.append("adminId", adminId);
+    query.append("byAdmin", adminId);
     const results = await axios.get(
-      `http://localhost:4000/assignment/admin?${query.toString()}`
+      `http://localhost:4000/admin/assignments/list?${query.toString()}`
     );
     setAdminAssignment(results.data.data);
     setIsLoadeing(false);

@@ -14,6 +14,11 @@ adminRouter.put("/add-lesson", protect, admin_controller.videoSubLessonUpload);
 adminRouter.get("/assignments", protect, admin_controller.getAllCoursesData);
 adminRouter.post("/assignments", protect, admin_controller.postNewAssignment);
 adminRouter.get(
+  "/assignments/list",
+  protect,
+  admin_controller.getAllAssignment
+);
+adminRouter.get(
   "/assignments/:assignmentId",
   protect,
   admin_controller.getAssignmentById
