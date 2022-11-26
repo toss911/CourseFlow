@@ -118,6 +118,7 @@ function AuthProvider(props) {
         logoutAdmin,
         loginAdmin,
         isAdminAuthenticated,
+        contextAdminState,
       }}
     >
       {props.children}

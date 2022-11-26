@@ -42,10 +42,6 @@ function AdminViewCourses() {
     setAdminCourses(results.data.data);
   };
 
-  const handleTextChange = (event) => {
-    setSearchText(event.target.value);
-  };
-
   useEffect(() => {
     const getCourses = setTimeout(() => {
       getAdminCourses(searchText);
@@ -55,21 +51,23 @@ function AdminViewCourses() {
   }, [searchText]);
 
   return (
-    <Box h="100vh">
+    <Box>
       <Flex>
-        <Sidebar />
+        <Sidebar selectedTab={1} />
         <Flex flexDirection="column">
           <AdminNavbar
-            heading="Courses"
-            action="+ Add Course"
-            handleSearchText={handleTextChange}
+            heading="Assignment"
+            action="+ Add Assignment"
+            url="add-course"
+            setSearchText={setSearchText}
+            searchText={searchText}
           />
-          <Box backgroundColor="gray.100" h="100vh">
+          <Box backgroundColor="gray.100" h="100%">
             <TableContainer
               borderRadius="8px"
               mt="48px"
               ml="48px"
-              w="1180px"
+              w="1120px"
               h="650px"
               overflowY="scroll"
             >

@@ -5,6 +5,7 @@ import AdminEditAssignment from "./AdminEditAssignment";
 import AdminAddLesson from "./AdminAddLessonPage";
 import AdminAddCoursesPage from "./AdminAddCoursesPage";
 import AdminError from "./AdminErrorPage";
+import AdminAssignmentList from "./AdminAssignmentListPage";
 
 function AuthenticatedAdmin() {
   return (
@@ -14,6 +15,7 @@ function AuthenticatedAdmin() {
       <Route path="/courses" element={<AdminViewCourses />} />
       <Route path="/courses/add-lesson" element={<AdminAddLesson />} />
       <Route path="/add-courses" element={<AdminAddCoursesPage />} />
+      <Route path="/assignment" element={<AdminAssignmentList />} />
       <Route path="/assignment/add" element={<AdminAddAssignment />} />
       <Route
         path="/assignment/edit/:assignmentId"
