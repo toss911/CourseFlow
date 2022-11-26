@@ -13,7 +13,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
 import AdminNavbar from "../../components/AdminNavbar.js";
@@ -23,6 +23,7 @@ function AdminAssignmentList() {
   const adminId = contextAdminState.user.admin_id;
   const [adminAssignment, setAdminAssignment] = useState();
   const [isLoading, setIsLoadeing] = useState(true);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const columnNames = [
     "Assignment detail",
@@ -35,10 +36,14 @@ function AdminAssignmentList() {
   ];
 
   useEffect(() => {
-    getAdminAssignment("");
-  }, []);
+    getAdminAssignment(searchParams.get("search"));
+  }, [searchParams.get("search")]);
 
   const getAdminAssignment = async (searchText) => {
+    /* In case of no searchText => transform searchText into empty string (instead of null) */
+    if (!searchText) {
+      searchText = "";
+    }
     setIsLoadeing(true);
     const query = new URLSearchParams();
     query.append("searchText", searchText);
@@ -48,10 +53,6 @@ function AdminAssignmentList() {
     );
     setAdminAssignment(results.data.data);
     setIsLoadeing(false);
-  };
-
-  const handleSearch = async (searchText) => {
-    await getAdminAssignment(searchText);
   };
 
   return (
@@ -65,7 +66,7 @@ function AdminAssignmentList() {
           heading="Assignment"
           action="+ Add Assignment"
           url="add"
-          handleSearch={handleSearch}
+          searchParams={searchParams}
         />
         {/* Right-Bottom Section */}
         <Flex

@@ -8,9 +8,19 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const AdminNavbar = (props) => {
   const navigate = useNavigate();
+  const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    setSearchText(
+      Boolean(props.searchParams.get("search"))
+        ? props.searchParams.get("search")
+        : ""
+    );
+  }, [props.searchParams.get("search")]);
 
   return (
     <Flex
@@ -28,7 +38,15 @@ const AdminNavbar = (props) => {
         <Flex mr="16px">
           <InputGroup>
             <InputLeftElement
-              pointerEvents="none"
+              // pointerEvents="none"
+              cursor="pointer"
+              onClick={() => {
+                if (Boolean(searchText)) {
+                  navigate(`.?search=${searchText}`);
+                } else {
+                  navigate(".");
+                }
+              }}
               children={
                 <Image src="../../assets/admin-page/search.svg" alt="search" />
               }
@@ -38,12 +56,19 @@ const AdminNavbar = (props) => {
               w="320px"
               type="text"
               placeholder="Search..."
+              onChange={(event) => {
+                setSearchText(event.target.value);
+              }}
               onKeyPress={(event) => {
                 if (event.key === "Enter") {
-                  props.handleSearch(event.target.value);
+                  if (Boolean(event.target.value)) {
+                    navigate(`.?search=${event.target.value}`);
+                  } else {
+                    navigate(".");
+                  }
                 }
               }}
-              // value={props.searchText}
+              value={searchText}
             />
           </InputGroup>
         </Flex>
