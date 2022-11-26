@@ -11,20 +11,36 @@ import {
   TableContainer,
   Image,
   Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Button,
+  Divider,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
 import AdminNavbar from "../../components/AdminNavbar.js";
+let assignment_id;
 
 function AdminAssignmentList() {
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
   const [adminAssignment, setAdminAssignment] = useState();
   const [isLoading, setIsLoadeing] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const {
+    isOpen: isConfirmModalOpen,
+    onOpen: onConfirmModalOpen,
+    onClose: onConfirmModalClose,
+  } = useDisclosure();
   const columnNames = [
     "Assignment detail",
     "Course",
@@ -53,6 +69,18 @@ function AdminAssignmentList() {
     );
     setAdminAssignment(results.data.data);
     setIsLoadeing(false);
+  };
+
+  const handleDeleteAssignment = async (assignmentId) => {
+    setIsDeleting(true);
+    const result = await axios.delete(
+      `http://localhost:4000/admin/assignments/${assignmentId}?byAdmin=${adminId}`
+    );
+    setIsDeleting(false);
+    if (/successfully/i.test(result.data.message)) {
+      onConfirmModalClose();
+      getAdminAssignment(searchParams.get("search"));
+    }
   };
 
   return (
@@ -143,6 +171,11 @@ function AdminAssignmentList() {
                               src="../../../assets/admin-page/bin.svg"
                               alt="bin"
                               cursor="pointer"
+                              _hover={{ opacity: 0.5 }}
+                              onClick={() => {
+                                assignment_id = assignment.assignment_id;
+                                onConfirmModalOpen();
+                              }}
                             />
                             <Image
                               src="../../../assets/admin-page/edit.svg"
@@ -151,6 +184,7 @@ function AdminAssignmentList() {
                               onClick={() =>
                                 navigate(`./edit/${assignment.assignment_id}`)
                               }
+                              _hover={{ opacity: 0.5 }}
                             />
                           </Flex>
                         </Td>
@@ -163,6 +197,44 @@ function AdminAssignmentList() {
           )}
         </Flex>
       </Flex>
+      <Modal
+        isCentered
+        isOpen={isConfirmModalOpen}
+        onClose={onConfirmModalClose}
+        closeOnOverlayClick={false}
+        preserveScrollBarGap
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader borderRadius="24px 24px 0px 0px">
+            <Text variant="body1" color="black">
+              Confirmation
+            </Text>
+          </ModalHeader>
+          <Divider sx={{ borderColor: "gray.300" }} />
+          <ModalCloseButton color="gray.500" />
+          <ModalBody p="24px 50px 24px 24px" color="black">
+            <Text variant="body2" color="gray.700" as="span">
+              Do you want to delete this assignment?
+            </Text>
+            <Flex mt="24px" width="600px">
+              <Button variant="secondary" onClick={onConfirmModalClose}>
+                No, I don't
+              </Button>
+              <Button
+                ml="16px"
+                isLoading={isDeleting}
+                variant="primary"
+                onClick={() => {
+                  handleDeleteAssignment(assignment_id);
+                }}
+              >
+                Yes, I want to delete
+              </Button>
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 }

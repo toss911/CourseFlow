@@ -436,6 +436,7 @@ function AdminAddAssignment() {
                                   <Textarea
                                     {...field}
                                     placeholder="Enter assignment"
+                                    resize="none"
                                   />
                                   <FormErrorMessage>
                                     {form.errors.assignment}

@@ -514,6 +514,7 @@ function AdminEditAssignment() {
                                   <Textarea
                                     {...field}
                                     placeholder="Enter assignment"
+                                    resize="none"
                                   />
                                   <FormErrorMessage>
                                     {form.errors.assignment}
@@ -581,7 +582,7 @@ function AdminEditAssignment() {
                       </Flex>
                     </Flex>
                   </Flex>
-                  <Flex my="60px" alignSelf="end">
+                  <Flex alignSelf="end" mt="60px">
                     <Link onClick={() => onConfirmModalOpen()}>
                       Delete Assignment
                     </Link>
