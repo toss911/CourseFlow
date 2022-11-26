@@ -38,10 +38,12 @@ const AdminNavbar = (props) => {
               w="320px"
               type="text"
               placeholder="Search..."
-              onChange={(event) => {
-                props.setSearchText(event.target.value);
+              onKeyPress={(event) => {
+                if (event.key === "Enter") {
+                  props.handleSearch(event.target.value);
+                }
               }}
-              value={props.searchText}
+              // value={props.searchText}
             />
           </InputGroup>
         </Flex>

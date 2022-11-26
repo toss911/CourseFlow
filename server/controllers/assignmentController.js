@@ -56,54 +56,61 @@ export const putSaveDraftAssignment = async (req, res) => {
 
 // ------------------------------------------Admin-------------------------------------
 export const getAdminAssignment = async (req, res) => {
-  let searchText = req.query.searchText || "";
-  searchText = "\\m" + searchText;
-  const adminId = req.query.adminId;
+  try {
+    let searchText = req.query.searchText || "";
+    searchText = "\\m" + searchText;
+    const adminId = req.query.adminId;
 
-  const changeDateFormat = (iso_Date) => {
-    const isoDate = new Date(iso_Date);
-    let year = isoDate.getFullYear();
-    let month = isoDate.getMonth();
-    let date = isoDate.getDate();
-    let time = isoDate.toLocaleString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
+    const changeDateFormat = (iso_Date) => {
+      if (iso_Date === null) {
+        return "null";
+      }
+      const isoDate = new Date(iso_Date);
+      let year = isoDate.getFullYear();
+      let month = isoDate.getMonth() + 1;
+      let date = isoDate.getDate();
+      let time = isoDate.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+
+      if (date < 10) {
+        date = "0" + date;
+      }
+
+      if (month < 10) {
+        month = "0" + month;
+      }
+
+      let normalDate = date + "/" + month + "/" + year + " " + time;
+
+      return normalDate;
+    };
+
+    const result = await pool.query(
+      `SELECT assignments.detail, courses.course_name, lessons.lesson_name, sub_lessons.sub_lesson_name, assignments.created_date, assignments.updated_date, assignments.assignment_id
+    FROM courses
+    INNER JOIN lessons
+    ON lessons.course_id = courses.course_id
+    INNER JOIN sub_lessons
+    ON sub_lessons.lesson_id = lessons.lesson_id
+    INNER JOIN assignments
+    ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
+    WHERE assignments.detail ~* $1 and courses.admin_id = $2
+    ORDER BY assignments.updated_date DESC`,
+      [searchText, adminId]
+    );
+
+    for (let course of result.rows) {
+      course.created_date = changeDateFormat(course.created_date);
+      course.updated_date = changeDateFormat(course.updated_date);
+    }
+
+    return res.json({
+      data: result.rows,
     });
-
-    if (date < 10) {
-      date = "0" + date;
-    }
-
-    if (month < 10) {
-      month = "0" + month;
-    }
-
-    let normalDate = date + "-" + month + "-" + year + " " + time;
-
-    return normalDate;
-  };
-
-  const result = await pool.query(
-    `select assignments.detail,courses.course_name,lessons.lesson_name,sub_lessons.sub_lesson_name,assignments.created_date,assignments.updated_date from admins
-    inner join courses
-    on courses.admin_id = admins.admin_id
-    inner join lessons
-    on lessons.course_id = courses.course_id
-    inner join sub_lessons
-    on sub_lessons.lesson_id = lessons.lesson_id
-    inner join assignments
-    on assignments.sub_lesson_id = sub_lessons.sub_lesson_id
-    where assignments.detail ~* $1 and admins.admin_id = $2
-    order by assignments.updated_date`,
-    [searchText, adminId]
-  );
-
-  for (let course of result.rows) {
-    course.created_date = changeDateFormat(course.created_date);
-    course.updated_date = changeDateFormat(course.updated_date);
+  } catch (error) {
+    return res.sendStatus(500);
   }
-  return res.json({
-    data: result.rows,
-  });
 };

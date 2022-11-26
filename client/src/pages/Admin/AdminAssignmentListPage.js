@@ -1,6 +1,5 @@
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
-  Box,
   Flex,
   Table,
   Text,
@@ -11,14 +10,10 @@ import {
   Td,
   TableContainer,
   Image,
-  Heading,
-  Input,
-  InputLeftElement,
-  InputGroup,
-  Button,
   Spinner,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
 import AdminNavbar from "../../components/AdminNavbar.js";
@@ -26,9 +21,9 @@ import AdminNavbar from "../../components/AdminNavbar.js";
 function AdminAssignmentList() {
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
-  const [searchText, setSearchText] = useState("");
   const [adminAssignment, setAdminAssignment] = useState();
   const [isLoading, setIsLoadeing] = useState(true);
+  const navigate = useNavigate();
   const columnNames = [
     "Assignment detail",
     "Course",
@@ -40,15 +35,11 @@ function AdminAssignmentList() {
   ];
 
   useEffect(() => {
-    setIsLoadeing(true);
-    const assignmentData = setTimeout(() => {
-      getAdminAssignment(searchText);
-      setIsLoadeing(false);
-    }, 1000);
-    return () => clearTimeout(assignmentData);
-  }, [searchText]);
+    getAdminAssignment("");
+  }, []);
 
-  const getAdminAssignment = async () => {
+  const getAdminAssignment = async (searchText) => {
+    setIsLoadeing(true);
     const query = new URLSearchParams();
     query.append("searchText", searchText);
     query.append("adminId", adminId);
@@ -56,6 +47,11 @@ function AdminAssignmentList() {
       `http://localhost:4000/assignment/admin?${query.toString()}`
     );
     setAdminAssignment(results.data.data);
+    setIsLoadeing(false);
+  };
+
+  const handleSearch = async (searchText) => {
+    await getAdminAssignment(searchText);
   };
 
   return (
@@ -69,8 +65,7 @@ function AdminAssignmentList() {
           heading="Assignment"
           action="+ Add Assignment"
           url="add"
-          setSearchText={setSearchText}
-          searchText={searchText}
+          handleSearch={handleSearch}
         />
         {/* Right-Bottom Section */}
         <Flex
@@ -124,6 +119,9 @@ function AdminAssignmentList() {
                     return (
                       <Tr key={key}>
                         {Object.keys(assignment).map((assignmentKey, index) => {
+                          if (/assignment_id/i.test(assignmentKey)) {
+                            return;
+                          }
                           return (
                             <Td
                               maxW="200px"
@@ -131,7 +129,7 @@ function AdminAssignmentList() {
                               textOverflow="ellipsis"
                               p="32px 16px"
                               color="black"
-                              fontSize="16px"
+                              fontSize="15px"
                               key={index}
                             >
                               {assignment[assignmentKey]}
@@ -143,10 +141,15 @@ function AdminAssignmentList() {
                             <Image
                               src="../../../assets/admin-page/bin.svg"
                               alt="bin"
+                              cursor="pointer"
                             />
                             <Image
                               src="../../../assets/admin-page/edit.svg"
                               alt="edit"
+                              cursor="pointer"
+                              onClick={() =>
+                                navigate(`./edit/${assignment.assignment_id}`)
+                              }
                             />
                           </Flex>
                         </Td>
