@@ -5,12 +5,11 @@ import UnauthenticatedAdmin from "./pages/Admin/UnauthenticatedAdmin";
 
 function AppAdmin() {
   const { isAdminAuthenticated } = useAuth();
-  console.log(isAdminAuthenticated);
   return (
     <>
-    { isAdminAuthenticated ? <AuthenticatedAdmin/> : <UnauthenticatedAdmin/> }
+      {isAdminAuthenticated ? <AuthenticatedAdmin /> : <UnauthenticatedAdmin />}
     </>
-    );
+  );
 }
 
 export default AppAdmin;

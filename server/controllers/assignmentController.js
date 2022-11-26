@@ -95,7 +95,7 @@ export const getAdminAssignment = async (req, res) => {
     inner join assignments
     on assignments.sub_lesson_id = sub_lessons.sub_lesson_id
     where assignments.detail ~* $1 and admins.admin_id = $2
-    order by assignments.updated_date `,
+    order by assignments.updated_date`,
     [searchText, adminId]
   );
 

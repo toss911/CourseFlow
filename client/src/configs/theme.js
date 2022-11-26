@@ -199,7 +199,7 @@ const components = {
           },
         },
         _active: {
-          bg: "gray.400",
+          bg: "gray.200",
         },
         _disabled: {
           color: "gray.600",
