@@ -20,14 +20,12 @@ import {
 const coursesPerPage = 6;
 
 function DesireCourse() {
-  const { getCourses, isLoading, setIsLoading, desireCourse, desireCourses } =
-    useCourses();
+  const { isLoading, getDesiredCourses, desireCourses } = useCourses();
   const { contextState } = useAuth();
   const [page, setPage] = useState(1);
-  // console.log(contextState.user.user_id);
 
   useEffect(() => {
-    desireCourse(contextState.user.user_id);
+    getDesiredCourses(contextState.user.user_id);
   }, []);
 
   // Get current posts
@@ -82,7 +80,7 @@ function DesireCourse() {
                         courseSummary={course.summary}
                         courseNumLessons={course.count}
                         courseTime={course.learning_time}
-                        courseImg={course.cover_image_directory}
+                        courseImg={course.cover_image_directory.url}
                         courseId={course.course_id}
                       />
                     );

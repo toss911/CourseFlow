@@ -63,13 +63,12 @@ const useCourses = () => {
     }
   };
 
-  const desireCourse = async (userId) => {
+  const getDesiredCourses = async (userId) => {
     try {
       setIsError(false);
       setIsLoading(true);
       const desireCourseData = await axios.get(
-        `http://localhost:4000/courses/desire?byUser=${userId}`
-        // `http://localhost:4000/courses/desire/5`
+        `http://localhost:4000/user/desired?byUser=${userId}`
       );
 
       setDesireCourses(desireCourseData.data.data);
@@ -108,7 +107,7 @@ const useCourses = () => {
     setIsLoading,
     isError,
     setIsError,
-    desireCourse,
+    getDesiredCourses,
     desireCourses,
   };
 };

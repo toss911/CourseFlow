@@ -6,10 +6,7 @@ import { checkSubscription } from "../middlewares/checkSubscription.js";
 
 const coursesRouter = Router();
 
-// Admin
 coursesRouter.get("/", courses_controller.getAll);
-
-coursesRouter.get("/desire", courses_controller.getDesire);
 
 coursesRouter.get("/:courseId", courses_controller.getById);
 
