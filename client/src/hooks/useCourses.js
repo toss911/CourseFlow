@@ -13,14 +13,12 @@ const useCourses = () => {
 
   const getCourses = async (input) => {
     try {
-      const { keywords, page } = input;
+      const { keywords } = input;
       const query = new URLSearchParams();
       query.append("keywords", keywords);
-      query.append("page", page);
       setIsError(false);
       const results = await axios.get(
         `http://localhost:4000/courses?${query.toString()}`
-        // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
       setCourses(results.data.data);
       setIsLoading(false);

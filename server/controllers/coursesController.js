@@ -8,16 +8,20 @@ export const getAll = async (req, res) => {
 
     const results = await pool.query(
       `
-        SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
-        FROM lessons
-        INNER JOIN courses
-        ON courses.course_id = lessons.course_id
-        WHERE courses.course_name ~* $1
-        GROUP BY courses.course_id
-        ORDER BY courses.course_id asc
+      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
+      FROM lessons
+      INNER JOIN courses
+      ON courses.course_id = lessons.course_id
+      WHERE courses.course_name ~* $1
+      GROUP BY courses.course_id
+      ORDER BY courses.course_id asc
       `,
       [keywords]
     );
+
+    for (let course of results.rows) {
+      course.cover_image_directory = JSON.parse(course.cover_image_directory);
+    }
 
     return res.json({
       data: results.rows,
