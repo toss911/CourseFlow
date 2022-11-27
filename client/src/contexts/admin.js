@@ -4,6 +4,7 @@ export const AdminContext = React.createContext();
 
 function AdminProvider(props) {
   const [addLesson, setAddLesson] = useState([]);
+
   return (
     <AdminContext.Provider value={{ addLesson, setAddLesson }}>
       {props.children}
