@@ -122,6 +122,10 @@ function AdminEditAssignment() {
             ? courseData[assignmentData.course_id].lessons[
                 assignmentData.lesson_id
               ].sub_lessons[assignmentData.sub_lesson_id].duration
+              ? courseData[assignmentData.course_id].lessons[
+                  assignmentData.lesson_id
+                ].sub_lessons[assignmentData.sub_lesson_id].duration
+              : 0
             : "",
       }}
       onSubmit={handleSubmit}
