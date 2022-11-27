@@ -11,10 +11,8 @@ function AuthenticatedAdmin() {
   return (
     <Routes>
       <Route path="/" element={<AdminViewCourses />} />
-      <Route path="/add-lesson" element={<AdminAddLesson />} />
-      <Route path="/courses" element={<AdminViewCourses />} />
-      <Route path="/courses/add-lesson" element={<AdminAddLesson />} />
-      <Route path="/add-courses" element={<AdminAddCoursesPage />} />
+      <Route path="/course/add" element={<AdminAddCoursesPage />} />
+      <Route path="/course/add/lesson" element={<AdminAddLesson />} />
       <Route path="/assignment" element={<AdminAssignmentList />} />
       <Route path="/assignment/add" element={<AdminAddAssignment />} />
       <Route

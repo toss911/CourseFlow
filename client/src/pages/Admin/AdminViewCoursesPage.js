@@ -1,6 +1,5 @@
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
-  Box,
   Flex,
   Table,
   Thead,
@@ -11,17 +10,37 @@ import {
   TableContainer,
   Text,
   Image,
+  Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Button,
+  Divider,
 } from "@chakra-ui/react";
 import AdminNavbar from "../../components/AdminNavbar";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/authentication";
+let course_id;
 
 function AdminViewCourses() {
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
-  const [adminCourses, setAdminCourses] = useState([]);
-  const [searchText, setSearchText] = useState("");
+  const [adminCourses, setAdminCourses] = useState();
+  const [isLoading, setIsLoadeing] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const {
+    isOpen: isConfirmModalOpen,
+    onOpen: onConfirmModalOpen,
+    onClose: onConfirmModalClose,
+  } = useDisclosure();
   const columnNames = [
     "Image",
     "Course name",
@@ -32,59 +51,95 @@ function AdminViewCourses() {
     "Action",
   ];
 
-  const getAdminCourses = async () => {
+  useEffect(() => {
+    getAdminCourses(searchParams.get("search"));
+  }, [searchParams.get("search")]);
+
+  const getAdminCourses = async (searchText) => {
+    /* In case of no searchText => transform searchText into empty string (instead of null) */
+    if (!searchText) {
+      searchText = "";
+    }
+    setIsLoadeing(true);
     const query = new URLSearchParams();
     query.append("searchText", searchText);
-    query.append("adminId", adminId);
+    query.append("byAdmin", adminId);
     const results = await axios.get(
-      `http://localhost:4000/courses/admin?${query.toString()}`
+      `http://localhost:4000/admin/courses?${query.toString()}`
     );
     setAdminCourses(results.data.data);
+    setIsLoadeing(false);
   };
 
-  useEffect(() => {
-    const getCourses = setTimeout(() => {
-      getAdminCourses(searchText);
-    }, 1000);
-
-    return () => clearTimeout(getCourses);
-  }, [searchText]);
+  const handleDeleteCourse = async (courseId) => {
+    setIsDeleting(true);
+    const result = await axios.delete(
+      `http://localhost:4000/admin/courses/${courseId}?byAdmin=${adminId}`
+    );
+    console.log("result: ", result.data.message);
+    setIsDeleting(false);
+    if (/successfully/i.test(result.data.message)) {
+      onConfirmModalClose();
+      getAdminCourses(searchParams.get("search"));
+    }
+  };
 
   return (
-    <Box>
-      <Flex>
-        <Sidebar selectedTab={1} />
-        <Flex flexDirection="column">
-          <AdminNavbar
-            heading="Assignment"
-            action="+ Add Assignment"
-            url="add-course"
-            setSearchText={setSearchText}
-            searchText={searchText}
-          />
-          <Box backgroundColor="gray.100" h="100%">
+    <Flex w="100vw">
+      {/* Left Section */}
+      <Sidebar selectedTab={1} />
+      {/* Right Section */}
+      <Flex direction="column" w="100%">
+        {/* Right-Top Section */}
+        <AdminNavbar
+          heading="Course"
+          action="+ Add Course"
+          url="course/add"
+          searchParams={searchParams}
+        />
+        {/* Right-Bottom Section */}
+        <Flex
+          bg="gray.100"
+          w="100%"
+          h="100%"
+          px="2.5%"
+          py="45px"
+          align="start"
+          justify="center"
+        >
+          {isLoading || !Boolean(adminCourses) ? (
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
+          ) : adminCourses.length === 0 ? (
+            <Text as="i">Course not found!</Text>
+          ) : (
             <TableContainer
+              bg="white"
               borderRadius="8px"
-              mt="48px"
-              ml="48px"
-              w="1120px"
-              h="650px"
-              overflowY="scroll"
+              maxW="80vw"
+              maxH="80vh"
+              overflowY="auto"
             >
-              <Table variant="simple" backgroundColor="white" size="md">
-                <Thead backgroundColor="gray.300" h="41px">
+              <Table>
+                <Thead bg="gray.300" h="41px">
                   <Tr>
-                    <Th></Th>
+                    <Th p="10px 16px"></Th>
                     {columnNames.map((columnName, key) => {
                       return (
-                        <Th key={key}>
-                          <Text
-                            variant="body3"
-                            textTransform="capitalize"
-                            textColor="gray.800"
-                          >
-                            {columnName}
-                          </Text>
+                        <Th
+                          key={key}
+                          textTransform="capitalize"
+                          color="gray.800"
+                          fontSize="14px"
+                          fontWeight="400"
+                          p="10px 16px"
+                        >
+                          {columnName}
                         </Th>
                       );
                     })}
@@ -93,48 +148,87 @@ function AdminViewCourses() {
                 <Tbody>
                   {adminCourses.map((course, key) => {
                     return (
-                      <Tr key={key} h="88px" w="1120px">
-                        <Td>{key + 1}</Td>
-                        <Td>
-                          <Image src={course.cover_image_directory} />
+                      <Tr key={key}>
+                        <Td maxW="48px" fontSize="15px" color="black">
+                          {key + 1}
                         </Td>
-                        <Td>
-                          <Text variant="body2" textColor="black">
-                            {course.course_name}
-                          </Text>
+                        <Td maxW="96px">
+                          <Image src={course.cover_image_directory.url} />
                         </Td>
-                        <Td>
-                          <Text variant="body2" textColor="black">
-                            {course.lessons_count} Lessons
-                          </Text>
+                        <Td
+                          maxW="268px"
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                          p="32px 16px"
+                          color="black"
+                          fontSize="15px"
+                        >
+                          {course.course_name}
                         </Td>
-                        <Td>
-                          <Text variant="body2" textColor="black">
-                            {course.price.toLocaleString("en", {
-                              minimumFractionDigits: 2,
-                            })}
-                          </Text>
+                        <Td
+                          maxW="105px"
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                          p="32px 16px"
+                          color="black"
+                          fontSize="15px"
+                        >
+                          {course.lessons_count} Lessons
                         </Td>
-                        <Td>
-                          <Text variant="body2" textColor="black">
-                            {course.created_date}
-                          </Text>
+                        <Td
+                          maxW="105px"
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                          p="32px 16px"
+                          color="black"
+                          fontSize="15px"
+                        >
+                          {course.price.toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                          })}
                         </Td>
-                        <Td>
-                          <Text variant="body2" textColor="black">
-                            {course.updated_date}
-                          </Text>
+                        <Td
+                          maxW="200px"
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                          p="32px 16px"
+                          color="black"
+                          fontSize="15px"
+                        >
+                          {course.created_date}
                         </Td>
-                        <Td>
-                          <Flex gap="20px" w="120px">
+                        <Td
+                          maxW="200px"
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                          p="32px 16px"
+                          color="black"
+                          fontSize="15px"
+                        >
+                          {course.updated_date}
+                        </Td>
+                        <Td maxW="150px" p="0px">
+                          <Flex gap="20%" justify="center">
                             <Image
                               src="../../../assets/admin-page/bin.svg"
                               alt="bin"
-                            ></Image>
+                              cursor="pointer"
+                              _hover={{ opacity: 0.5 }}
+                              onClick={() => {
+                                course_id = course.course_id;
+                                console.log("course_id: ", course_id);
+                                onConfirmModalOpen();
+                              }}
+                            />
                             <Image
                               src="../../../assets/admin-page/edit.svg"
                               alt="edit"
-                            ></Image>
+                              cursor="pointer"
+                              _hover={{ opacity: 0.5 }}
+                              // onClick={() =>
+                              //   navigate(`./edit/${course.course_id}`)
+                              // }
+                            />
                           </Flex>
                         </Td>
                       </Tr>
@@ -143,10 +237,48 @@ function AdminViewCourses() {
                 </Tbody>
               </Table>
             </TableContainer>
-          </Box>
+          )}
         </Flex>
       </Flex>
-    </Box>
+      <Modal
+        isCentered
+        isOpen={isConfirmModalOpen}
+        onClose={onConfirmModalClose}
+        closeOnOverlayClick={false}
+        preserveScrollBarGap
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader borderRadius="24px 24px 0px 0px">
+            <Text variant="body1" color="black">
+              Confirmation
+            </Text>
+          </ModalHeader>
+          <Divider sx={{ borderColor: "gray.300" }} />
+          <ModalCloseButton color="gray.500" />
+          <ModalBody p="24px 50px 24px 24px" color="black">
+            <Text variant="body2" color="gray.700" as="span">
+              Do you want to delete this course?
+            </Text>
+            <Flex mt="24px" width="600px">
+              <Button variant="secondary" onClick={onConfirmModalClose}>
+                No, I don't
+              </Button>
+              <Button
+                ml="16px"
+                isLoading={isDeleting}
+                variant="primary"
+                onClick={() => {
+                  handleDeleteCourse(course_id);
+                }}
+              >
+                Yes, I want to delete
+              </Button>
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </Flex>
   );
 }
 

@@ -1,5 +1,4 @@
 import { pool } from "../utils/db.js";
-import { getAdminCourses } from "./coursesController.js";
 
 export const getAllHomework = async (req, res) => {
   try {

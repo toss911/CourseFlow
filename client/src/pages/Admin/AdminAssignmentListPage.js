@@ -125,7 +125,7 @@ function AdminAssignmentList() {
               overflowY="auto"
             >
               <Table>
-                <Thead bg="gray.300">
+                <Thead bg="gray.300" h="41px">
                   <Tr>
                     {columnNames.map((columnName, key) => {
                       return (
@@ -181,10 +181,10 @@ function AdminAssignmentList() {
                               src="../../../assets/admin-page/edit.svg"
                               alt="edit"
                               cursor="pointer"
+                              _hover={{ opacity: 0.5 }}
                               onClick={() =>
                                 navigate(`./edit/${assignment.assignment_id}`)
                               }
-                              _hover={{ opacity: 0.5 }}
                             />
                           </Flex>
                         </Td>

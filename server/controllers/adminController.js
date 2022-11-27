@@ -37,6 +37,104 @@ export const addCourse = async (req, res) => {
   await pool.query(``);
 };
 
+export const getAdminCourses = async (req, res) => {
+  try {
+    let searchText = req.query.searchText || "";
+    searchText = "\\m" + searchText;
+    const adminId = req.query.byAdmin;
+
+    // Change ISO date to normal date before sending data to FE
+    const changeDateFormat = (iso_Date) => {
+      if (iso_Date === null) {
+        return "null";
+      }
+      const isoDate = new Date(iso_Date);
+      let year = isoDate.getFullYear();
+      let month = isoDate.getMonth() + 1;
+      let date = isoDate.getDate();
+      let time = isoDate.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+
+      if (date < 10) {
+        date = "0" + date;
+      }
+
+      if (month < 10) {
+        month = "0" + month;
+      }
+
+      let normalDate = date + "/" + month + "/" + year + " " + time;
+
+      return normalDate;
+    };
+
+    const results = await pool.query(
+      `
+      SELECT courses.cover_image_directory, courses.course_name, count(lessons.lesson_id) as lessons_count, courses.price, courses.created_date, courses.updated_date, courses.course_id
+      FROM lessons
+      INNER JOIN courses
+      ON courses.course_id = lessons.course_id
+      WHERE courses.course_name ~* $1 AND courses.admin_id = $2
+      GROUP BY courses.course_id
+      ORDER BY courses.updated_date DESC
+        `,
+      [searchText, adminId]
+    );
+
+    for (let course of results.rows) {
+      course.cover_image_directory = JSON.parse(course.cover_image_directory);
+      course.created_date = changeDateFormat(course.created_date);
+      course.updated_date = changeDateFormat(course.updated_date);
+    }
+
+    return res.json({
+      data: results.rows,
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+export const deleteCourse = async (req, res) => {
+  try {
+    const admin_id = req.query.byAdmin;
+    const course_id = req.params.courseId;
+
+    /* Validate whether this admin owned the course or not */
+    let doesAdminOwnThisCourse = await pool.query(
+      `
+    SELECT EXISTS 
+    (SELECT *
+      FROM courses
+    WHERE admin_id = $1 AND course_id = $2)
+    `,
+      [admin_id, course_id]
+    );
+    doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+    if (!doesAdminOwnThisCourse) {
+      return res
+        .status(403)
+        .json({ message: "You have no permission to delete this course" });
+    }
+
+    /* Delete an assignment from "assignments" table */
+    await pool.query(
+      `
+    DELETE FROM courses
+    WHERE course_id = $1
+    `,
+      [course_id]
+    );
+
+    return res.json({ message: "Course has been successfully deleted" });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
 export const getAllCoursesData = async (req, res) => {
   try {
     const adminId = req.query.byAdmin;
@@ -191,15 +289,15 @@ export const getAllAssignment = async (req, res) => {
 
     const result = await pool.query(
       `SELECT assignments.detail, courses.course_name, lessons.lesson_name, sub_lessons.sub_lesson_name, assignments.created_date, assignments.updated_date, assignments.assignment_id
-    FROM courses
-    INNER JOIN lessons
-    ON lessons.course_id = courses.course_id
-    INNER JOIN sub_lessons
-    ON sub_lessons.lesson_id = lessons.lesson_id
-    INNER JOIN assignments
-    ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
-    WHERE assignments.detail ~* $1 and courses.admin_id = $2
-    ORDER BY assignments.updated_date DESC`,
+      FROM courses
+      INNER JOIN lessons
+      ON lessons.course_id = courses.course_id
+      INNER JOIN sub_lessons
+      ON sub_lessons.lesson_id = lessons.lesson_id
+      INNER JOIN assignments
+      ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
+      WHERE assignments.detail ~* $1 and courses.admin_id = $2
+      ORDER BY assignments.updated_date DESC`,
       [searchText, adminId]
     );
 

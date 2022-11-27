@@ -13,18 +13,18 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 jwtInterceptor();
 root.render(
-  // <React.StrictMode>
-  <BrowserRouter>
-    <ChakraProvider theme={theme}>
-      <AuthProvider>
-        <Routes>
-          <Route path="/*" element={<App />} />
-          <Route path="/admin/*" element={<AppAdmin />} />
-        </Routes>
-      </AuthProvider>
-    </ChakraProvider>
-  </BrowserRouter>
-  // </React.StrictMode>
+  <React.StrictMode>
+    <BrowserRouter>
+      <ChakraProvider theme={theme}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/*" element={<App />} />
+            <Route path="/admin/*" element={<AppAdmin />} />
+          </Routes>
+        </AuthProvider>
+      </ChakraProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

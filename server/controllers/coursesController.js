@@ -530,13 +530,13 @@ export const postWatchedOrAccepted = async (req, res) => {
 };
 
 export const getSubLesson = async (req, res) => {
-  // try {
-  const userId = req.query.byUser;
-  const subLessonId = req.params.subLessonId;
-  const courseId = req.params.courseId;
+  try {
+    const userId = req.query.byUser;
+    const subLessonId = req.params.subLessonId;
+    const courseId = req.params.courseId;
 
-  let querySubLesson = await pool.query(
-    `
+    let querySubLesson = await pool.query(
+      `
     SELECT sub_lessons.sub_lesson_name, sub_lessons.video_directory, assignments.assignment_id, assignments.detail, sub_lessons.duration
     FROM lessons
     INNER JOIN sub_lessons
@@ -544,28 +544,28 @@ export const getSubLesson = async (req, res) => {
     LEFT JOIN assignments
     ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
     WHERE lessons.course_id = $1 AND sub_lessons.sub_lesson_id = $2`,
-    [courseId, subLessonId]
-  );
-  querySubLesson = querySubLesson.rows;
-  const subLessonData = {
-    sub_lesson_id: subLessonId,
-    sub_lesson_name: querySubLesson[0].sub_lesson_name,
-    video_directory: querySubLesson[0].video_directory,
-    duration: querySubLesson[0].duration,
-    assignments: {},
-  };
-  querySubLesson.map((assignment) => {
-    if (assignment.assignment_id !== null) {
-      subLessonData.assignments[assignment.assignment_id] = {
-        detail: assignment.detail,
-      };
-    } else {
-      subLessonData.assignments = null;
-    }
-  });
+      [courseId, subLessonId]
+    );
+    querySubLesson = querySubLesson.rows;
+    const subLessonData = {
+      sub_lesson_id: subLessonId,
+      sub_lesson_name: querySubLesson[0].sub_lesson_name,
+      video_directory: querySubLesson[0].video_directory,
+      duration: querySubLesson[0].duration,
+      assignments: {},
+    };
+    querySubLesson.map((assignment) => {
+      if (assignment.assignment_id !== null) {
+        subLessonData.assignments[assignment.assignment_id] = {
+          detail: assignment.detail,
+        };
+      } else {
+        subLessonData.assignments = null;
+      }
+    });
 
-  let queryAssignmentStatus = await pool.query(
-    `
+    let queryAssignmentStatus = await pool.query(
+      `
     SELECT assignments.assignment_id, sub_lessons.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id, users_assignments.answer, users_assignments.submitted_date
     FROM assignments
     INNER JOIN users_assignments
@@ -574,109 +574,57 @@ export const getSubLesson = async (req, res) => {
     ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
     WHERE assignments.sub_lesson_id = $1 AND users_assignments.user_id = $2
     `,
-    [subLessonId, userId]
-  );
+      [subLessonId, userId]
+    );
 
-  if (Boolean(queryAssignmentStatus.rowCount)) {
-    subLessonData.assignment_status = "accepted";
-    queryAssignmentStatus.rows.map((assignment) => {
-      subLessonData.assignments[String(assignment.assignment_id)].answer =
-        assignment.answer;
-      subLessonData.assignments[
-        String(assignment.assignment_id)
-      ].submitted_date = assignment.submitted_date;
-      // If an assignment status is overdue => Stored in response's data immediately (no need to check overdue status again)
-      if (
-        assignment.status === "overdue" ||
-        assignment.status === "submitted"
-      ) {
-        subLessonData.assignments[String(assignment.assignment_id)].status =
-          assignment.status;
-      } else {
-        // If an assignment status isn't overdue => Need to check whether it is overdue or not first
-        let daysAfterAccepted = Math.abs(assignment.accepted_date - new Date());
-        daysAfterAccepted = daysAfterAccepted / (1000 * 60 * 60 * 24);
-        // If it is overdue => Changed status to "overdue" then send into response's data and also update the database
-        if (daysAfterAccepted >= assignment.duration) {
-          assignment.status = "overdue";
-          pool.query(
-            `
+    if (Boolean(queryAssignmentStatus.rowCount)) {
+      subLessonData.assignment_status = "accepted";
+      queryAssignmentStatus.rows.map((assignment) => {
+        subLessonData.assignments[String(assignment.assignment_id)].answer =
+          assignment.answer;
+        subLessonData.assignments[
+          String(assignment.assignment_id)
+        ].submitted_date = assignment.submitted_date;
+        // If an assignment status is overdue => Stored in response's data immediately (no need to check overdue status again)
+        if (
+          assignment.status === "overdue" ||
+          assignment.status === "submitted"
+        ) {
+          subLessonData.assignments[String(assignment.assignment_id)].status =
+            assignment.status;
+        } else {
+          // If an assignment status isn't overdue => Need to check whether it is overdue or not first
+          let daysAfterAccepted = Math.abs(
+            assignment.accepted_date - new Date()
+          );
+          daysAfterAccepted = daysAfterAccepted / (1000 * 60 * 60 * 24);
+          // If it is overdue => Changed status to "overdue" then send into response's data and also update the database
+          if (daysAfterAccepted >= assignment.duration) {
+            assignment.status = "overdue";
+            pool.query(
+              `
             UPDATE users_assignments
             SET status = 'overdue', updated_date = $1
             WHERE user_assignment_id = $2
             `,
-            [new Date(), assignment.user_assignment_id]
-          );
+              [new Date(), assignment.user_assignment_id]
+            );
+          }
+          subLessonData.assignments[String(assignment.assignment_id)].status =
+            assignment.status;
         }
-        subLessonData.assignments[String(assignment.assignment_id)].status =
-          assignment.status;
-      }
-    });
-  } else {
-    /* In case of there is no assignment in that sub lesson, assignment_status will automatically be assigned as "accepted" */
-    if (subLessonData.assignments === null) {
-      subLessonData.assignment_status = "accepted";
+      });
     } else {
-      subLessonData.assignment_status = "unaccepted";
+      /* In case of there is no assignment in that sub lesson, assignment_status will automatically be assigned as "accepted" */
+      if (subLessonData.assignments === null) {
+        subLessonData.assignment_status = "accepted";
+      } else {
+        subLessonData.assignment_status = "unaccepted";
+      }
     }
+
+    return res.json({ data: subLessonData });
+  } catch (error) {
+    return res.sendStatus(500);
   }
-
-  return res.json({ data: subLessonData });
-  // } catch (error) {
-  //   return res.sendStatus(500);
-  // }
-};
-
-// Admin
-export const getAdminCourses = async (req, res) => {
-  let searchText = req.query.searchText || "";
-  searchText = "\\m" + searchText;
-  const adminId = req.query.adminId;
-
-  // Change ISO date to normal date before sending data to FE
-  const changeDateFormat = (iso_Date) => {
-    const isoDate = new Date(iso_Date);
-    let year = isoDate.getFullYear();
-    let month = isoDate.getMonth();
-    let date = isoDate.getDate();
-    let time = isoDate.toLocaleString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
-
-    if (date < 10) {
-      date = "0" + date;
-    }
-
-    if (month < 10) {
-      month = "0" + month;
-    }
-
-    let normalDate = date + "-" + month + "-" + year + " " + time;
-
-    return normalDate;
-  };
-
-  const results = await pool.query(
-    `
-      SELECT courses.course_id, courses.course_name, courses.cover_image_directory, count(lessons.lesson_id) as lessons_count, courses.price, courses.created_date, courses.updated_date
-        FROM lessons
-        INNER JOIN courses
-        ON courses.course_id = lessons.course_id
-        WHERE courses.course_name ~* $1 AND courses.admin_id = $2
-        GROUP BY courses.course_id
-        ORDER BY courses.course_id asc
-      `,
-    [searchText, adminId]
-  );
-
-  for (let course of results.rows) {
-    course.created_date = changeDateFormat(course.created_date);
-    course.updated_date = changeDateFormat(course.updated_date);
-  }
-
-  return res.json({
-    data: results.rows,
-  });
 };
