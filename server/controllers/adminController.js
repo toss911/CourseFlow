@@ -371,3 +371,61 @@ lesson_update as (
     });
   }
 };
+
+
+// DELETE course
+
+export const deleteCourse = async (req, res) => {
+  const courseId = req.params.courseId;
+  const adminId = req.query.adminId;
+
+  // Step1: Delete all media related to that course from cloudinary
+ 
+  const courseMediaFiles = await pool.query(`
+  SELECT courses.cover_image_directory, courses.video_trailer_directory, sub_lessons.video_directory
+  FROM courses
+  INNER join lessons
+  ON lessons.course_id = courses.course_id
+  INNER JOIN sub_lessons
+  ON sub_lessons.lesson_id = lessons.lesson_id
+  WHERE courses.course_id = $1 AND admin_id = $2
+  `, [courseId, adminId])
+
+  
+  const courseAttachedFiles = await pool.query(
+    `
+  SELECT * from files where course_id = $1
+  `,
+    [courseId]
+  );
+
+  let filesPublicIdForDelete = [];
+
+  for (let file of courseAttachedFiles.rows) {
+    filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
+  }
+
+  for (let publicId of Object.values(courseMediaFiles.rows[0])) {
+    console.log(JSON.parse(publicId).public_id);
+    filesPublicIdForDelete.push(JSON.parse(publicId).public_id)
+    
+  }
+
+  console.log(filesPublicIdForDelete);
+
+  for (let filePublicId of filesPublicIdForDelete) {
+    await cloudinaryUpload(filePublicId, "delete");
+  }
+
+  // Step2: Delete course from database
+
+  await pool.query(`
+  DELETE from courses WHERE course_id = $1 AND admin_id = $2`,
+  [courseId, adminId]);
+
+  return res.json({
+    "message": "course deleted"
+  });
+}
+
+
