@@ -25,14 +25,11 @@ import { useAdmin } from "../../contexts/admin.js";
 let action;
 
 function AdminAddLesson() {
-  // * ทำ context API เก็บ data
-  // * ไม่สามารถ create ได้ถ้า input และ video ไม่ถูกใส่
-  // * get data form in state lesson-name,sub-lesson-name,seq.,
-  // ! video_directory
-  // * add effect when press add sub-lesson button
-  // * add delete button
-  // todo drag and drop
-  // todo display course_name at title
+  // *Add sub lesson ได้แล้ว
+  // *delete ได้แล้ว
+  // !ปัญหาคือ video
+  // ? สงสัยว่า <- กับ back ต่างยังไง
+  // todo จะทำ query course , drag and drop และแก้ปัญหาที่เหลือ
 
   const { addLesson, setAddLesson } = useAdmin();
   const [video, setVideo] = useState();
@@ -52,10 +49,11 @@ function AdminAddLesson() {
     ],
   };
 
-  const handleVideoChange = (event) => {
+  const handleVideoChange = (event, index) => {
     const currentFile = event.target.files[0];
+    // let arrayVideo = [];
+    // arrayVideo[index] = currentFile;
     //setFileVideo(event.target.files[0]);
-
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
         action = "change";
@@ -70,7 +68,7 @@ function AdminAddLesson() {
     }
   };
 
-  let handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     // event.video_directory = fileVideo;
     event.sub_lessons_count = event.sub_lessons.length;
     setAddLesson(event);
@@ -391,7 +389,6 @@ function AdminAddLesson() {
                                         name={`sub_lessons.${index}.video_directory`}
                                       >
                                         {({ field, form }) => {
-                                          console.log("field: ", field);
                                           //sub_lesson.video_directory = "";
                                           return (
                                             <FormControl
@@ -407,9 +404,15 @@ function AdminAddLesson() {
                                                 {...field}
                                                 onChange={handleVideoChange}
                                                 // onChange={(event) => {
-                                                //   values.setFieldValue(
-                                                //     "file",
+                                                //   form.setFieldValue(
+                                                //     `sub_lessons.${index}.video_directory`,
                                                 //     event.target.files[0]
+                                                //   );
+                                                // }}
+                                                // onChange={(event, index) => {
+                                                //   handleVideoChange(
+                                                //     event,
+                                                //     index
                                                 //   );
                                                 // }}
                                               />
