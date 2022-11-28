@@ -506,12 +506,7 @@ function UserProfile() {
           )}
         </Formik>
       </Flex>
-      <Modal
-        isCentered
-        isOpen={isOpen}
-        onClose={onClose}
-        // onCloseComplete={() => window.location.reload()}
-      >
+      <Modal isCentered isOpen={isOpen} onClose={onClose} preserveScrollBarGap>
         <ModalOverlay />
         <ModalContent borderRadius="24px">
           <ModalHeader

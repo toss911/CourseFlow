@@ -199,7 +199,7 @@ const components = {
           },
         },
         _active: {
-          bg: "gray.400",
+          bg: "gray.200",
         },
         _disabled: {
           color: "gray.600",
@@ -289,6 +289,120 @@ const components = {
             borderColor: "purple",
             backgroundImage: "url('/assets/misc/warning-icon.svg')",
             backgroundPosition: "95% 52.5%",
+            backgroundRepeat: "no-repeat",
+          },
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.200",
+            borderColor: "gray.400",
+            opacity: 1,
+          },
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Select: {
+    variants: {
+      default: {
+        field: {
+          border: "1px solid",
+          borderColor: "gray.400",
+          borderRadius: "8px",
+          bg: "white",
+          color: "black",
+          fontSize: "16px",
+          fontWeight: 400,
+          lineHeight: "normal",
+          _focus: {
+            borderColor: "orange.500",
+          },
+          _invalid: {
+            pr: "5%",
+            borderColor: "purple",
+            backgroundImage: "url('/assets/misc/warning-icon.svg')",
+            backgroundPosition: "92.5% 52.5%",
+            backgroundRepeat: "no-repeat",
+          },
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.200",
+            borderColor: "gray.400",
+            opacity: 1,
+          },
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Textarea: {
+    variants: {
+      default: {
+        border: "1px solid",
+        borderColor: "gray.400",
+        borderRadius: "8px",
+        p: "12px 30px 12px 12px",
+        bg: "white",
+        color: "black",
+        fontSize: "16px",
+        fontWeight: 400,
+        lineHeight: "normal",
+        _placeholder: {
+          color: "gray.600",
+        },
+        _focus: {
+          borderColor: "orange.500",
+        },
+        _invalid: {
+          color: "black",
+          pr: "5%",
+          borderColor: "purple",
+          backgroundImage: "url('/assets/misc/warning-icon.svg')",
+          backgroundPosition: "97.5% 52.5%",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "25px",
+        },
+        _disabled: {
+          color: "gray.600",
+          bg: "gray.200",
+          borderColor: "gray.400",
+          opacity: 1,
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  NumberInput: {
+    variants: {
+      default: {
+        field: {
+          border: "1px solid",
+          borderColor: "gray.400",
+          borderRadius: "8px",
+          p: "12px 16px 12px 12px",
+          bg: "white",
+          color: "black",
+          fontSize: "16px",
+          fontWeight: 400,
+          lineHeight: "normal",
+          _placeholder: {
+            color: "gray.600",
+          },
+          _focus: {
+            borderColor: "orange.500",
+          },
+          _invalid: {
+            color: "black",
+            pr: "5%",
+            borderColor: "purple",
+            backgroundImage: "url('/assets/misc/warning-icon.svg')",
+            backgroundPosition: "92.5% 52.5%",
             backgroundRepeat: "no-repeat",
           },
           _disabled: {

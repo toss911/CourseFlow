@@ -268,3 +268,32 @@ export const subscribedCourses = async (req, res) => {
     return res.sendStatus(500);
   }
 };
+
+export const desiredCourses = async (req, res) => {
+  try {
+    const userId = req.query.byUser;
+
+    let desiredCourses = await pool.query(
+      `select desired_courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id)
+      from desired_courses
+      inner join courses
+      on courses.course_id = desired_courses.course_id
+      inner join lessons
+      on courses.course_id = lessons.course_id
+      where desired_courses.user_id = $1
+      group by desired_courses.course_id, courses.course_id`,
+      [userId]
+    );
+    desiredCourses = desiredCourses.rows;
+
+    for (let course of desiredCourses) {
+      course.cover_image_directory = JSON.parse(course.cover_image_directory);
+    }
+
+    return res.json({
+      data: desiredCourses,
+    });
+  } catch (err) {
+    return res.sendStatus(500);
+  }
+};

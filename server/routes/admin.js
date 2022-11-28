@@ -6,6 +6,7 @@ import { protect } from "../middlewares/protect.js";
 const adminRouter = Router();
 const multerUpload = multer({ dest: "uploads/" });
 
+
 const courseUpload = multerUpload.fields([
   { name: "course_cover_images", maxCount: 1},
   { name: "course_video_trailers", maxCount: 1},
@@ -15,6 +16,35 @@ const courseUpload = multerUpload.fields([
 
 adminRouter.post("/add-course", courseUpload, admin_controller.addCourse);
 adminRouter.get("/get-course/:courseId", admin_controller.getCourse);
-// adminRouter.put("/add-lesson", protect, admin_controller.videoSubLessonUpload);
+adminRouter.get("/courses", protect, admin_controller.getAdminCourses);
+adminRouter.delete(
+  "/courses/:courseId",
+  protect,
+  admin_controller.deleteCourse
+);
+
+adminRouter.get("/assignments", protect, admin_controller.getAllCoursesData);
+adminRouter.post("/assignments", protect, admin_controller.postNewAssignment);
+adminRouter.get(
+  "/assignments/list",
+  protect,
+  admin_controller.getAllAssignment
+);
+adminRouter.get(
+  "/assignments/:assignmentId",
+  protect,
+  admin_controller.getAssignmentById
+);
+adminRouter.put(
+  "/assignments/:assignmentId",
+  protect,
+  admin_controller.editAssignment
+);
+adminRouter.delete(
+  "/assignments/:assignmentId",
+  protect,
+  admin_controller.deleteAssignment
+);
+
 
 export default adminRouter;

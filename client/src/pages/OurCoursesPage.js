@@ -33,10 +33,10 @@ function OurCourses() {
   useEffect(() => {
     setIsLoading(true);
     const getData = setTimeout(() => {
-      getCourses({ keywords, page });
+      getCourses({ keywords });
     }, 1000);
     return () => clearTimeout(getData);
-  }, [keywords, page]);
+  }, [keywords]);
 
   // Get current posts
   const indexOfLastCourse = page * coursesPerPage;
@@ -62,7 +62,7 @@ function OurCourses() {
           <Box mb="100px">
             <InputGroup w="357px">
               <Input
-                type="string"
+                type="text"
                 placeholder="Search..."
                 pl="40px"
                 onChange={handleSearchTextChange}
@@ -103,7 +103,7 @@ function OurCourses() {
                   courseSummary={course.summary}
                   courseNumLessons={course.lessons_count}
                   courseTime={course.learning_time}
-                  courseImg={course.cover_image_directory}
+                  courseImg={course.cover_image_directory.url}
                   courseId={course.course_id}
                 />
               );

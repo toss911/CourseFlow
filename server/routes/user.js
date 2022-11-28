@@ -16,4 +16,6 @@ userRouter.put(
 
 userRouter.get("/subscription", protect, user_controller.subscribedCourses);
 
+userRouter.get("/desired", protect, user_controller.desiredCourses);
+
 export default userRouter;

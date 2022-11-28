@@ -431,6 +431,7 @@ function RegisterPage() {
         onClose={onClose}
         onCloseComplete={() => navigate("/login")}
         closeOnOverlayClick={false}
+        preserveScrollBarGap
       >
         <ModalOverlay />
         <ModalContent borderRadius="24px">
