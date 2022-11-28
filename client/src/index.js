@@ -7,24 +7,24 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { AuthProvider } from "./contexts/authentication.js";
 import theme from "./configs/theme.js";
 import jwtInterceptor from "./utils/jwtInterceptors.js";
-import { BrowserRouter, Routes, Route, } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppAdmin from "./AppAdmin.js";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 jwtInterceptor();
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ChakraProvider theme={theme}>
-        <AuthProvider>
+  // <React.StrictMode>
+  <BrowserRouter>
+    <ChakraProvider theme={theme}>
+      <AuthProvider>
         <Routes>
-          <Route path="/*" element={<App />}/>
-          <Route path="/admin/*" element={<AppAdmin/>}/>
+          <Route path="/*" element={<App />} />
+          <Route path="/admin/*" element={<AppAdmin />} />
         </Routes>
-        </AuthProvider>
-      </ChakraProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+      </AuthProvider>
+    </ChakraProvider>
+  </BrowserRouter>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
