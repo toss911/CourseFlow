@@ -5,7 +5,7 @@ import useCourses from "../hooks/useCourses";
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import { Pagination } from "antd";
-import "antd/dist/antd.css";
+import "antd/dist/antd.min.css";
 import {
   Box,
   Image,

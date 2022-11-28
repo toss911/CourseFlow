@@ -3,7 +3,7 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Pagination } from "antd";
-import "antd/dist/antd.css";
+import "antd/dist/antd.min.css";
 import { useEffect, useState } from "react";
 import {
   Box,
