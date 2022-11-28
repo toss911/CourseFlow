@@ -71,7 +71,7 @@ export const login = async (req, res) => {
         full_name: user.rows[0].full_name,
         birthdate: user.rows[0].birthdate,
         education: user.rows[0].education,
-        avatar_directory: user.rows[0].avatar_directory,
+        avatar_directory: JSON.parse(user.rows[0].avatar_directory),
       },
       process.env.SECRET_KEY,
       {
