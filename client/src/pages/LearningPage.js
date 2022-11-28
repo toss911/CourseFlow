@@ -252,6 +252,21 @@ function LearningPage() {
                               borderBottom="1px solid #D6D9E4"
                               pl="0"
                               pt="12px"
+                              onClick={() => {
+                                if (openAccordionIndex.includes(key)) {
+                                  const newAccordion = [...openAccordionIndex];
+                                  newAccordion.splice(
+                                    newAccordion.indexOf(key),
+                                    1
+                                  );
+                                  setOpenAccordionIndex(newAccordion);
+                                } else {
+                                  setOpenAccordionIndex([
+                                    ...openAccordionIndex,
+                                    key,
+                                  ]);
+                                }
+                              }}
                             >
                               <Box
                                 flex="1"
