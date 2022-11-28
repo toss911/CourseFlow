@@ -68,11 +68,9 @@ function LearningPage() {
       const result = await getCourseLearningById(userId);
       let i = 0;
       for (let lessonId in result.lessons) {
-        for (let subLessonId in result.lessons[lessonId].sub_lessons) {
-          if (subLessonId == params.subLessonId) {
-            setOpenAccordionIndex([Number(i)]);
-            break;
-          }
+        if (params.subLessonId in result.lessons[lessonId].sub_lessons) {
+          setOpenAccordionIndex([Number(i)]);
+          break;
         }
         i++;
       }
@@ -233,7 +231,7 @@ function LearningPage() {
               </Box>
               {!Boolean(openAccordionIndex) ? null : (
                 <Accordion
-                  defaultIndex={openAccordionIndex}
+                  index={openAccordionIndex}
                   allowMultiple
                   w="300px"
                   mt="24px"
@@ -582,6 +580,14 @@ function LearningPage() {
                 sequence[sequence.indexOf(Number(params.subLessonId)) - 1];
               navigate(`/courses/${params.courseId}/learning/${prevLessonId}`);
               window.scrollTo(0, 150);
+              let i = 0;
+              for (let lessonId in course.lessons) {
+                if (prevLessonId in course.lessons[lessonId].sub_lessons) {
+                  setOpenAccordionIndex([Number(i)]);
+                  break;
+                }
+                i++;
+              }
             }}
           >
             {Object.keys(course).length === 0
@@ -618,6 +624,14 @@ function LearningPage() {
                 sequence[sequence.indexOf(Number(params.subLessonId)) + 1];
               navigate(`/courses/${params.courseId}/learning/${nextLessonId}`);
               window.scrollTo(0, 150);
+              let i = 0;
+              for (let lessonId in course.lessons) {
+                if (nextLessonId in course.lessons[lessonId].sub_lessons) {
+                  setOpenAccordionIndex([Number(i)]);
+                  break;
+                }
+                i++;
+              }
             }}
           >
             {Object.keys(course).length === 0
