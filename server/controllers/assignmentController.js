@@ -4,20 +4,21 @@ export const getAllHomework = async (req, res) => {
   try {
     const userId = req.query.byUser;
     const results = await pool.query(
-      `SELECT courses.course_name, courses.course_id, lessons.lesson_name, sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, 
-        assignments.assignment_id, assignments.detail, sub_lessons.duration, 
-        users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date, users_assignments.updated_date, users_assignments.status, users_assignments.user_assignment_id
-        FROM courses
-        JOIN lessons
-        ON courses.course_id = lessons.course_id
-        JOIN sub_lessons
-        ON lessons.lesson_id = sub_lessons.lesson_id
-        JOIN assignments
-        ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
-        JOIN users_assignments 
-        ON assignments.assignment_id = users_assignments.assignment_id
-        WHERE users_assignments.user_id = $1
-        ORDER BY updated_date desc`,
+      `
+      SELECT courses.course_name, courses.course_id, lessons.lesson_name, sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, 
+      assignments.assignment_id, assignments.detail, sub_lessons.duration, 
+      users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date, users_assignments.updated_date, users_assignments.status, users_assignments.user_assignment_id
+      FROM courses
+      JOIN lessons
+      ON courses.course_id = lessons.course_id
+      JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      JOIN assignments
+      ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
+      JOIN users_assignments 
+      ON assignments.assignment_id = users_assignments.assignment_id
+      WHERE users_assignments.user_id = $1
+      ORDER BY updated_date desc`,
       [userId]
     );
 
@@ -93,6 +94,8 @@ export const putSubmitAssignment = async (req, res) => {
         FROM assignments
         INNER JOIN users_assignments
         ON assignments.assignment_id = users_assignments.assignment_id
+        INNER JOIN sub_lessons
+        ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
         WHERE assignments.assignment_id = $1 AND users_assignments.user_id = $2
         `,
         [assignmentId, userId]
@@ -125,47 +128,49 @@ export const putSubmitAssignment = async (req, res) => {
 };
 
 export const putSaveDraftAssignment = async (req, res) => {
-  try {
-    const answer = req.body.answer;
-    const updatedDate = new Date();
-    const assignmentId = req.params.assignmentId;
-    const userId = req.query.byUser;
-    let status = req.body.status;
+  // try {
+  const answer = req.body.answer;
+  const updatedDate = new Date();
+  const assignmentId = req.params.assignmentId;
+  const userId = req.query.byUser;
+  let status = req.body.status;
 
-    if (!/overdue/i.test(status)) {
-      let queryAssignmentStatus = await pool.query(
-        `
+  if (!/overdue/i.test(status)) {
+    let queryAssignmentStatus = await pool.query(
+      `
         SELECT sub_lessons.duration, users_assignments.accepted_date
         FROM assignments
         INNER JOIN users_assignments
         ON assignments.assignment_id = users_assignments.assignment_id
+        INNER JOIN sub_lessons
+        ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
         WHERE assignments.assignment_id = $1 AND users_assignments.user_id = $2
         `,
-        [assignmentId, userId]
-      );
-      queryAssignmentStatus = queryAssignmentStatus.rows[0];
-      let daysAfterAccepted = Math.abs(
-        queryAssignmentStatus.accepted_date - new Date()
-      );
-      daysAfterAccepted = daysAfterAccepted / (1000 * 60 * 60 * 24);
-      if (daysAfterAccepted >= queryAssignmentStatus.duration) {
-        status = "overdue";
-      } else {
-        status = "in progress";
-      }
+      [assignmentId, userId]
+    );
+    queryAssignmentStatus = queryAssignmentStatus.rows[0];
+    let daysAfterAccepted = Math.abs(
+      queryAssignmentStatus.accepted_date - new Date()
+    );
+    daysAfterAccepted = daysAfterAccepted / (1000 * 60 * 60 * 24);
+    if (daysAfterAccepted >= queryAssignmentStatus.duration) {
+      status = "overdue";
+    } else {
+      status = "in progress";
     }
+  }
 
-    await pool.query(
-      `
+  await pool.query(
+    `
     UPDATE users_assignments SET answer = $1, updated_date = $2, status = $3
     WHERE assignment_id = $4 AND user_id = $5`,
-      [answer, updatedDate, status, assignmentId, userId]
-    );
+    [answer, updatedDate, status, assignmentId, userId]
+  );
 
-    return res.json({
-      message: "Assignment is saved.",
-    });
-  } catch (error) {
-    return res.sendStatus(500);
-  }
+  return res.json({
+    message: "Assignment is saved.",
+  });
+  // } catch (error) {
+  //   return res.sendStatus(500);
+  // }
 };
