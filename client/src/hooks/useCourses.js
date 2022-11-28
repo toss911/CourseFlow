@@ -11,12 +11,15 @@ const useCourses = () => {
   const [desireCourses, setDesireCourses] = useState([]);
   const params = useParams();
 
-  const getCourses = async (input) => {
+  const getCourses = async (keywords) => {
     try {
-      const { keywords } = input;
+      /* In case of no searchText => transform searchText into empty string (instead of null) */
+      if (!keywords) {
+        keywords = "";
+      }
+      setIsLoading(true);
       const query = new URLSearchParams();
       query.append("keywords", keywords);
-      setIsError(false);
       const results = await axios.get(
         `http://localhost:4000/courses?${query.toString()}`
       );

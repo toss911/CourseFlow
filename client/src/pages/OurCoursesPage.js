@@ -18,25 +18,23 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import useCourses from "../hooks/useCourses";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const coursesPerPage = 12;
 
 function OurCourses() {
-  const [keywords, setKeywords] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1);
-  const { getCourses, courses, isLoading, setIsLoading } = useCourses();
-
-  const handleSearchTextChange = (event) => {
-    setKeywords(event.target.value);
-  };
+  const { getCourses, courses, isLoading } = useCourses();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setIsLoading(true);
-    const getData = setTimeout(() => {
-      getCourses({ keywords });
-    }, 1000);
-    return () => clearTimeout(getData);
-  }, [keywords]);
+    setSearchText(
+      Boolean(searchParams.get("search")) ? searchParams.get("search") : ""
+    );
+    getCourses(searchParams.get("search"));
+  }, [searchParams.get("search")]);
 
   // Get current posts
   const indexOfLastCourse = page * coursesPerPage;
@@ -65,8 +63,19 @@ function OurCourses() {
                 type="text"
                 placeholder="Search..."
                 pl="40px"
-                onChange={handleSearchTextChange}
-                value={keywords}
+                onChange={(event) => {
+                  setSearchText(event.target.value);
+                }}
+                onKeyPress={(event) => {
+                  if (event.key === "Enter") {
+                    if (Boolean(event.target.value)) {
+                      navigate(`.?search=${event.target.value}`);
+                    } else {
+                      navigate(".");
+                    }
+                  }
+                }}
+                value={searchText}
               />
               <InputLeftElement
                 pointerEvents="none"
