@@ -18,22 +18,29 @@ import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router";
 import { useAuth } from "../../contexts/authentication";
 
 function AdminEditCourses() {
   const [courseData, setCourseData] = useState({});
   let action;
   const [video, setVideo] = useState();
+  const [videoFile, setVideoFile] = useState();
   const [coverImage, setCoverImage] = useState();
+  const [coverImageFile, setCoverImageFile] = useState();
   const [files, setFiles] = useState([]);
   const [filesObj, setFilesObj] = useState([]);
   const props = " Add more files";
+  const [subLesson, setSubLesson] = useState();
+  const [subLessonFile, setSubLessonFile] = useState();
 
   const toast = useToast();
-  //   const { contextAdminState } = useAuth();
-  //   const adminId = contextAdminState.user.admin_id;
-  const adminId = 2;
-  const courseId = 70;
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
+  const params = useParams();
+  const courseId = params.courseId;
+  console.log(adminId);
+  action = "no files";
 
   const getCourseData = async () => {
     const result = await axios.get(
@@ -44,9 +51,15 @@ function AdminEditCourses() {
       result.data.filesMetaData,
       result.data.allMediaUrls
     );
-    setFilesObj(results);
+    
+    console.log(results.slice(3));
+    setFilesObj(results); // this is an array of file objects
     setCoverImage(results[0].fileUrl.url);
+    setCoverImageFile(results[0].fileData);
     setVideo(results[1].fileUrl.url);
+    setVideoFile(results[1].fileData);
+    setSubLesson(results[2].fileUrl);
+    setSubLessonFile(results[2].fileData);
     setFiles(results.slice(3));
   };
 
@@ -72,6 +85,11 @@ function AdminEditCourses() {
     return filesObjects;
   };
 
+  console.log(files);
+  console.log(filesObj); // to access each individual file object, filesObj.fileData
+  console.log(courseData);
+
+
   useEffect(() => {
     getCourseData();
   }, []);
@@ -84,19 +102,33 @@ function AdminEditCourses() {
     //   // navigate to view courses page
     // } else {
     // }
+    console.log(coverImageFile);
+    console.log(action);
     const formData = new FormData();
     formData.append("course_name", values.course_name);
     formData.append("price", values.price);
     formData.append("learning_time", values.total_learning_time);
-    formData.append("summary", values.course_summary);
-    formData.append("detail", values.course_detail);
+    formData.append("course_summary", values.course_summary);
+    formData.append("course_detail", values.course_detail);
     formData.append("category", values.category);
-    if (/change/i.test(action)) {
-      formData.append("action", action);
-      formData.append("cover_image_directory", values.cover_image);
+    // formData.append("action", action);
+    formData.append("lesson_name", "test lesson name");
+    formData.append("lesson_sequence", 3);
+    formData.append("sub_lesson_name", "test sub_lesson_name");
+    formData.append("sub_lesson_sequence", 4);
+    // if (/change/i.test(action)) {
+      formData.append("course_cover_images", coverImageFile);
+      formData.append("course_video_trailers", videoFile);
+      formData.append("sub_lesson_videos", subLessonFile); // check again
+      files.forEach((file) => {
+        formData.append("course_attached_files", file);
+      });
+    // }
+    for (let i of formData) {
+      console.log(i);
     }
     const result = await axios.put(
-      `http://localhost:4000/admin/edit-courses/${courseId}?${adminId}`,
+      `http://localhost:4000/admin/edit-course/${courseId}?adminId=${adminId}`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -106,10 +138,11 @@ function AdminEditCourses() {
 
   const handleVideoChange = (event) => {
     const currentFile = event.target.files[0];
+    action = "change";
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
         if (currentFile.size <= 1.2e9) {
-          action = "change";
+          setVideoFile(currentFile);
           setVideo(URL.createObjectURL(currentFile));
         } else {
           return toast({
@@ -130,11 +163,12 @@ function AdminEditCourses() {
 
   const handleCoverImageChange = (event) => {
     const currentFile = event.target.files[0];
+    action = "change";
 
     if (currentFile) {
       if (/jpeg|png/gi.test(currentFile.type)) {
         if (currentFile.size <= 2e6) {
-          action = "change";
+          setCoverImageFile(currentFile);
           setCoverImage(URL.createObjectURL(currentFile));
           console.log(coverImage);
         } else {
@@ -162,16 +196,20 @@ function AdminEditCourses() {
       setFiles([...files, ...newFiles]);
     } else {
       setFiles([...newFiles]);
+      console.log(files);
     }
   };
 
   const handleDeleteFiles = (uniqueIdentifier) => {
+    action = "change";
     let filesLeftAfterDelete = files.filter((file) => {
       return file.size != uniqueIdentifier;
     });
 
     setFiles([...filesLeftAfterDelete]);
   };
+
+  console.log(files);
 
   // *- input validation -* //
   const validateCourseName = (value) => {
@@ -230,12 +268,12 @@ function AdminEditCourses() {
     <>
       <Formik
         initialValues={{
-          course_name: courseData.course_name,
+          course_name: courseData.course_name || "",
           price: courseData.price || "",
-          total_learning_time: courseData.learning_time,
-          course_summary: courseData.summary,
-          course_detail: courseData.detail,
-          cover_image: "", // change to current cover_image
+          total_learning_time: courseData.learning_time || "",
+          course_summary: courseData.summary || "",
+          course_detail: courseData.detail || "",
+          cover_image: "",
           video_trailer: "",
           files_upload: "",
           category: courseData.category,
@@ -273,13 +311,13 @@ function AdminEditCourses() {
                         Course
                       </Heading>
                       <Heading variant="headline3">
-                        'Service Design Essentials'
+                        {courseData.course_name}
                       </Heading>
                     </Flex>
                   </Flex>
                   <Flex alignItems="center" gap="16px">
                     <Button variant="secondary">Cancel</Button>
-                    <Button variant="primary" onClick={handleSubmit}>
+                    <Button variant="primary" type="submit">
                       Save edits
                     </Button>
                   </Flex>
@@ -485,7 +523,8 @@ function AdminEditCourses() {
                                     cursor="pointer"
                                     onClick={() => {
                                       setCoverImage();
-                                      action = "delete";
+                                      action = "change";
+                                      console.log(action);
                                     }}
                                   >
                                     <Image
@@ -564,7 +603,7 @@ function AdminEditCourses() {
                                     cursor="pointer"
                                     onClick={() => {
                                       setVideo();
-                                      action = "delete";
+                                      action = "change";
                                     }}
                                   >
                                     <Image
@@ -610,6 +649,7 @@ function AdminEditCourses() {
                             <FormLabel variant="body2" color="black" mt="40px">
                               Attach Files (Optional)
                             </FormLabel>
+
                             {files.length > 0 ? (
                               files.map((file, key) => {
                                 return (
@@ -686,7 +726,7 @@ function AdminEditCourses() {
                                         onClick={() => {
                                           // setFiles();
                                           handleDeleteFiles(file.size);
-                                          action = "delete";
+                                          action = "change";
                                         }}
                                       >
                                         <Image

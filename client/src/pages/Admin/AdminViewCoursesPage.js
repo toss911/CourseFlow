@@ -225,9 +225,9 @@ function AdminViewCourses() {
                               alt="edit"
                               cursor="pointer"
                               _hover={{ opacity: 0.5 }}
-                              // onClick={() =>
-                              //   navigate(`./edit/${course.course_id}`)
-                              // }
+                              onClick={() =>
+                                navigate(`/admin/edit-course/${course.course_id}`)
+                              }
                             />
                           </Flex>
                         </Td>

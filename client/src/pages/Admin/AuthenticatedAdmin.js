@@ -21,7 +21,7 @@ function AuthenticatedAdmin() {
       />
       <Route path="*" element={<AdminError />} />
       <Route path="/add-lesson" element={<AdminAddLesson />} />
-      <Route path="/edit-courses" element={<AdminEditCourses />} />
+      <Route path="/edit-course/:courseId" element={<AdminEditCourses />} />
     </Routes>
   );
 }
