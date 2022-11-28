@@ -18,6 +18,7 @@ import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from 'react-router'
 import { useAuth } from "../../contexts/authentication";
 
 function AdminEditCourses() {
@@ -29,10 +30,11 @@ function AdminEditCourses() {
   const [filesObj, setFilesObj] = useState([]);
 
   const toast = useToast();
-  //   const { contextAdminState } = useAuth();
-  //   const adminId = contextAdminState.user.admin_id;
-  const adminId = 2;
-  const courseId = 70;
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
+  const params = useParams(); 
+  const courseId = params.courseId;
+  console.log(adminId);
 
   const getCourseData = async () => {
     const result = await axios.get(
@@ -43,11 +45,14 @@ function AdminEditCourses() {
       result.data.filesMetaData,
       result.data.allMediaUrls
     );
-    setFilesObj(results);
+    console.log(results);
+    setFilesObj(results); // this is an array of file objects
     setCoverImage(results[0].fileUrl.url);
     setVideo(results[1].fileUrl.url);
     setFiles(results.slice(3))
   };
+
+  console.log(files);
 
   // Convert media urls into file objects:
   const convertToFileObj = async (filesMetaData, allMediaUrls) => {
@@ -67,6 +72,8 @@ function AdminEditCourses() {
 
     return filesObjects;
   };
+
+  console.log(filesObj);
 
 
   useEffect(() => {
@@ -164,7 +171,7 @@ function AdminEditCourses() {
 
   const handleDeleteFiles = (uniqueIdentifier) => {
     let filesLeftAfterDelete = files.filter((file) => {
-      return file.size != uniqueIdentifier;
+      return file.fileData.size != uniqueIdentifier;
     });
 
     setFiles([...filesLeftAfterDelete]);
@@ -227,15 +234,15 @@ function AdminEditCourses() {
     <>
       <Formik
         initialValues={{
-          course_name: courseData.course_name,
+          course_name: courseData.course_name || "",
           price: courseData.price || "",
-          total_learning_time: courseData.learning_time,
-          course_summary: courseData.summary,
-          course_detail: courseData.detail,
+          total_learning_time: courseData.learning_time || "",
+          course_summary: courseData.summary || "",
+          course_detail: courseData.detail || "",
           cover_image: "", // change to current cover_image
           video_trailer: "",
           files_upload: "",
-          category: courseData.category
+          category: "business" || ""
         }}
         enableReinitialize
         onSubmit={handleSubmit}
@@ -605,7 +612,9 @@ function AdminEditCourses() {
                             <FormLabel variant="body2" color="black" mt="40px">
                               Attach Files (Optional)
                             </FormLabel>
+                            
                             {files.length > 0 ? (
+        
                               files.map((file, key) => {
                                 return (
                                   <>
@@ -635,17 +644,17 @@ function AdminEditCourses() {
                                         align="center"
                                       >
                                         <Box w="20px">
-                                          {/^image/i.test(file.type) ? (
+                                          {/^image/i.test(file.fileData.type) ? (
                                             <Image
                                               src="../../../assets/course-detail-page/image-icon.svg"
                                               alt="image icon"
                                             />
-                                          ) : /^audio/i.test(file.type) ? (
+                                          ) : /^audio/i.test(file.fileData.type) ? (
                                             <Image
                                               src="../../../assets/course-detail-page/audio-icon.svg"
                                               alt="audio icon"
                                             />
-                                          ) : /^video/i.test(file.type) ? (
+                                          ) : /^video/i.test(file.fileData.type) ? (
                                             <Image
                                               src="../../../assets/course-detail-page/video-icon.svg"
                                               alt="video icon"
@@ -659,7 +668,7 @@ function AdminEditCourses() {
                                         </Box>
                                       </Flex>
                                       <Text variant="body3" fontSize="xl">
-                                        {file.name}
+                                        {file.fileData.name}
                                       </Text>
 
                                       <Flex
@@ -680,7 +689,7 @@ function AdminEditCourses() {
                                         cursor="pointer"
                                         onClick={() => {
                                           // setFiles();
-                                          handleDeleteFiles(file.size);
+                                          handleDeleteFiles(file.fileData.size);
                                           action = "delete";
                                         }}
                                       >
