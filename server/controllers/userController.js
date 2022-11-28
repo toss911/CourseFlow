@@ -272,17 +272,33 @@ export const subscribedCourses = async (req, res) => {
 export const desiredCourses = async (req, res) => {
   try {
     const userId = req.query.byUser;
+    const page = req.query.page;
+    const coursesPerPage = 6;
+    const offset = (page - 1) * coursesPerPage;
+
+    let coursesCount = await pool.query(
+      `
+      SELECT COUNT(course_id) AS courses_count
+      FROM desired_courses
+      WHERE user_id = $1
+      `,
+      [userId]
+    );
+    coursesCount = Number(coursesCount.rows[0].courses_count);
 
     let desiredCourses = await pool.query(
-      `select desired_courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id)
-      from desired_courses
-      inner join courses
-      on courses.course_id = desired_courses.course_id
-      inner join lessons
-      on courses.course_id = lessons.course_id
-      where desired_courses.user_id = $1
-      group by desired_courses.course_id, courses.course_id`,
-      [userId]
+      `
+    SELECT desired_courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id)
+    FROM desired_courses
+    INNER JOIN courses
+    ON courses.course_id = desired_courses.course_id
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    WHERE desired_courses.user_id = $1
+    GROUP BY desired_courses.course_id, courses.course_id, desired_courses.created_date
+    ORDER BY desired_courses.created_date DESC
+    LIMIT $2 OFFSET $3`,
+      [userId, coursesPerPage, offset]
     );
     desiredCourses = desiredCourses.rows;
 
@@ -292,6 +308,7 @@ export const desiredCourses = async (req, res) => {
 
     return res.json({
       data: desiredCourses,
+      count: coursesCount,
     });
   } catch (err) {
     return res.sendStatus(500);

@@ -2,7 +2,8 @@ import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import useCourses from "../hooks/useCourses";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/authentication.js";
 import { Pagination } from "antd";
 import "antd/dist/antd.min.css";
@@ -17,28 +18,19 @@ import {
   Stack,
 } from "@chakra-ui/react";
 
-const coursesPerPage = 6;
-
 function DesireCourse() {
-  const { isLoading, getDesiredCourses, desireCourses } = useCourses();
+  const { isLoading, getDesiredCourses, desiredCourses } = useCourses();
   const { contextState } = useAuth();
-  const [page, setPage] = useState(1);
+  const userId = contextState.user.user_id;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    getDesiredCourses(contextState.user.user_id);
-  }, []);
+    getDesiredCourses(userId, searchParams.get("page"));
+  }, [searchParams.get("page")]);
 
-  // Get current posts
-  const indexOfLastCourse = page * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = desireCourses.slice(
-    indexOfFirstCourse,
-    indexOfLastCourse
-  );
-
-  // Change page
   const paginate = (pageNumber) => {
-    setPage(pageNumber);
+    navigate(`.?page=${pageNumber}`);
     window.scrollTo(0, 150);
   };
 
@@ -62,17 +54,16 @@ function DesireCourse() {
                   size="xl"
                   mb="187px"
                 />
-              ) : typeof desireCourses !== "undefined" &&
-                desireCourses.length > 0 ? (
+              ) : !Object.keys(desiredCourses).length >
+                0 ? null : desiredCourses.data.length > 0 ? (
                 <Flex
                   flexDirection="row"
                   justifyContent="center"
                   mb="180px"
                   flexWrap="wrap"
-                  w="100%"
-                  // w="100%" ถ้าจอคนอื่นให้ใช้อันนี้
+                  w="90%"
                 >
-                  {currentCourses.map((course, key) => {
+                  {desiredCourses.data.map((course, key) => {
                     return (
                       <CourseCard
                         key={key}
@@ -80,7 +71,7 @@ function DesireCourse() {
                         courseSummary={course.summary}
                         courseNumLessons={course.count}
                         courseTime={course.learning_time}
-                        courseImg={course.cover_image_directory.url}
+                        courseImg={course.cover_image_directory}
                         courseId={course.course_id}
                       />
                     );
@@ -96,10 +87,12 @@ function DesireCourse() {
         </Box>
         <Center mb="20">
           <Pagination
-            total={desireCourses.length}
-            current={page}
-            pageSize={coursesPerPage}
+            total={desiredCourses.count}
+            current={Number(searchParams.get("page")) || 1}
+            pageSize={6}
             onChange={paginate}
+            showSizeChanger={false}
+            hideOnSinglePage={Number(desiredCourses.count) === 0 ? true : false}
           />
         </Center>
       </Box>

@@ -8,7 +8,7 @@ const useCourses = () => {
   const [category, setCategory] = useState([]);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-  const [desireCourses, setDesireCourses] = useState([]);
+  const [desiredCourses, setDesiredCourses] = useState({});
   const params = useParams();
 
   const getCourses = async (keyword, page) => {
@@ -71,15 +71,20 @@ const useCourses = () => {
     }
   };
 
-  const getDesiredCourses = async (userId) => {
+  const getDesiredCourses = async (userId, page) => {
     try {
-      setIsError(false);
+      /* If there is no page value => set its value to be 1 (first page) */
+      if (!page) {
+        page = 1;
+      }
       setIsLoading(true);
       const desireCourseData = await axios.get(
-        `http://localhost:4000/user/desired?byUser=${userId}`
+        `http://localhost:4000/user/desired?byUser=${userId}&page=${page}`
       );
-
-      setDesireCourses(desireCourseData.data.data);
+      setDesiredCourses({
+        data: desireCourseData.data.data,
+        count: desireCourseData.data.count,
+      });
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -115,7 +120,7 @@ const useCourses = () => {
     isError,
     setIsError,
     getDesiredCourses,
-    desireCourses,
+    desiredCourses,
   };
 };
 

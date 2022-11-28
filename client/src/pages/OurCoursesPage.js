@@ -99,7 +99,7 @@ function OurCourses() {
             justifyContent="center"
             mb="180px"
             flexWrap="wrap"
-            w="70%"
+            w="85%"
           >
             {courses.data.map((course, key) => {
               return (
@@ -109,7 +109,7 @@ function OurCourses() {
                   courseSummary={course.summary}
                   courseNumLessons={course.lessons_count}
                   courseTime={course.learning_time}
-                  courseImg={course.cover_image_directory.url}
+                  courseImg={course.cover_image_directory}
                   courseId={course.course_id}
                 />
               );
