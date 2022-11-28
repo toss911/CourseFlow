@@ -6,12 +6,7 @@ import { checkSubscription } from "../middlewares/checkSubscription.js";
 
 const coursesRouter = Router();
 
-// Admin
-coursesRouter.get("/admin", courses_controller.getAdminCourses);
-
 coursesRouter.get("/", courses_controller.getAll);
-
-coursesRouter.get("/desire", courses_controller.getDesire);
 
 coursesRouter.get("/:courseId", courses_controller.getById);
 
@@ -49,6 +44,5 @@ coursesRouter.post(
   checkSubscription,
   courses_controller.postWatchedOrAccepted
 );
-
 
 export default coursesRouter;

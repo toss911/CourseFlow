@@ -143,6 +143,7 @@ export const PriceCard = (props) => {
         onClose={onClose}
         closeOnOverlayClick={false}
         size="lg"
+        preserveScrollBarGap
       >
         <ModalOverlay />
         <ModalContent borderRadius="24px">

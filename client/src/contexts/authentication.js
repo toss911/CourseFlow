@@ -12,7 +12,7 @@ function AuthProvider(props) {
     user: null,
     previousUrl: null,
   });
-  const [contextAdminState, setContextAdminState] = useState({user: null})
+  const [contextAdminState, setContextAdminState] = useState({ user: null });
 
   const navigate = useNavigate();
 
@@ -65,7 +65,7 @@ function AuthProvider(props) {
     const userDataFromToken = jwtDecode(token);
     setContextState({ ...contextState, user: userDataFromToken });
   }
-  
+
   const logout = () => {
     localStorage.removeItem("token");
     setContextState({ ...contextState, user: null });
@@ -74,7 +74,10 @@ function AuthProvider(props) {
   // -------------------------------------Admin Login-------------------------------
   const loginAdmin = async (data) => {
     try {
-      const result = await axios.post("http://localhost:4000/auth/loginAdmin", data);
+      const result = await axios.post(
+        "http://localhost:4000/auth/loginAdmin",
+        data
+      );
       if (result.data.token) {
         const adminToken = result.data.token;
         localStorage.setItem("adminToken", adminToken);
@@ -84,22 +87,22 @@ function AuthProvider(props) {
       } else {
         return result.data.message;
       }
-      console.log("result.data.adminToken : ", result.data.token);
     } catch (error) {
       alert(`ERROR: Please try again later`);
     }
   };
 
-    const logoutAdmin = () => {
+  const logoutAdmin = () => {
     localStorage.removeItem("adminToken");
-    setContextState({ ...contextAdminState, user: null });
+    setContextAdminState({ ...contextAdminState, user: null });
     navigate("/admin");
   };
+
   const isAdminAuthenticated = Boolean(localStorage.getItem("adminToken"));
   if (isAdminAuthenticated && !contextAdminState.user) {
     const adminToken = localStorage.getItem("adminToken");
     const userDataFromToken = jwtDecode(adminToken);
-    setContextAdminState({ ...contextState, user: userDataFromToken });
+    setContextAdminState({ ...contextAdminState, user: userDataFromToken });
   }
 
   return (
@@ -107,13 +110,15 @@ function AuthProvider(props) {
       value={{
         contextState,
         setContextState,
+        contextAdminState,
         login,
         logout,
         register,
         isAuthenticated,
         logoutAdmin,
         loginAdmin,
-        isAdminAuthenticated
+        isAdminAuthenticated,
+        contextAdminState,
       }}
     >
       {props.children}
@@ -123,4 +128,4 @@ function AuthProvider(props) {
 
 const useAuth = () => React.useContext(AuthContext);
 
-export { AuthProvider, useAuth};
+export { AuthProvider, useAuth };

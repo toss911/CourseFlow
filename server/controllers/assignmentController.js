@@ -5,7 +5,7 @@ export const getAllHomework = async (req, res) => {
     const userId = req.query.byUser;
     const results = await pool.query(
       `SELECT courses.course_name, courses.course_id, lessons.lesson_name, sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, 
-        assignments.assignment_id, assignments.detail, assignments.duration, 
+        assignments.assignment_id, assignments.detail, sub_lessons.duration, 
         users_assignments.answer, users_assignments.accepted_date, users_assignments.submitted_date, users_assignments.updated_date, users_assignments.status, users_assignments.user_assignment_id
         FROM courses
         JOIN lessons
@@ -89,7 +89,7 @@ export const putSubmitAssignment = async (req, res) => {
     if (!/overdue/i.test(status)) {
       let queryAssignmentStatus = await pool.query(
         `
-        SELECT assignments.duration, users_assignments.accepted_date
+        SELECT sub_lessons.duration, users_assignments.accepted_date
         FROM assignments
         INNER JOIN users_assignments
         ON assignments.assignment_id = users_assignments.assignment_id
@@ -135,7 +135,7 @@ export const putSaveDraftAssignment = async (req, res) => {
     if (!/overdue/i.test(status)) {
       let queryAssignmentStatus = await pool.query(
         `
-        SELECT assignments.duration, users_assignments.accepted_date
+        SELECT sub_lessons.duration, users_assignments.accepted_date
         FROM assignments
         INNER JOIN users_assignments
         ON assignments.assignment_id = users_assignments.assignment_id

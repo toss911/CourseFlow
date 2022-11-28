@@ -9,6 +9,7 @@ import {
   FormLabel,
   FormErrorMessage,
   Textarea,
+  Select
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import React from "react";
@@ -17,6 +18,7 @@ import LessonTable from "../../components/LessonsTable";
 import AdminNavbarAdd from "../../components/AdminNavbarAdd";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../../contexts/authentication";
 
 // Steps:
 // 1. Check if the user (admin) added at least one lesson and one sub-lesson:
@@ -32,12 +34,25 @@ const AdminAddCoursesPage = () => {
   const [video, setVideo] = useState();
   const [files, setFiles] = useState();
   const toast = useToast();
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
   let action;
 
   // this function will be triggered after user clicks on 'create course' button
   const addCourse = async () => {
     const result = await axios.post("", courseData);
   };
+
+  const handleSubmit = () => {
+    // check if user has added all info
+    if (true) {
+      addCourse();
+      // pop up modal
+      // navigate to view courses page
+    } else {
+      
+    }
+  }
 
   const handleVideoChange = (event) => {
     const currentFile = event.target.files[0];
@@ -88,6 +103,59 @@ const AdminAddCoursesPage = () => {
     }
   };
 
+  // *- input validation -* //
+  const validateCourseName = (value) => {
+    let error;
+    if (!value) {
+      error = "Course name cannot be empty";
+    } 
+    return error;
+  };
+
+  const validatePrice = (value) => {
+    let error;
+    if (!value) {
+      error = "Please specify price";
+    } else if (!/^(?:[1-9]\d*|\d)$/i.test(value)) {
+      error = `Price cannot be below 0`;
+    }
+    return error;
+  };
+
+  const validateLearningTime = (value) => {
+    let error;
+    if (!value) {
+      error = "Please specify learning time";
+    } else if (!/^(?:[1-9]\d*|\d)$/i.test(value)) {
+      error = `Learning time cannot be less than 0`;
+    }
+    return error;
+  };
+
+  const validateCourseSummary = (value) => {
+    let error;
+    if (!value) {
+      error = "Course summary cannot be empty";
+    } 
+    return error;
+  };
+
+  const validateCourseDetail = (value) => {
+    let error;
+    if (!value) {
+      error = "Course detail cannot be empty";
+    } 
+    return error;
+  };
+
+  const validateCategory = (value) => {
+    let error;
+    if (!value) {
+      error = "Category cannot be empty";
+    } 
+    return error;
+  };
+
   return (
     <>
       <Flex>
@@ -129,7 +197,7 @@ const AdminAddCoursesPage = () => {
                         flexDirection="column"
                       >
                         {/* Course name field */}
-                        <Field name="course_name">
+                        <Field name="course_name" validate={validateCourseName}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -148,14 +216,14 @@ const AdminAddCoursesPage = () => {
                                 {...field}
                               />
                               <FormErrorMessage>
-                                {form.errors.full_name}
+                                {form.errors.course_name}
                               </FormErrorMessage>
                             </FormControl>
                           )}
                         </Field>
                         <Flex>
                           {/* Price field */}
-                          <Field name="price">
+                          <Field name="price" validate={validatePrice}>
                             {({ field, form }) => (
                               <FormControl
                                 isInvalid={
@@ -172,6 +240,7 @@ const AdminAddCoursesPage = () => {
                                 </FormLabel>
                                 <Input
                                   type="number"
+                                  min="0"
                                   w="420px"
                                   h="48px"
                                   {...field}
@@ -183,7 +252,7 @@ const AdminAddCoursesPage = () => {
                             )}
                           </Field>
                           {/* Total Learning Time field */}
-                          <Field name="learning_time">
+                          <Field name="learning_time" validate={validateLearningTime}>
                             {({ field, form }) => (
                               <FormControl
                                 isInvalid={
@@ -212,7 +281,7 @@ const AdminAddCoursesPage = () => {
                             )}
                           </Field>
                         </Flex>
-                        <Field name="course_summary">
+                        <Field name="course_summary" validate={validateCourseSummary}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -240,7 +309,7 @@ const AdminAddCoursesPage = () => {
                             </FormControl>
                           )}
                         </Field>
-                        <Field name="course_detail">
+                        <Field name="course_detail" validate={validateCourseDetail}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -268,9 +337,42 @@ const AdminAddCoursesPage = () => {
                             </FormControl>
                           )}
                         </Field>
+                        <Field name="category" validate={validateCategory}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.category &&
+                                form.touched.category
+                              }
+                              isRequired
+                            >
+                              <FormLabel
+                                variant="body2"
+                                color="black"
+                                mt="40px"
+                              >
+                                Category
+                              </FormLabel>
+                              <Select 
+                                w="920px"
+                             
+                                {...field}>
+                                  <option value='category1'>Science</option>
+                                  <option value='category2'>Business</option>
+                                  <option value='category3'>Software development</option>
+                                
+                                </Select>
+                              <FormErrorMessage>
+                                {form.errors.category}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
                         {/* File Uploads */}
+                        
                         <Flex display="column" flexWrap="wrap" w="920px">
                           {/* Cover Image Upload */}
+                      
                           <Text variant="body2" mt="40px" w="fit-content">
                             Cover Image *
                           </Text>
@@ -285,6 +387,7 @@ const AdminAddCoursesPage = () => {
                             bg="gray.100"
                             mb="40px"
                             mt="8px"
+                        
                           >
                             {coverImage ? (
                               <Flex w="100%" h="100%" position="relative">
@@ -328,6 +431,7 @@ const AdminAddCoursesPage = () => {
                                   type="file"
                                   hidden
                                   onChange={handleCoverImageChange}
+                                  isRequired
                                 />
                                 <Flex
                                   w="358px"
@@ -343,7 +447,9 @@ const AdminAddCoursesPage = () => {
                                 </Flex>
                               </label>
                             )}
+                       
                           </Flex>
+                          
                           {/* Video Upload */}
                           <Text variant="body2">Video Trailer *</Text>
                           <Flex
@@ -396,6 +502,7 @@ const AdminAddCoursesPage = () => {
                                   type="file"
                                   hidden
                                   onChange={handleVideoChange}
+                                  isRequired
                                 />
                                 <Flex
                                   w="358px"

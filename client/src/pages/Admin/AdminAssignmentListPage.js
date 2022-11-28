@@ -2,13 +2,13 @@ import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Flex,
   Table,
+  Text,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
   TableContainer,
-  Text,
   Image,
   Spinner,
   Modal,
@@ -21,17 +21,17 @@ import {
   Button,
   Divider,
 } from "@chakra-ui/react";
-import AdminNavbar from "../../components/AdminNavbar";
-import axios from "axios";
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
-let course_id;
+import AdminNavbar from "../../components/AdminNavbar.js";
+let assignment_id;
 
-function AdminViewCourses() {
+function AdminAssignmentList() {
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
-  const [adminCourses, setAdminCourses] = useState();
+  const [adminAssignment, setAdminAssignment] = useState();
   const [isLoading, setIsLoadeing] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchParams] = useSearchParams();
@@ -42,20 +42,20 @@ function AdminViewCourses() {
     onClose: onConfirmModalClose,
   } = useDisclosure();
   const columnNames = [
-    "Image",
-    "Course name",
+    "Assignment detail",
+    "Course",
     "Lesson",
-    "Price",
+    "Sub-lesson",
     "Created date",
-    "Updated date",
+    "Update date",
     "Action",
   ];
 
   useEffect(() => {
-    getAdminCourses(searchParams.get("search"));
+    getAdminAssignment(searchParams.get("search"));
   }, [searchParams.get("search")]);
 
-  const getAdminCourses = async (searchText) => {
+  const getAdminAssignment = async (searchText) => {
     /* In case of no searchText => transform searchText into empty string (instead of null) */
     if (!searchText) {
       searchText = "";
@@ -65,36 +65,35 @@ function AdminViewCourses() {
     query.append("searchText", searchText);
     query.append("byAdmin", adminId);
     const results = await axios.get(
-      `http://localhost:4000/admin/courses?${query.toString()}`
+      `http://localhost:4000/admin/assignments/list?${query.toString()}`
     );
-    setAdminCourses(results.data.data);
+    setAdminAssignment(results.data.data);
     setIsLoadeing(false);
   };
 
-  const handleDeleteCourse = async (courseId) => {
+  const handleDeleteAssignment = async (assignmentId) => {
     setIsDeleting(true);
     const result = await axios.delete(
-      `http://localhost:4000/admin/courses/${courseId}?byAdmin=${adminId}`
+      `http://localhost:4000/admin/assignments/${assignmentId}?byAdmin=${adminId}`
     );
-    console.log("result: ", result.data.message);
     setIsDeleting(false);
     if (/successfully/i.test(result.data.message)) {
       onConfirmModalClose();
-      getAdminCourses(searchParams.get("search"));
+      getAdminAssignment(searchParams.get("search"));
     }
   };
 
   return (
     <Flex w="100vw">
       {/* Left Section */}
-      <Sidebar selectedTab={1} />
+      <Sidebar selectedTab={2} />
       {/* Right Section */}
       <Flex direction="column" w="100%">
         {/* Right-Top Section */}
         <AdminNavbar
-          heading="Course"
-          action="+ Add Course"
-          url="course/add"
+          heading="Assignment"
+          action="+ Add Assignment"
+          url="add"
           searchParams={searchParams}
         />
         {/* Right-Bottom Section */}
@@ -107,7 +106,7 @@ function AdminViewCourses() {
           align="start"
           justify="center"
         >
-          {isLoading || !Boolean(adminCourses) ? (
+          {isLoading || !Boolean(adminAssignment) ? (
             <Spinner
               thickness="4px"
               speed="0.65s"
@@ -115,8 +114,8 @@ function AdminViewCourses() {
               color="blue.500"
               size="xl"
             />
-          ) : adminCourses.length === 0 ? (
-            <Text as="i">Course not found!</Text>
+          ) : adminAssignment.length === 0 ? (
+            <Text as="i">Assignment not found!</Text>
           ) : (
             <TableContainer
               bg="white"
@@ -128,7 +127,6 @@ function AdminViewCourses() {
               <Table>
                 <Thead bg="gray.300" h="41px">
                   <Tr>
-                    <Th p="10px 16px"></Th>
                     {columnNames.map((columnName, key) => {
                       return (
                         <Th
@@ -146,67 +144,27 @@ function AdminViewCourses() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {adminCourses.map((course, key) => {
+                  {adminAssignment.map((assignment, key) => {
                     return (
                       <Tr key={key}>
-                        <Td maxW="48px" fontSize="15px" color="black">
-                          {key + 1}
-                        </Td>
-                        <Td maxW="96px">
-                          <Image src={course.cover_image_directory.url} />
-                        </Td>
-                        <Td
-                          maxW="268px"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          p="32px 16px"
-                          color="black"
-                          fontSize="15px"
-                        >
-                          {course.course_name}
-                        </Td>
-                        <Td
-                          maxW="105px"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          p="32px 16px"
-                          color="black"
-                          fontSize="15px"
-                        >
-                          {course.lessons_count} Lessons
-                        </Td>
-                        <Td
-                          maxW="105px"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          p="32px 16px"
-                          color="black"
-                          fontSize="15px"
-                        >
-                          {course.price.toLocaleString("en", {
-                            minimumFractionDigits: 2,
-                          })}
-                        </Td>
-                        <Td
-                          maxW="200px"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          p="32px 16px"
-                          color="black"
-                          fontSize="15px"
-                        >
-                          {course.created_date}
-                        </Td>
-                        <Td
-                          maxW="200px"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          p="32px 16px"
-                          color="black"
-                          fontSize="15px"
-                        >
-                          {course.updated_date}
-                        </Td>
+                        {Object.keys(assignment).map((assignmentKey, index) => {
+                          if (/assignment_id/i.test(assignmentKey)) {
+                            return;
+                          }
+                          return (
+                            <Td
+                              maxW="200px"
+                              overflow="hidden"
+                              textOverflow="ellipsis"
+                              p="32px 16px"
+                              color="black"
+                              fontSize="15px"
+                              key={index}
+                            >
+                              {assignment[assignmentKey]}
+                            </Td>
+                          );
+                        })}
                         <Td maxW="150px" p="0px">
                           <Flex gap="20%" justify="center">
                             <Image
@@ -215,8 +173,7 @@ function AdminViewCourses() {
                               cursor="pointer"
                               _hover={{ opacity: 0.5 }}
                               onClick={() => {
-                                course_id = course.course_id;
-                                console.log("course_id: ", course_id);
+                                assignment_id = assignment.assignment_id;
                                 onConfirmModalOpen();
                               }}
                             />
@@ -225,9 +182,9 @@ function AdminViewCourses() {
                               alt="edit"
                               cursor="pointer"
                               _hover={{ opacity: 0.5 }}
-                              // onClick={() =>
-                              //   navigate(`./edit/${course.course_id}`)
-                              // }
+                              onClick={() =>
+                                navigate(`./edit/${assignment.assignment_id}`)
+                              }
                             />
                           </Flex>
                         </Td>
@@ -258,7 +215,7 @@ function AdminViewCourses() {
           <ModalCloseButton color="gray.500" />
           <ModalBody p="24px 50px 24px 24px" color="black">
             <Text variant="body2" color="gray.700" as="span">
-              Do you want to delete this course?
+              Do you want to delete this assignment?
             </Text>
             <Flex mt="24px" width="600px">
               <Button variant="secondary" onClick={onConfirmModalClose}>
@@ -269,7 +226,7 @@ function AdminViewCourses() {
                 isLoading={isDeleting}
                 variant="primary"
                 onClick={() => {
-                  handleDeleteCourse(course_id);
+                  handleDeleteAssignment(assignment_id);
                 }}
               >
                 Yes, I want to delete
@@ -282,4 +239,4 @@ function AdminViewCourses() {
   );
 }
 
-export default AdminViewCourses;
+export default AdminAssignmentList;

@@ -13,14 +13,12 @@ const useCourses = () => {
 
   const getCourses = async (input) => {
     try {
-      const { keywords, page } = input;
+      const { keywords } = input;
       const query = new URLSearchParams();
       query.append("keywords", keywords);
-      query.append("page", page);
       setIsError(false);
       const results = await axios.get(
         `http://localhost:4000/courses?${query.toString()}`
-        // `http://localhost:4000/courses?keywords=${params.get("keywords")}&page=${params.get("page")}`
       );
       setCourses(results.data.data);
       setIsLoading(false);
@@ -65,13 +63,12 @@ const useCourses = () => {
     }
   };
 
-  const desireCourse = async (userId) => {
+  const getDesiredCourses = async (userId) => {
     try {
       setIsError(false);
       setIsLoading(true);
       const desireCourseData = await axios.get(
-        `http://localhost:4000/courses/desire?byUser=${userId}`
-        // `http://localhost:4000/courses/desire/5`
+        `http://localhost:4000/user/desired?byUser=${userId}`
       );
 
       setDesireCourses(desireCourseData.data.data);
@@ -110,7 +107,7 @@ const useCourses = () => {
     setIsLoading,
     isError,
     setIsError,
-    desireCourse,
+    getDesiredCourses,
     desireCourses,
   };
 };

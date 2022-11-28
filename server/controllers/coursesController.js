@@ -8,16 +8,20 @@ export const getAll = async (req, res) => {
 
     const results = await pool.query(
       `
-        SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
-        FROM lessons
-        INNER JOIN courses
-        ON courses.course_id = lessons.course_id
-        WHERE courses.course_name ~* $1
-        GROUP BY courses.course_id
-        ORDER BY courses.course_id asc
+      SELECT courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, count(lessons.lesson_id) as lessons_count
+      FROM lessons
+      INNER JOIN courses
+      ON courses.course_id = lessons.course_id
+      WHERE courses.course_name ~* $1
+      GROUP BY courses.course_id
+      ORDER BY courses.course_id asc
       `,
       [keywords]
     );
+
+    for (let course of results.rows) {
+      course.cover_image_directory = JSON.parse(course.cover_image_directory);
+    }
 
     return res.json({
       data: results.rows,
@@ -190,30 +194,6 @@ export const postSubscribeOrAddCourse = async (req, res) => {
       message,
     });
   } catch (error) {
-    return res.sendStatus(500);
-  }
-};
-
-export const getDesire = async (req, res) => {
-  try {
-    const userId = req.query.byUser;
-    let courseDesire = await pool.query(
-      `select desired_courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id)
-      from desired_courses
-      inner join courses
-      on courses.course_id = desired_courses.course_id
-      inner join lessons
-      on courses.course_id = lessons.course_id
-      where desired_courses.user_id = $1
-      group by desired_courses.course_id, courses.course_id`,
-      [userId]
-    );
-    let course = courseDesire.rows;
-
-    return res.json({
-      data: course,
-    });
-  } catch (err) {
     return res.sendStatus(500);
   }
 };
@@ -537,7 +517,7 @@ export const getSubLesson = async (req, res) => {
 
     let querySubLesson = await pool.query(
       `
-    SELECT sub_lessons.sub_lesson_name, sub_lessons.video_directory, assignments.assignment_id, assignments.detail, assignments.duration
+    SELECT sub_lessons.sub_lesson_name, sub_lessons.video_directory, assignments.assignment_id, assignments.detail, sub_lessons.duration
     FROM lessons
     INNER JOIN sub_lessons
     ON lessons.lesson_id = sub_lessons.lesson_id
@@ -551,13 +531,13 @@ export const getSubLesson = async (req, res) => {
       sub_lesson_id: subLessonId,
       sub_lesson_name: querySubLesson[0].sub_lesson_name,
       video_directory: querySubLesson[0].video_directory,
+      duration: querySubLesson[0].duration,
       assignments: {},
     };
     querySubLesson.map((assignment) => {
       if (assignment.assignment_id !== null) {
         subLessonData.assignments[assignment.assignment_id] = {
           detail: assignment.detail,
-          duration: assignment.duration,
         };
       } else {
         subLessonData.assignments = null;
@@ -566,10 +546,12 @@ export const getSubLesson = async (req, res) => {
 
     let queryAssignmentStatus = await pool.query(
       `
-    SELECT assignments.assignment_id, assignments.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id, users_assignments.answer, users_assignments.submitted_date
+    SELECT assignments.assignment_id, sub_lessons.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id, users_assignments.answer, users_assignments.submitted_date
     FROM assignments
     INNER JOIN users_assignments
     ON assignments.assignment_id = users_assignments.assignment_id
+    INNER JOIN sub_lessons
+    ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
     WHERE assignments.sub_lesson_id = $1 AND users_assignments.user_id = $2
     `,
       [subLessonId, userId]
@@ -625,55 +607,4 @@ export const getSubLesson = async (req, res) => {
   } catch (error) {
     return res.sendStatus(500);
   }
-};
-
-// Admin
-export const getAdminCourses = async (req, res) => {
-
-  let searchText = req.query.searchText || "";
-  searchText = "\\m" + searchText;
-  const adminId = req.query.adminId;
-
-  // Change ISO date to normal date before sending data to FE
-  const changeDateFormat = (iso_Date) => {
-    const isoDate = new Date(iso_Date);
-    let year = isoDate.getFullYear();
-    let month = isoDate.getMonth();
-    let date = isoDate.getDate();
-    let time = isoDate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true});
-
-    if (date < 10) {
-      date = '0' + date;
-    }
-
-    if (month < 10) {
-      month = '0' + month;
-    }
-
-    let normalDate = date + '-' + month + '-' + year + ' ' + time
-
-    return normalDate;
-  }
-
-  const results = await pool.query(
-    `
-      SELECT courses.course_id, courses.course_name, courses.cover_image_directory, count(lessons.lesson_id) as lessons_count, courses.price, courses.created_date, courses.updated_date
-        FROM lessons
-        INNER JOIN courses
-        ON courses.course_id = lessons.course_id
-        WHERE courses.course_name ~* $1 AND courses.admin_id = $2
-        GROUP BY courses.course_id
-        ORDER BY courses.course_id asc
-      `,
-    [searchText, adminId]
-  );
-
-  for (let course of results.rows) {
-    course.created_date = changeDateFormat(course.created_date);
-    course.updated_date = changeDateFormat(course.updated_date);
-  }
-
-  return res.json({
-    data: results.rows,
-  });
 };
