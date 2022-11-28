@@ -14,7 +14,6 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 jwtInterceptor();
 root.render(
-
   <React.StrictMode>
     <BrowserRouter>
       <ChakraProvider theme={theme}>
