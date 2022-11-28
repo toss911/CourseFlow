@@ -6,13 +6,12 @@ import { protect } from "../middlewares/protect.js";
 const adminRouter = Router();
 const multerUpload = multer({ dest: "uploads/" });
 
-
 const courseUpload = multerUpload.fields([
-  { name: "course_cover_images", maxCount: 1},
-  { name: "course_video_trailers", maxCount: 1},
-  { name: "course_attached_files", maxCount: 20},
-  { name: "sub_lesson_videos", maxCount: 200}
-])
+  { name: "course_cover_images", maxCount: 1 },
+  { name: "course_video_trailers", maxCount: 1 },
+  { name: "course_attached_files", maxCount: 20 },
+  { name: "sub_lesson_videos", maxCount: 200 },
+]);
 
 adminRouter.post("/add-course", courseUpload, admin_controller.addCourse);
 adminRouter.get("/get-course/:courseId", admin_controller.getCourse);
@@ -46,5 +45,15 @@ adminRouter.delete(
   admin_controller.deleteAssignment
 );
 
+adminRouter.put(
+  "/edit-course/:courseId",
+  courseUpload,
+  admin_controller.updateCourse
+);
+adminRouter.delete(
+  "/delete-course/:courseId",
+  courseUpload,
+  admin_controller.deleteCourse
+);
 
 export default adminRouter;

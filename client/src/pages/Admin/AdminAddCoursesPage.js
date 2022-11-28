@@ -20,7 +20,6 @@ import AdminNavbarAdd from "../../components/AdminNavbarAdd";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
-import e from "cors";
 
 // Steps:
 // 1. Check if the user (admin) added at least one lesson and one sub-lesson:
@@ -30,7 +29,7 @@ import e from "cors";
 // >> If NO,  1. Jump to lesson table section
 //            2. Display message 'Must add at least one lesson and one sub-lesson to continue'
 
-const AdminAddCoursesPage = () => {
+const AdminAddCourses = () => {
   let courseData = [];
   const [coverImage, setCoverImage] = useState();
   const [video, setVideo] = useState();
@@ -712,4 +711,4 @@ const AdminAddCoursesPage = () => {
   );
 };
 
-export default AdminAddCoursesPage;
+export default AdminAddCourses;
