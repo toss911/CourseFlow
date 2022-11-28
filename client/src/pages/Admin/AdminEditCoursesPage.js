@@ -737,33 +737,35 @@ function AdminEditCourses() {
                                       </Flex>
                                     </Flex>
                                     {/* Add more files */}
-                                    <label w="250px">
-                                      <Input
-                                        type="file"
-                                        hidden
-                                        onChange={handleFilesChange}
-                                        multiple
-                                      />
-                                      <Box
-                                        border="1px"
-                                        textAlign="center"
-                                        w="110px"
-                                        mt="10px"
-                                        borderRadius="12px"
-                                        borderColor="blue.300"
-                                        sx={{
-                                          "&:hover": {
-                                            bgColor: "blue.200",
-                                            border: "solid 1px white",
-                                          },
-                                        }}
-                                        cursor="pointer"
-                                      >
-                                        <Text variant="body3">
-                                          Add more files
-                                        </Text>
-                                      </Box>
-                                    </label>
+                                    {key === files.length - 1 ? (
+                                      <label w="250px">
+                                        <Input
+                                          type="file"
+                                          hidden
+                                          onChange={handleFilesChange}
+                                          multiple
+                                        />
+                                        <Box
+                                          border="1px"
+                                          textAlign="center"
+                                          w="110px"
+                                          mt="10px"
+                                          borderRadius="12px"
+                                          borderColor="blue.300"
+                                          sx={{
+                                            "&:hover": {
+                                              bgColor: "blue.200",
+                                              border: "solid 1px white",
+                                            },
+                                          }}
+                                          cursor="pointer"
+                                        >
+                                          <Text variant="body3">
+                                            Add more files
+                                          </Text>
+                                        </Box>
+                                      </label>
+                                    ) : null}
                                     {/* End of Add more files */}
                                   </>
                                 );
