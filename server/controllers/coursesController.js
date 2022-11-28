@@ -13,11 +13,11 @@ export const getAll = async (req, res) => {
       `
       SELECT COUNT(course_id) AS courses_count
       FROM courses
-      WHERE courses.course_name ~* $1
+      WHERE course_name ~* $1
       `,
       [keyword]
     );
-    coursesCount = coursesCount.rows[0].courses_count;
+    coursesCount = Number(coursesCount.rows[0].courses_count);
 
     const results = await pool.query(
       `
@@ -183,16 +183,16 @@ export const postSubscribeOrAddCourse = async (req, res) => {
         );
       }
       await pool.query(
-        `INSERT INTO subscriptions(user_id, course_id, status)
-              VALUES ($1, $2, $3)`,
-        [userId, courseId, 0]
+        `INSERT INTO subscriptions(user_id, course_id, status, created_date)
+              VALUES ($1, $2, $3, $4)`,
+        [userId, courseId, 0, new Date()]
       );
       message = "The course has been successfully subscribed";
     } else if (/add/i.test(action)) {
       await pool.query(
-        `INSERT INTO desired_courses(user_id, course_id)
-              VALUES ($1, $2)`,
-        [userId, courseId]
+        `INSERT INTO desired_courses(user_id, course_id, created_date)
+              VALUES ($1, $2, $3)`,
+        [userId, courseId, new Date()]
       );
       message =
         "The course has been successfully added to the desired courses list";
