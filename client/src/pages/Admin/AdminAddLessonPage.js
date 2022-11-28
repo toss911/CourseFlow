@@ -22,21 +22,20 @@ import {
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
+import { useNavigate } from "react-router-dom";
 let action;
-
 function AdminAddLesson() {
-  // *Add sub lesson ได้แล้ว
-  // *delete ได้แล้ว
-  // !ปัญหาคือ video เหลือ validate video
-  // ? สงสัยว่า <- กับ back ต่างยังไง
-  // todo จะทำ query course , drag and drop และแก้ปัญหาที่เหลือ
+  // * validate multi video
+  // * cancel button
+  // * todo back button
+  // todo drag and drop
 
   const { addLesson, setAddLesson } = useAdmin();
   const [video, setVideo] = useState([]);
   const [fileVideo, setFileVideo] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-
+  const navigate = useNavigate();
   const initialValues = {
     lesson_name: "",
     sub_lessons_count: "",
@@ -47,10 +46,14 @@ function AdminAddLesson() {
       },
     ],
   };
-
+  const handleCancel = () => {
+    setVideo([]);
+    setFileVideo([]);
+  };
   const handleAddSubLesson = () => {
     video.push(null);
   };
+
   const handleVideoChange = (event, index) => {
     const currentFile = event.target.files[0];
     if (currentFile) {
@@ -74,15 +77,17 @@ function AdminAddLesson() {
     }
   };
   const handleRemoveVideo = (index) => {
+    //remove video by index at contextAPI
     const newFileVideo = [...fileVideo];
     newFileVideo[index] = null;
     setFileVideo(newFileVideo);
-    // delete video by index
+    // remove video by index
     const newVideo = [...video];
     newVideo[index] = null;
     setVideo(newVideo);
   };
   const handleDelete = (index) => {
+    //delete video by index at contextAPI
     const newFileVideo = [...fileVideo];
     newFileVideo.splice(index, 1);
     setFileVideo(newFileVideo);
@@ -107,7 +112,7 @@ function AdminAddLesson() {
         <Flex flexDirection="column" w="100vw">
           {/* -------------Navbar add-lesson -----------------*/}
           <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-            {({ values }) => (
+            {({ values, resetForm }) => (
               <Form>
                 <Flex
                   flexDirection="row"
@@ -122,6 +127,10 @@ function AdminAddLesson() {
                       src="/assets/admin-lesson-page/arrow.svg"
                       arc="arrow"
                       ml="44px"
+                      _hover={{ opacity: 0.5 }}
+                      onClick={() => {
+                        navigate(-1);
+                      }}
                     />
                     <Flex
                       flexDirection="column"
@@ -153,6 +162,10 @@ function AdminAddLesson() {
                       h="60px"
                       variant="secondary"
                       shadow="shadow1"
+                      onClick={() => {
+                        resetForm();
+                        handleCancel();
+                      }}
                     >
                       Cancel
                     </Button>
@@ -219,25 +232,32 @@ function AdminAddLesson() {
                 >
                   <Flex>
                     <Field name="lesson_name">
-                      {({ field, form }) => (
-                        <FormControl
-                          isInvalid={
-                            form.errors.lesson_name && form.touched.lesson_name
-                          }
-                          isRequired
-                        >
-                          <FormLabel mt="40px" fontSize="16px" fontWeight="400">
-                            Lesson name
-                          </FormLabel>
-                          <Input type="text" w="920px" h="48px" {...field} />
-                          <Box
-                            mt="40px"
-                            w="920px"
-                            borderBottom="1px"
-                            borderColor="gray.400"
-                          />
-                        </FormControl>
-                      )}
+                      {({ field, form }) => {
+                        return (
+                          <FormControl
+                            isInvalid={
+                              form.errors.lesson_name &&
+                              form.touched.lesson_name
+                            }
+                            isRequired
+                          >
+                            <FormLabel
+                              mt="40px"
+                              fontSize="16px"
+                              fontWeight="400"
+                            >
+                              Lesson name
+                            </FormLabel>
+                            <Input type="text" w="920px" h="48px" {...field} />
+                            <Box
+                              mt="40px"
+                              w="920px"
+                              borderBottom="1px"
+                              borderColor="gray.400"
+                            />
+                          </FormControl>
+                        );
+                      }}
                     </Field>
                   </Flex>
 
