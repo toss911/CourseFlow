@@ -287,8 +287,8 @@ function LearningPage() {
                               </Box>
                               <AccordionIcon />
                             </AccordionButton>
-                            <AccordionPanel pb={4}>
-                              <UnorderedList>
+                            <AccordionPanel p={0}>
+                              <UnorderedList m="16px 0px">
                                 {Object.keys(lesson.sub_lessons).map(
                                   (subLessonId, keySub) => {
                                     return (
@@ -296,11 +296,13 @@ function LearningPage() {
                                         flexDirection="row"
                                         alignItems="start"
                                         justifyContent="start"
-                                        mt="24px"
+                                        p="8px 24px"
                                         key={keySub}
-                                        _hover={{ backgroundColor: "gray.100" }}
-                                        _active={{
+                                        _hover={{
                                           backgroundColor: "gray.200",
+                                        }}
+                                        _active={{
+                                          backgroundColor: "gray.100",
                                         }}
                                         bg={
                                           subLessonId === params.subLessonId
