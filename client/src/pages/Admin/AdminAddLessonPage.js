@@ -22,6 +22,8 @@ import {
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+
 let action;
 
 function AdminAddLesson() {
@@ -86,6 +88,7 @@ function AdminAddLesson() {
     setAddLesson(event);
     console.log(fileVideo);
   };
+
   return (
     <>
       {/* ------------- Wrap all ------------------ */}
@@ -242,12 +245,33 @@ function AdminAddLesson() {
                       Sub-Lesson
                     </Text>
                     {/* ! --------------- Add Form START----------------  */}
+
                     <FieldArray name="sub_lessons">
                       {({ insert, remove, push }) => (
                         <>
                           {values.sub_lessons.length > 0 &&
                             values.sub_lessons.map((sub_lesson, index) => {
                               sub_lesson.sequence = index + 1;
+
+                              {
+                                /* /// */
+                              }
+
+                              const reorder = (index, startIndex, endIndex) => {
+                                const result = { index };
+                                const [removed] = result.splice(startIndex, 1);
+                                result.splice(endIndex, 0, removed);
+
+                                return result;
+                              };
+
+                              const onEnd = (result) => {
+                                console.log(result);
+                                reorder(
+                                  result.source.index,
+                                  result.destination.index
+                                );
+                              };
 
                               return (
                                 <Flex
@@ -297,7 +321,6 @@ function AdminAddLesson() {
                                       Delete
                                     </Text>
                                   )}
-
                                   <Field
                                     name={`sub_lessons.${index}.sub_lesson_name`}
                                   >
@@ -318,13 +341,43 @@ function AdminAddLesson() {
                                           >
                                             Sub-lesson name
                                           </FormLabel>
-                                          <DragHandleIcon
-                                            left="-45px"
-                                            top="60px"
-                                            position="absolute"
-                                            color="gray.500"
-                                            fontSize="16px"
-                                          />
+                                          {/* //!Allow to Drag drop start here */}
+                                          <DragDropContext onDragEnd={onEnd}>
+                                            <Droppable
+                                              droppableId="123"
+                                              type="PERSON"
+                                            >
+                                              {(provided, snapshot) => (
+                                                <div
+                                                  ref={provided.innerRef()}
+                                                  {...provided.droppableProps}
+                                                >
+                                                  <Draggable
+                                                    draggableId={index}
+                                                    index={index}
+                                                  >
+                                                    {(provided, snapshot) => (
+                                                      <div
+                                                        ref={provided.innerRef()}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                      >
+                                                        <div>{index}</div>
+                                                      </div>
+                                                    )}
+                                                    <DragHandleIcon
+                                                      left="-45px"
+                                                      top="60px"
+                                                      position="absolute"
+                                                      color="gray.500"
+                                                      fontSize="16px"
+                                                    />
+                                                  </Draggable>
+                                                  {provided.placeholder}
+                                                </div>
+                                              )}
+                                            </Droppable>
+                                          </DragDropContext>
                                           <Input
                                             type="text"
                                             w="530px"
@@ -335,7 +388,6 @@ function AdminAddLesson() {
                                       );
                                     }}
                                   </Field>
-
                                   <Text
                                     fontSize="16px"
                                     fontWeight="400"
@@ -347,7 +399,6 @@ function AdminAddLesson() {
                                       &nbsp;*
                                     </Text>
                                   </Text>
-
                                   {Boolean(video[index]) ? (
                                     <Flex
                                       w="100%"
@@ -428,6 +479,7 @@ function AdminAddLesson() {
                                 </Flex>
                               );
                             })}
+
                           {/* ! --------------- Add Form END----------------  */}
                           <Button
                             mt="24px"
