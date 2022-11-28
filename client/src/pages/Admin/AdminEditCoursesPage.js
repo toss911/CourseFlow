@@ -27,6 +27,7 @@ function AdminEditCourses() {
   const [coverImage, setCoverImage] = useState();
   const [files, setFiles] = useState([]);
   const [filesObj, setFilesObj] = useState([]);
+  const props = " Add more files";
 
   const toast = useToast();
   //   const { contextAdminState } = useAuth();
@@ -46,7 +47,7 @@ function AdminEditCourses() {
     setFilesObj(results);
     setCoverImage(results[0].fileUrl.url);
     setVideo(results[1].fileUrl.url);
-    setFiles(results.slice(3))
+    setFiles(results.slice(3));
   };
 
   // Convert media urls into file objects:
@@ -61,13 +62,15 @@ function AdminEditCourses() {
         const file = new File([blob], filesMetaData[i].file_name, {
           type: blob.type,
         });
-        filesObjects.push({fileData: file, fileUrl: filesMetaDataFromCloudinary[i]});
+        filesObjects.push({
+          fileData: file,
+          fileUrl: filesMetaDataFromCloudinary[i],
+        });
       });
     }
 
     return filesObjects;
   };
-
 
   useEffect(() => {
     getCourseData();
@@ -82,23 +85,23 @@ function AdminEditCourses() {
     // } else {
     // }
     const formData = new FormData();
-      formData.append("course_name", values.course_name);
-      formData.append("price", values.price);
-      formData.append("learning_time", values.total_learning_time);
-      formData.append("summary", values.course_summary);
-      formData.append("detail", values.course_detail);
-      formData.append("category", values.category);
-      if (/change/i.test(action)) {
-        formData.append("action", action);
-        formData.append("cover_image_directory", values.cover_image);
+    formData.append("course_name", values.course_name);
+    formData.append("price", values.price);
+    formData.append("learning_time", values.total_learning_time);
+    formData.append("summary", values.course_summary);
+    formData.append("detail", values.course_detail);
+    formData.append("category", values.category);
+    if (/change/i.test(action)) {
+      formData.append("action", action);
+      formData.append("cover_image_directory", values.cover_image);
+    }
+    const result = await axios.put(
+      `http://localhost:4000/admin/edit-courses/${courseId}?${adminId}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
       }
-      const result = await axios.put(
-        `http://localhost:4000/admin/edit-courses/${courseId}?${adminId}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+    );
   };
 
   const handleVideoChange = (event) => {
@@ -235,7 +238,7 @@ function AdminEditCourses() {
           cover_image: "", // change to current cover_image
           video_trailer: "",
           files_upload: "",
-          category: courseData.category
+          category: courseData.category,
         }}
         enableReinitialize
         onSubmit={handleSubmit}
@@ -276,7 +279,9 @@ function AdminEditCourses() {
                   </Flex>
                   <Flex alignItems="center" gap="16px">
                     <Button variant="secondary">Cancel</Button>
-                    <Button variant="primary" onClick={handleSubmit}>Save edits</Button>
+                    <Button variant="primary" onClick={handleSubmit}>
+                      Save edits
+                    </Button>
                   </Flex>
                 </Flex>
                 {/* navbar */}
@@ -693,33 +698,35 @@ function AdminEditCourses() {
                                       </Flex>
                                     </Flex>
                                     {/* Add more files */}
-                                    <label w="250px">
-                                      <Input
-                                        type="file"
-                                        hidden
-                                        onChange={handleFilesChange}
-                                        multiple
-                                      />
-                                      <Box
-                                        border="1px"
-                                        textAlign="center"
-                                        w="110px"
-                                        mt="10px"
-                                        borderRadius="12px"
-                                        borderColor="blue.300"
-                                        sx={{
-                                          "&:hover": {
-                                            bgColor: "blue.200",
-                                            border: "solid 1px white",
-                                          },
-                                        }}
-                                        cursor="pointer"
-                                      >
-                                        <Text variant="body3">
-                                          Add more files
-                                        </Text>
-                                      </Box>
-                                    </label>
+                                    {key === files.length - 1 ? (
+                                      <label w="250px">
+                                        <Input
+                                          type="file"
+                                          hidden
+                                          onChange={handleFilesChange}
+                                          multiple
+                                        />
+                                        <Box
+                                          border="1px"
+                                          textAlign="center"
+                                          w="110px"
+                                          mt="10px"
+                                          borderRadius="12px"
+                                          borderColor="blue.300"
+                                          sx={{
+                                            "&:hover": {
+                                              bgColor: "blue.200",
+                                              border: "solid 1px white",
+                                            },
+                                          }}
+                                          cursor="pointer"
+                                        >
+                                          <Text variant="body3">
+                                            Add more files
+                                          </Text>
+                                        </Box>
+                                      </label>
+                                    ) : null}
                                     {/* End of Add more files */}
                                   </>
                                 );
