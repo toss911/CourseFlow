@@ -45,4 +45,15 @@ adminRouter.delete(
   admin_controller.deleteAssignment
 );
 
+adminRouter.put(
+  "/edit-course/:courseId",
+  courseUpload,
+  admin_controller.updateCourse
+);
+adminRouter.delete(
+  "/delete-course/:courseId",
+  courseUpload,
+  admin_controller.deleteCourse
+);
+
 export default adminRouter;
