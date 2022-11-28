@@ -3,8 +3,21 @@ import format from "pg-format";
 
 export const getAll = async (req, res) => {
   try {
-    let keywords = req.query.keywords || "";
-    keywords = "\\m" + keywords;
+    let keyword = req.query.keyword;
+    keyword = "\\m" + keyword;
+    const page = req.query.page;
+    const coursesPerPage = 12;
+    const offset = (page - 1) * coursesPerPage;
+
+    let coursesCount = await pool.query(
+      `
+      SELECT COUNT(course_id) AS courses_count
+      FROM courses
+      WHERE courses.course_name ~* $1
+      `,
+      [keyword]
+    );
+    coursesCount = coursesCount.rows[0].courses_count;
 
     const results = await pool.query(
       `
@@ -14,9 +27,10 @@ export const getAll = async (req, res) => {
       ON courses.course_id = lessons.course_id
       WHERE courses.course_name ~* $1
       GROUP BY courses.course_id
-      ORDER BY courses.course_id asc
+      ORDER BY courses.course_id DESC
+      LIMIT $2 OFFSET $3
       `,
-      [keywords]
+      [keyword, coursesPerPage, offset]
     );
 
     for (let course of results.rows) {
@@ -25,6 +39,7 @@ export const getAll = async (req, res) => {
 
     return res.json({
       data: results.rows,
+      count: coursesCount,
     });
   } catch (error) {
     return res.sendStatus(500);
@@ -464,7 +479,7 @@ export const postWatchedOrAccepted = async (req, res) => {
       const sqlStatement = format(
         `
         INSERT INTO users_assignments(user_id, assignment_id, accepted_date, updated_date, status)
-        VALUES (%s, UNNEST(ARRAY[%s]), %L, %L, %L)`, 
+        VALUES (%s, UNNEST(ARRAY[%s]), %L, %L, %L)`,
         userId,
         assignmentList,
         dateNow,

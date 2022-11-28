@@ -20,30 +20,26 @@ import {
 import useCourses from "../hooks/useCourses";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-const coursesPerPage = 12;
-
 function OurCourses() {
   const [searchText, setSearchText] = useState("");
-  const [page, setPage] = useState(1);
   const { getCourses, courses, isLoading } = useCourses();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
+    /* Set state to initialize input (search) field value */
     setSearchText(
       Boolean(searchParams.get("search")) ? searchParams.get("search") : ""
     );
-    getCourses(searchParams.get("search"));
-  }, [searchParams.get("search")]);
+    getCourses(searchParams.get("search"), searchParams.get("page"));
+  }, [searchParams.get("search"), searchParams.get("page")]);
 
-  // Get current posts
-  const indexOfLastCourse = page * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
-
-  // Change page
   const paginate = (pageNumber) => {
-    setPage(pageNumber);
+    if (searchParams.get("search")) {
+      navigate(`.?search=${searchParams.get("search")}&page=${pageNumber}`);
+    } else {
+      navigate(`.?page=${pageNumber}`);
+    }
     window.scrollTo(0, 150);
   };
 
@@ -96,7 +92,8 @@ function OurCourses() {
             size="xl"
             mb="187px"
           />
-        ) : typeof courses !== "undefined" && courses.length > 0 ? (
+        ) : !Object.keys(courses).length > 0 ? null : courses.data.length >
+          0 ? (
           <Flex
             flexDirection="row"
             justifyContent="center"
@@ -104,7 +101,7 @@ function OurCourses() {
             flexWrap="wrap"
             w="70%"
           >
-            {currentCourses.map((course, key) => {
+            {courses.data.map((course, key) => {
               return (
                 <CourseCard
                   key={key}
@@ -126,10 +123,12 @@ function OurCourses() {
       </Center>
       <Center mb="20">
         <Pagination
-          total={courses.length}
-          current={page}
-          pageSize={coursesPerPage}
+          total={courses.count}
+          current={Number(searchParams.get("page")) || 1}
+          pageSize={12}
           onChange={paginate}
+          showSizeChanger={false}
+          hideOnSinglePage={Number(courses.count) === 0 ? true : false}
         />
       </Center>
       <Footer />

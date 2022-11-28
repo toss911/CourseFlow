@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const useCourses = () => {
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState({});
   const [course, setCourse] = useState({});
   const [category, setCategory] = useState([]);
   const [isError, setIsError] = useState(null);
@@ -11,19 +11,24 @@ const useCourses = () => {
   const [desireCourses, setDesireCourses] = useState([]);
   const params = useParams();
 
-  const getCourses = async (keywords) => {
+  const getCourses = async (keyword, page) => {
     try {
-      /* In case of no searchText => transform searchText into empty string (instead of null) */
-      if (!keywords) {
-        keywords = "";
+      /* In case of no keyword => transform keyword into empty string (instead of null) */
+      if (!keyword) {
+        keyword = "";
+      }
+      /* If there is no page value => set its value to be 1 (first page) */
+      if (!page) {
+        page = 1;
       }
       setIsLoading(true);
       const query = new URLSearchParams();
-      query.append("keywords", keywords);
+      query.append("keyword", keyword);
+      query.append("page", page);
       const results = await axios.get(
         `http://localhost:4000/courses?${query.toString()}`
       );
-      setCourses(results.data.data);
+      setCourses({ data: results.data.data, count: results.data.count });
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -76,7 +81,6 @@ const useCourses = () => {
 
       setDesireCourses(desireCourseData.data.data);
       setIsLoading(false);
-      console.log(desireCourses.data.data);
     } catch (error) {
       setIsError(true);
       setIsLoading(false);
