@@ -48,9 +48,11 @@ function AdminAddLesson() {
     ],
   };
 
+  const handleAddSubLesson = () => {
+    video.push(null);
+  };
   const handleVideoChange = (event, index) => {
     const currentFile = event.target.files[0];
-
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
         action = "change";
@@ -80,12 +82,23 @@ function AdminAddLesson() {
     newVideo[index] = null;
     setVideo(newVideo);
   };
-  const handleSubmit = (event) => {
-    // event.video_directory = fileVideo;
-    event.sub_lessons_count = event.sub_lessons.length;
-    setAddLesson(event);
-    console.log(fileVideo);
+  const handleDelete = (index) => {
+    const newFileVideo = [...fileVideo];
+    newFileVideo.splice(index, 1);
+    setFileVideo(newFileVideo);
+    // delete video by index
+    const newVideo = [...video];
+    newVideo.splice(index, 1);
+    setVideo(newVideo);
   };
+  const handleSubmit = (event) => {
+    event.sub_lessons_count = event.sub_lessons.length;
+    event.video_directory = fileVideo;
+    setAddLesson(event);
+    console.log(addLesson);
+  };
+  //console.log(video);
+  //console.log(fileVideo);
   return (
     <>
       {/* ------------- Wrap all ------------------ */}
@@ -143,7 +156,7 @@ function AdminAddLesson() {
                     >
                       Cancel
                     </Button>
-                    {fileVideo[fileVideo.length] !== null ? (
+                    {!video.includes(null) ? (
                       <Button
                         type="submit"
                         w="117px"
@@ -291,7 +304,7 @@ function AdminAddLesson() {
                                       type="button"
                                       onClick={() => {
                                         remove(index);
-                                        handleRemoveVideo(index);
+                                        handleDelete(index);
                                       }}
                                     >
                                       Delete
@@ -437,12 +450,13 @@ function AdminAddLesson() {
                             variant="secondary"
                             shadow="shadow1"
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              handleAddSubLesson();
                               push({
                                 sequence: "",
                                 sub_lesson_name: "",
-                              })
-                            }
+                              });
+                            }}
                           >
                             + Add Sub-lesson
                           </Button>
