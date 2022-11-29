@@ -17,6 +17,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 
 function MyHomework() {
   // *- States and variables -* //
@@ -33,6 +34,7 @@ function MyHomework() {
   const homeworkSubmitted = homework.filter((hw) => {
     return hw.status === "submitted";
   });
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
@@ -99,10 +101,21 @@ function MyHomework() {
               <Heading variant="headline2">My Homework</Heading>
               <Tabs
                 w="470px"
-                // h="40px"
                 mt="60px"
                 gap="16px"
                 textColor="gray.600"
+                isLazy
+                index={
+                  searchParams.get("status") === "pending"
+                    ? 1
+                    : searchParams.get("status") === "in progress"
+                    ? 2
+                    : searchParams.get("status") === "submitted"
+                    ? 3
+                    : searchParams.get("status") === "overdue"
+                    ? 4
+                    : 0
+                }
                 sx={{
                   ".css-1oezttv": {
                     borderColor: "white",
@@ -115,19 +128,39 @@ function MyHomework() {
                 }}
               >
                 <TabList>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams();
+                    }}
+                  >
                     <Text variant="body2">All</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "pending" });
+                    }}
+                  >
                     <Text variant="body2">Pending</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "in progress" });
+                    }}
+                  >
                     <Text variant="body2">In progress</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "submitted" });
+                    }}
+                  >
                     <Text variant="body2">Submitted</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "overdue" });
+                    }}
+                  >
                     <Text variant="body2">Overdue</Text>
                   </Tab>
                 </TabList>

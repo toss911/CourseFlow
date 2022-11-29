@@ -58,9 +58,9 @@ function MyCourses() {
             <Tabs
               isLazy
               index={
-                searchParams.get("filter") === "in_progress"
+                searchParams.get("status") === "in_progress"
                   ? 1
-                  : searchParams.get("filter") === "completed"
+                  : searchParams.get("status") === "completed"
                   ? 2
                   : 0
               }
@@ -86,14 +86,14 @@ function MyCourses() {
                 </Tab>
                 <Tab
                   onClick={() => {
-                    setSearchParams({ filter: "in_progress" });
+                    setSearchParams({ status: "in_progress" });
                   }}
                 >
                   In progress
                 </Tab>
                 <Tab
                   onClick={() => {
-                    setSearchParams({ filter: "completed" });
+                    setSearchParams({ status: "completed" });
                   }}
                 >
                   Completed
