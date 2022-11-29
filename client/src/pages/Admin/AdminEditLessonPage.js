@@ -522,13 +522,6 @@ function AdminAddLesson() {
                                       <Input
                                         type="file"
                                         hidden
-                                        //onChange={handleVideoChange}
-                                        // onChange={(event) => {
-                                        //   form.setFieldValue(
-                                        //     `sub_lessons.${index}.video_directory`,
-                                        //     event.target.files[0]
-                                        //   );
-                                        // }}
                                         onChange={(event) => {
                                           handleVideoChange(event, index);
                                         }}
