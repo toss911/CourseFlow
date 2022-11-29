@@ -22,7 +22,7 @@ import {
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 let action;
 function AdminAddLesson() {
   // * validate multi video
@@ -36,6 +36,7 @@ function AdminAddLesson() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const navigate = useNavigate();
+  const { courseId } = useParams();
   const initialValues = {
     lesson_name: "",
     sub_lessons_count: "",
@@ -100,7 +101,11 @@ function AdminAddLesson() {
     event.sub_lessons_count = event.sub_lessons.length;
     event.video_directory = fileVideo;
     setAddLesson(event);
-    //navigate("..");
+    if (Boolean(courseId)) {
+      navigate(`/edit-course/${courseId}`);
+    } else {
+      navigate(`/add-course`);
+    }
   };
   //console.log(video);
   //console.log(fileVideo);
@@ -129,7 +134,11 @@ function AdminAddLesson() {
                       ml="44px"
                       _hover={{ opacity: 0.5 }}
                       onClick={() => {
-                        navigate("/course/add");
+                        if (Boolean(courseId)) {
+                          navigate(`/edit-course/${courseId}`);
+                        } else {
+                          navigate(`/add-course`);
+                        }
                       }}
                     />
                     <Flex
