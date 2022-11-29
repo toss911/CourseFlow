@@ -60,7 +60,6 @@ function MyHomework() {
       `http://localhost:4000/assignment/${courseId}/submit/${assignmentId}?byUser=${userId}`,
       body
     );
-    window.location.reload();
     getHomeworkDetails();
   };
 
@@ -75,7 +74,6 @@ function MyHomework() {
       `http://localhost:4000/assignment/${courseId}/save/${assignmentId}?byUser=${userId}`,
       body
     );
-    window.location.reload();
     getHomeworkDetails();
   };
 
@@ -108,7 +106,7 @@ function MyHomework() {
                 index={
                   searchParams.get("status") === "pending"
                     ? 1
-                    : searchParams.get("status") === "in progress"
+                    : searchParams.get("status") === "in_progress"
                     ? 2
                     : searchParams.get("status") === "submitted"
                     ? 3
@@ -144,7 +142,7 @@ function MyHomework() {
                   </Tab>
                   <Tab
                     onClick={() => {
-                      setSearchParams({ status: "in progress" });
+                      setSearchParams({ status: "in_progress" });
                     }}
                   >
                     <Text variant="body2">In progress</Text>
