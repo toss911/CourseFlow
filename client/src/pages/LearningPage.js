@@ -39,6 +39,7 @@ let assignment_id;
 
 function LearningPage() {
   const [userAssignment, setUserAssignment] = useState({});
+  console.log("userAssignment: ", userAssignment);
   const [subLessonData, setSubLessonData] = useState({});
   const [answer, setAnswer] = useState("");
   const [isCourseLoading, setIsCourseLoading] = useState(false);
@@ -566,9 +567,26 @@ function LearningPage() {
                               Save Draft
                             </Button>
                             <Spacer />
-                            <Text pt="20px" color="gray.700">
-                              Submit within {subLessonData.duration} days
-                            </Text>
+                            <Flex direction="column" align="end">
+                              <Text pt="20px" color="gray.700" variant="body3">
+                                {userAssignment.assignments[assignmentId]
+                                  .days_until_deadline === 0
+                                  ? `Submit within today`
+                                  : userAssignment.assignments[assignmentId]
+                                      .days_until_deadline === 1
+                                  ? `Submit with 1 day`
+                                  : userAssignment.assignments[assignmentId]
+                                      .days_until_deadline > 1
+                                  ? `Submit within ${userAssignment.assignments[assignmentId].days_until_deadline} days`
+                                  : null}
+                              </Text>
+                              <Text color="gray.700" variant="body4">
+                                {userAssignment.assignments[assignmentId]
+                                  .days_until_deadline >= 0
+                                  ? `Deadline: ${userAssignment.assignments[assignmentId].deadline}`
+                                  : null}
+                              </Text>
+                            </Flex>
                           </Flex>
                         ) : null}
                       </Flex>

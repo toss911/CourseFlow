@@ -99,7 +99,6 @@ const HomeworkBox = (props) => {
             </Text>
             <Text
               variant="body3"
-              as="i"
               textColor="gray.700"
               display={displayOrNot(props.status)}
             >

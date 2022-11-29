@@ -559,6 +559,16 @@ export const getSubLesson = async (req, res) => {
       }
     });
 
+    const findDaysUntilDeadline = (currentDate, deadline) => {
+      const dl = new Date(deadline);
+      const cd = new Date(currentDate);
+      const deadlineDateInMs = dl.getTime();
+      const currentDateInMs = cd.getTime();
+      const msDiff = deadlineDateInMs - currentDateInMs;
+      const daysUntilDeadline = msDiff / (1000 * 60 * 60 * 24);
+      return Math.round(daysUntilDeadline);
+    };
+
     let queryAssignmentStatus = await pool.query(
       `
     SELECT assignments.assignment_id, sub_lessons.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id, users_assignments.answer, users_assignments.submitted_date
@@ -607,6 +617,19 @@ export const getSubLesson = async (req, res) => {
           }
           subLessonData.assignments[String(assignment.assignment_id)].status =
             assignment.status;
+          if (!/overdue/i.test(assignment.status)) {
+            let deadlineDate = new Date(assignment.accepted_date);
+            deadlineDate = new Date(
+              deadlineDate.setDate(deadlineDate.getDate() + assignment.duration)
+            );
+            const deadlineDateString = deadlineDate.toLocaleString("en-GB");
+            subLessonData.assignments[
+              String(assignment.assignment_id)
+            ].deadline = deadlineDateString;
+            subLessonData.assignments[String(assignment.assignment_id)][
+              "days_until_deadline"
+            ] = findDaysUntilDeadline(new Date(), deadlineDate);
+          }
         }
       });
     } else {
