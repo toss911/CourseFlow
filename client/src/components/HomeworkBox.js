@@ -14,6 +14,10 @@ import { useState } from "react";
 const HomeworkBox = (props) => {
   const navigate = useNavigate();
   const [answer, setAnswer] = useState({ answer: props.answer });
+  let deadlineDate = new Date(props.acceptedDate);
+  deadlineDate = new Date(
+    deadlineDate.setDate(deadlineDate.getDate() + props.duration)
+  ).toLocaleString("en-GB");
 
   // *- Change status badge color -* //
   const changeBadgeColor = (status) => {
@@ -39,16 +43,16 @@ const HomeworkBox = (props) => {
     let display;
     switch (status) {
       case "submitted":
-        display = "hidden";
+        display = "none";
         break;
       case "overdue":
-        display = "hidden";
+        display = "none";
         break;
       case "in progress":
-        display = "visible";
+        display = "block";
         break;
       case "pending":
-        display = "visible";
+        display = "block";
         break;
     }
     return display;
@@ -70,38 +74,37 @@ const HomeworkBox = (props) => {
         borderRadius="8px"
       >
         <Flex w="925px" justify="space-between">
-          <Flex flexDirection="column" w="746px" gap="12px">
+          <Flex flexDirection="column" w="700px" gap="12px">
             <Heading variant="headline3">Course: {props.courseName}</Heading>
             <Text variant="body2" textColor="gray.700">
               {props.lessonName}: {props.subLessonName}
             </Text>
           </Flex>
-          <Flex flexDirection="column" gap="12px" alignItems="flex-end">
+          <Flex flexDirection="column" alignItems="flex-end">
             <Badge
               variant={changeBadgeColor(props.status)}
               sx={{ textTransform: "capitalize" }}
             >
               <Text variant="body3">{props.status}</Text>
             </Badge>
-            {props.daysUntilDeadline === 0 ? (
-              <Text
-                w="165px"
-                variant="body2"
-                textColor="gray.700"
-                visibility={displayOrNot(props.status)}
-              >
-                Submit within today
-              </Text>
-            ) : (
-              <Text
-                w="165px"
-                variant="body2"
-                textColor="gray.700"
-                visibility={displayOrNot(props.status)}
-              >
-                Submit within {props.daysUntilDeadline} {props.dayOrDays}
-              </Text>
-            )}
+            <Text
+              mt="12px"
+              variant="body2"
+              textColor="gray.700"
+              display={displayOrNot(props.status)}
+            >
+              {props.daysUntilDeadline === 0
+                ? `Submit within today`
+                : `Submit within ${props.daysUntilDeadline} ${props.dayOrDays}`}
+            </Text>
+            <Text
+              variant="body3"
+              as="i"
+              textColor="gray.700"
+              display={displayOrNot(props.status)}
+            >
+              Deadline: {deadlineDate}
+            </Text>
           </Flex>
         </Flex>
         <Flex

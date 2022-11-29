@@ -209,6 +209,8 @@ function MyHomework() {
                                   saveAnswerDraft={saveAnswerDraft}
                                   assignmentId={hw.assignment_id}
                                   submittedDate={hw.submitted_date}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
                             })
@@ -251,6 +253,8 @@ function MyHomework() {
                                   assignmentId={hw.assignment_id}
                                   submittedDate={hw.submitted_date}
                                   saveAnswerDraft={saveAnswerDraft}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
                             })
@@ -293,6 +297,8 @@ function MyHomework() {
                                   saveAnswerDraft={saveAnswerDraft}
                                   submitHomework={submitHomework}
                                   courseId={hw.course_id}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
                             })
@@ -334,6 +340,8 @@ function MyHomework() {
                                   submitHomework={submitHomework}
                                   submittedDate={hw.submitted_date}
                                   courseId={hw.course_id}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
                             })
@@ -376,6 +384,8 @@ function MyHomework() {
                                   saveAnswerDraft={saveAnswerDraft}
                                   submitHomework={submitHomework}
                                   courseId={hw.course_id}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
                             })
