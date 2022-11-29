@@ -253,45 +253,52 @@ function AdminAddLesson() {
                             values.sub_lessons.map((sub_lesson, index) => {
                               sub_lesson.sequence = index + 1;
 
-                              const reorder = (index, startIndex, endIndex) => {
-                                const result = index;
-                                const [removed] = result.splice(startIndex, 1);
+                              const reorder = (
+                                sub_lesson,
+                                startIndex,
+                                endIndex
+                              ) => {
+                                const result = Array.from(sub_lesson);
+                                console.log(result);
+                                const removed = result.splice(startIndex, 1);
+                                console.log(removed);
                                 result.splice(endIndex, 0, removed);
-
+                                console.log(result);
                                 return result;
                               };
 
                               const onEnd = (result) => {
                                 console.log(result);
-                                index(
-                                  reorder(
-                                    index,
-                                    result.source.index,
-                                    result.destination.index
-                                  )
+                                sub_lesson = reorder(
+                                  sub_lesson,
+                                  result.source.index,
+                                  result.destination.index
                                 );
                               };
                               return (
                                 <DragDropContext onDragEnd={onEnd}>
-                                  <Droppable droppableId="1234" type="PERSON">
-                                    {(provided, snapshot) => (
-                                      <Box
+                                  <Droppable droppableId="1" type="PERSON">
+                                    {(provided) => (
+                                      <div
+                                        key={index}
                                         ref={provided.innerRef}
                                         {...provided.droppableProps}
                                       >
                                         <Draggable
-                                          colSpan="3"
+                                          // key={index}
                                           draggableId={index.toString()}
-                                          index={index}
+                                          // index={index}
+                                          key={1}
+                                          index={0}
                                         >
-                                          {(provided, snapshot) => (
-                                            <Box
+                                          {(provided) => (
+                                            <div
                                               ref={provided.innerRef}
                                               {...provided.draggableProps}
                                               {...provided.dragHandleProps}
                                             >
                                               <Flex
-                                                key={index}
+                                                // key={index}
                                                 flexDirection="column"
                                                 alignItems="start"
                                                 justifyContent="center"
@@ -481,11 +488,11 @@ function AdminAddLesson() {
                                                   </label>
                                                 )}
                                               </Flex>
-                                            </Box>
+                                            </div>
                                           )}
                                         </Draggable>
                                         {provided.placeholder}
-                                      </Box>
+                                      </div>
                                     )}
                                   </Droppable>
                                 </DragDropContext>
