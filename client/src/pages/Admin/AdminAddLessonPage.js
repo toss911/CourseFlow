@@ -27,7 +27,7 @@ let action;
 function AdminAddLesson() {
   // * validate multi video
   // * cancel button
-  // * todo back button
+  // ! todo back button
   // todo drag and drop
 
   const { addLesson, setAddLesson } = useAdmin();
@@ -100,7 +100,7 @@ function AdminAddLesson() {
     event.sub_lessons_count = event.sub_lessons.length;
     event.video_directory = fileVideo;
     setAddLesson(event);
-    console.log(addLesson);
+    //navigate("..");
   };
   //console.log(video);
   //console.log(fileVideo);
@@ -129,7 +129,7 @@ function AdminAddLesson() {
                       ml="44px"
                       _hover={{ opacity: 0.5 }}
                       onClick={() => {
-                        navigate(-1);
+                        navigate("/course/add");
                       }}
                     />
                     <Flex
