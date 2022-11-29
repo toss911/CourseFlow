@@ -39,7 +39,6 @@ let assignment_id;
 
 function LearningPage() {
   const [userAssignment, setUserAssignment] = useState({});
-  console.log("userAssignment: ", userAssignment);
   const [subLessonData, setSubLessonData] = useState({});
   const [answer, setAnswer] = useState("");
   const [isCourseLoading, setIsCourseLoading] = useState(false);
