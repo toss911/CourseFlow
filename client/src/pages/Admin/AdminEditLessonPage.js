@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Box,
@@ -19,36 +18,46 @@ import {
   ModalBody,
   useDisclosure,
 } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
 import { useNavigate, useParams } from "react-router-dom";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import axios from "axios";
+import { useAuth } from "../../contexts/authentication.js";
 
 let action;
 function AdminAddLesson() {
-  // * validate multi video
-  // * cancel button
-  // ! todo back button
-  // todo drag and drop
-
+  const [courseData, setCourseData] = useState();
   const { addLesson, setAddLesson } = useAdmin();
   const [video, setVideo] = useState([]);
   const [fileVideo, setFileVideo] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
   const { courseId } = useParams();
-  const initialValues = {
-    lesson_name: "",
-    sub_lessons_count: "",
-    sub_lessons: [
-      {
-        sequence: "",
-        sub_lesson_name: "",
-      },
-    ],
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.adminId;
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      await getCourseData();
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  // Querying a course data
+  const getCourseData = async () => {
+    let result = await axios.get(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson?byAdmin=${adminId}`
+    );
+    setCourseData(result.data.data);
   };
+  console.log(courseData);
   const handleCancel = () => {
     setVideo([]);
     setFileVideo([]);
@@ -101,11 +110,9 @@ function AdminAddLesson() {
   };
   const handleSubmit = (event) => {
     event.sub_lessons_count = event.sub_lessons.length;
-    //event.video_directory = fileVideo;
-    for (let i = 0; i < fileVideo.length; i++) {
-      event.sub_lessons[i].video_directory = fileVideo[i];
-    }
+    event.video_directory = fileVideo;
     setAddLesson(event);
+    console.log(addLesson);
     if (Boolean(courseId)) {
       navigate(`/admin/edit-course/${courseId}`);
     } else {
@@ -114,6 +121,17 @@ function AdminAddLesson() {
   };
   //console.log(video);
   //console.log(fileVideo);
+  const initialValues = {
+    lesson_name: Boolean(courseData) ? courseData.lesson_name : "",
+    sub_lessons_count: "",
+    sub_lessons: [
+      {
+        sequence: "",
+        sub_lesson_name: Boolean(courseData) ? courseData.sub_lesson_name : "",
+      },
+    ],
+  };
+
   return (
     <>
       {/* ------------- Wrap all ------------------ */}
@@ -122,7 +140,7 @@ function AdminAddLesson() {
         <Flex flexDirection="column" w="100vw">
           {/* -------------Navbar add-lesson -----------------*/}
           <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-            {({ values, resetForm }) => (
+            {({ values, resetForm, setFieldValue }) => (
               <Form>
                 <Flex
                   flexDirection="row"
@@ -140,9 +158,9 @@ function AdminAddLesson() {
                       _hover={{ opacity: 0.5 }}
                       onClick={() => {
                         if (Boolean(courseId)) {
-                          navigate(`/edit-course/${courseId}`);
+                          navigate(`/admin/edit-course/${courseId}`);
                         } else {
-                          navigate(`/add-course`);
+                          navigate(`/admin/add-course`);
                         }
                       }}
                     />
@@ -161,12 +179,21 @@ function AdminAddLesson() {
                           Course
                         </Text>
                         <Text ml="8px" variant="body3" color="black">
-                          'Service Design Essentials'
+                          'Service Design Essentials'Introduction
                         </Text>
                       </Flex>
-                      <Heading variant="headline3" w="796px">
-                        Add Lesson
-                      </Heading>
+                      <Flex
+                        flexDirection="row"
+                        alignItems="start"
+                        justifyContent="start"
+                      >
+                        <Heading variant="headline3" color="gray.600">
+                          Lesson
+                        </Heading>
+                        <Heading ml="8px" variant="headline3" w="796px">
+                          'Introduction'
+                        </Heading>
+                      </Flex>
                     </Flex>
                   </Flex>
 
@@ -186,23 +213,23 @@ function AdminAddLesson() {
                     {!video.includes(null) ? (
                       <Button
                         type="submit"
-                        w="117px"
+                        w="95px"
                         h="60px"
                         shadow="shadow1"
                         mr="40px"
                       >
-                        Create
+                        Edit
                       </Button>
                     ) : (
                       <>
                         <Button
                           onClick={onOpen}
-                          w="117px"
+                          w="95px"
                           h="60px"
                           shadow="shadow1"
                           mr="40px"
                         >
-                          Create
+                          Edit
                         </Button>
                         <Modal isCentered isOpen={isOpen} onClose={onClose}>
                           <ModalOverlay />
@@ -262,7 +289,18 @@ function AdminAddLesson() {
                             >
                               Lesson name
                             </FormLabel>
-                            <Input type="text" w="920px" h="48px" {...field} />
+                            <Input
+                              type="text"
+                              w="920px"
+                              h="48px"
+                              {...field}
+                              onChange={(event) => {
+                                setFieldValue(
+                                  "lesson_name",
+                                  event.target.value
+                                );
+                              }}
+                            />
                             <Box
                               mt="40px"
                               w="920px"
@@ -320,27 +358,27 @@ function AdminAddLesson() {
                               //   );
                               // };
                               return (
-                                // <DragDropContext onDragEnd={onEnd}>
-                                //   <Droppable droppableId="1" type="PERSON">
+                                //  <DragDropContext onDragEnd={onEnd}>
+                                //    <Droppable droppableId="1" type="PERSON">
                                 //     {(provided) => (
-                                //       <div
+                                //        <div
                                 //         key={index}
                                 //         ref={provided.innerRef}
                                 //         {...provided.droppableProps}
                                 //       >
-                                //         <Draggable
+                                //          <Draggable
                                 //           // key={index}
                                 //           draggableId={index.toString()}
                                 //           // index={index}
                                 //           key={1}
                                 //           index={0}
                                 //         >
-                                //           {(provided) => (
-                                //             <div
-                                //               ref={provided.innerRef}
-                                //               {...provided.draggableProps}
-                                //               {...provided.dragHandleProps}
-                                //             >
+                                //             {(provided) => (
+                                //              <div
+                                //                ref={provided.innerRef}
+                                //                {...provided.draggableProps}
+                                //                {...provided.dragHandleProps}
+                                //              >
                                 <Flex
                                   key={index}
                                   flexDirection="column"
@@ -509,13 +547,13 @@ function AdminAddLesson() {
                                     </label>
                                   )}
                                 </Flex>
-                                //             </div>
-                                //           )}
-                                //         </Draggable>
+                                //               </div>
+                                //            )}
+                                //          </Draggable>
                                 //         {provided.placeholder}
-                                //       </div>
-                                //     )}
-                                //   </Droppable>
+                                //         </div>
+                                //      )}
+                                //    </Droppable>
                                 // </DragDropContext>
                               );
                             })}
