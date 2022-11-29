@@ -1,7 +1,7 @@
 import { pool } from "../utils/db.js";
 import { cloudinaryUpload } from "../utils/upload.js";
 
-// POST course // check if there are attached files or not
+// POST course 
 
 export const addCourse = async (req, res) => {
   const adminId = req.query.adminId;
@@ -17,15 +17,6 @@ export const addCourse = async (req, res) => {
     courseAttachFiles: [],
   };
 
-  const newLesson = {
-    lessonName: req.body.lesson_name,
-    sequence: req.body.lesson_sequence,
-  };
-
-  const newSubLesson = {
-    subLessonName: req.body.sub_lesson_name,
-    sequence: req.body.sub_lesson_sequence,
-  };
 
   newCourse.courseCoverImage = await cloudinaryUpload(
     ...req.files.course_cover_images,
@@ -38,12 +29,29 @@ export const addCourse = async (req, res) => {
     "course_video_trailers"
   );
 
-  newSubLesson.subLessonVideo = await cloudinaryUpload(
-    ...req.files.sub_lesson_videos,
+  const newLesson = { lessonNames: [], lessonSequence: []};
 
-    "upload",
-    "sub_lesson_videos"
-  );
+  for (let lesson of req.body.lesson_name) {
+    newLesson.lessonNames.push(lesson);
+  }
+
+  for (let lesson of req.body.lesson_sequence) {
+    newLesson.lessonSequence.push(lesson);
+  }
+
+  const newSubLesson = { subLessonNames: [], subLessonSequence: [], subLessonVideos: []};
+
+  for (let subLesson of req.body.sub_lesson_name) {
+    newSubLesson.subLessonNames.push(subLesson);
+  }
+
+  for (let subLesson of req.body.sub_lesson_sequence) {
+    newSubLesson.subLessonSequence.push(subLesson);
+  }
+
+  for (let video of req.files.sub_lesson_videos) {
+    newSubLesson.subLessonVideos.push(JSON.stringify(await cloudinaryUpload(video, "upload", "sub_lesson_videos")))
+  }
 
   // If there are attached files
   if (req.files.course_attached_files != undefined) {
@@ -72,13 +80,13 @@ export const addCourse = async (req, res) => {
        second_insert as (
          INSERT INTO lessons( course_id, lesson_name, sequence) 
          VALUES
-         ( (select course_id from first_insert), $11, $12)
+         ( (select course_id from first_insert), unnest($11::text[]), unnest($12::int[]))
          RETURNING lesson_id
        ),
        third_insert as (
           INSERT INTO sub_lessons ( lesson_id , sub_lesson_name, video_directory, sequence) 
        VALUES 
-       ( (select lesson_id from second_insert), $13, $14, $15)
+       ( unnest((select array_agg(lesson_id) from second_insert)), unnest($13::text[]), unnest($14::text[]), unnest($15::int[]) )
           
        )
        insert into files (course_id, file_name, type, size, directory)
@@ -97,11 +105,11 @@ export const addCourse = async (req, res) => {
         newCourse.courseVideoTrailer,
         createdDate,
         newCourse.category,
-        newLesson.lessonName,
-        newLesson.sequence,
-        newSubLesson.subLessonName,
-        newSubLesson.subLessonVideo,
-        newSubLesson.sequence,
+        newLesson.lessonNames,
+        newLesson.lessonSequence,
+        newSubLesson.subLessonNames,
+        newSubLesson.subLessonVideos,
+        newSubLesson.subLessonSequence,
         fileName,
         fileType,
         fileSize,
@@ -112,20 +120,20 @@ export const addCourse = async (req, res) => {
     await pool.query(
       `
       with first_insert as (
-          INSERT INTO courses(admin_id, course_name, summary, detail, price, learning_time, cover_image_directory, video_trailer_directory, created_date, category) 
-          VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
-          RETURNING course_id
-       ), 
-       second_insert as (
-         INSERT INTO lessons( course_id, lesson_name, sequence) 
-         VALUES
-         ( (select course_id from first_insert), $11, $12)
-         RETURNING lesson_id
-       )
-        INSERT INTO sub_lessons ( lesson_id , sub_lesson_name, video_directory, sequence) 
-       VALUES 
-       ( (select lesson_id from second_insert), $13, $14, $15)
-  
+        INSERT INTO courses(admin_id, course_name, summary, detail, price, learning_time, cover_image_directory, video_trailer_directory, created_date, category) 
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+        RETURNING course_id
+     ), 
+     second_insert as (
+       INSERT INTO lessons( course_id, lesson_name, sequence) 
+       VALUES
+       ( (select course_id from first_insert), unnest($11::text[]), unnest($12::int[]))
+       RETURNING lesson_id
+     )
+      INSERT INTO sub_lessons ( lesson_id , sub_lesson_name, video_directory, sequence) 
+     VALUES 
+     ( unnest((select array_agg(lesson_id) from second_insert)), unnest($13::text[]), unnest($14::text[]), unnest($15::int[]) )
+        
        `,
       [
         adminId,
@@ -138,11 +146,11 @@ export const addCourse = async (req, res) => {
         newCourse.courseVideoTrailer,
         createdDate,
         newCourse.category,
-        newLesson.lessonName,
-        newLesson.sequence,
-        newSubLesson.subLessonName,
-        newSubLesson.subLessonVideo,
-        newSubLesson.sequence,
+        newLesson.lessonNames,
+        newLesson.lessonSequence,
+        newSubLesson.subLessonNames,
+        newSubLesson.subLessonVideos,
+        newSubLesson.subLessonSequence,
       ]
     );
   }
