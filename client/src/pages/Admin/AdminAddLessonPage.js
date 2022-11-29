@@ -253,12 +253,8 @@ function AdminAddLesson() {
                             values.sub_lessons.map((sub_lesson, index) => {
                               sub_lesson.sequence = index + 1;
 
-                              {
-                                /* /// */
-                              }
-
                               const reorder = (index, startIndex, endIndex) => {
-                                const result = { index };
+                                const result = index;
                                 const [removed] = result.splice(startIndex, 1);
                                 result.splice(endIndex, 0, removed);
 
@@ -267,219 +263,234 @@ function AdminAddLesson() {
 
                               const onEnd = (result) => {
                                 console.log(result);
-                                reorder(
-                                  result.source.index,
-                                  result.destination.index
+                                index(
+                                  reorder(
+                                    index,
+                                    result.source.index,
+                                    result.destination.index
+                                  )
                                 );
                               };
-
                               return (
-                                <Flex
-                                  key={index}
-                                  flexDirection="column"
-                                  alignItems="start"
-                                  justifyContent="center"
-                                  mt="40px"
-                                  pl="66px"
-                                  pb="24px"
-                                  w="920px"
-                                  bgColor="gray.100"
-                                  borderRadius="16px"
-                                  borderColor="gray.300"
-                                  borderWidth="1px"
-                                  position="relative"
-                                >
-                                  {index === 0 ? (
-                                    <Text
-                                      cursor="pointer"
-                                      color="gray.500"
-                                      fontWeight="700"
-                                      fontSize="16px"
-                                      position="absolute"
-                                      right="24px"
-                                      top="28px"
-                                      zIndex="1"
-                                    >
-                                      Delete
-                                    </Text>
-                                  ) : (
-                                    <Text
-                                      cursor="pointer"
-                                      color="blue.500"
-                                      fontWeight="700"
-                                      fontSize="16px"
-                                      position="absolute"
-                                      right="24px"
-                                      top="28px"
-                                      zIndex="1"
-                                      type="button"
-                                      onClick={() => {
-                                        remove(index);
-                                        handleRemoveVideo(index);
-                                      }}
-                                    >
-                                      Delete
-                                    </Text>
-                                  )}
-                                  <Field
-                                    name={`sub_lessons.${index}.sub_lesson_name`}
-                                  >
-                                    {({ field, form }) => {
-                                      return (
-                                        <FormControl
-                                          isInvalid={
-                                            form.errors.sub_lesson_name &&
-                                            form.touched.sub_lesson_name
-                                          }
-                                          isRequired
+                                <DragDropContext onDragEnd={onEnd}>
+                                  <Droppable droppableId="1234" type="PERSON">
+                                    {(provided, snapshot) => (
+                                      <Box
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                      >
+                                        <Draggable
+                                          colSpan="3"
+                                          draggableId={index.toString()}
+                                          index={index}
                                         >
-                                          <FormLabel
-                                            //htmlFor={`sub_lessons.${index}.sub_lesson_name`}
-                                            fontSize="16px"
-                                            fontWeight="400"
-                                            mt="24px"
-                                          >
-                                            Sub-lesson name
-                                          </FormLabel>
-                                          {/* //!Allow to Drag drop start here */}
-                                          <DragDropContext onDragEnd={onEnd}>
-                                            <Droppable
-                                              droppableId="123"
-                                              type="PERSON"
+                                          {(provided, snapshot) => (
+                                            <Box
+                                              ref={provided.innerRef}
+                                              {...provided.draggableProps}
+                                              {...provided.dragHandleProps}
                                             >
-                                              {(provided, snapshot) => (
-                                                <div
-                                                  ref={provided.innerRef()}
-                                                  {...provided.droppableProps}
-                                                >
-                                                  <Draggable
-                                                    draggableId={index}
-                                                    index={index}
+                                              <Flex
+                                                key={index}
+                                                flexDirection="column"
+                                                alignItems="start"
+                                                justifyContent="center"
+                                                mt="40px"
+                                                pl="66px"
+                                                pb="24px"
+                                                w="920px"
+                                                bgColor="gray.100"
+                                                borderRadius="16px"
+                                                borderColor="gray.300"
+                                                borderWidth="1px"
+                                                position="relative"
+                                              >
+                                                {index === 0 ? (
+                                                  <Text
+                                                    cursor="pointer"
+                                                    color="gray.500"
+                                                    fontWeight="700"
+                                                    fontSize="16px"
+                                                    position="absolute"
+                                                    right="24px"
+                                                    top="28px"
+                                                    zIndex="1"
                                                   >
-                                                    {(provided, snapshot) => (
-                                                      <div
-                                                        ref={provided.innerRef()}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
+                                                    Delete
+                                                  </Text>
+                                                ) : (
+                                                  <Text
+                                                    cursor="pointer"
+                                                    color="blue.500"
+                                                    fontWeight="700"
+                                                    fontSize="16px"
+                                                    position="absolute"
+                                                    right="24px"
+                                                    top="28px"
+                                                    zIndex="1"
+                                                    type="button"
+                                                    onClick={() => {
+                                                      remove(index);
+                                                      handleRemoveVideo(index);
+                                                    }}
+                                                  >
+                                                    Delete
+                                                  </Text>
+                                                )}
+                                                <Field
+                                                  name={`sub_lessons.${index}.sub_lesson_name`}
+                                                >
+                                                  {({ field, form }) => {
+                                                    return (
+                                                      <FormControl
+                                                        isInvalid={
+                                                          form.errors
+                                                            .sub_lesson_name &&
+                                                          form.touched
+                                                            .sub_lesson_name
+                                                        }
+                                                        isRequired
                                                       >
-                                                        <div>{index}</div>
-                                                      </div>
-                                                    )}
-                                                    <DragHandleIcon
-                                                      left="-45px"
-                                                      top="60px"
-                                                      position="absolute"
-                                                      color="gray.500"
-                                                      fontSize="16px"
+                                                        <FormLabel
+                                                          //htmlFor={`sub_lessons.${index}.sub_lesson_name`}
+                                                          fontSize="16px"
+                                                          fontWeight="400"
+                                                          mt="24px"
+                                                        >
+                                                          Sub-lesson name
+                                                        </FormLabel>
+                                                        {/* //!Allow to Drag drop start here */}
+
+                                                        <DragHandleIcon
+                                                          left="-45px"
+                                                          top="60px"
+                                                          position="absolute"
+                                                          color="gray.500"
+                                                          fontSize="16px"
+                                                        />
+                                                        <Input
+                                                          type="text"
+                                                          w="530px"
+                                                          h="48px"
+                                                          {...field}
+                                                        />
+                                                      </FormControl>
+                                                    );
+                                                  }}
+                                                </Field>
+                                                <Text
+                                                  fontSize="16px"
+                                                  fontWeight="400"
+                                                  mt="24px"
+                                                  mb="8px"
+                                                >
+                                                  Video
+                                                  <Text
+                                                    as="span"
+                                                    color="#E53E3E"
+                                                  >
+                                                    &nbsp;*
+                                                  </Text>
+                                                </Text>
+                                                {Boolean(video[index]) ? (
+                                                  <Flex
+                                                    w="100%"
+                                                    h="100%"
+                                                    position="relative"
+                                                    mb="24px"
+                                                  >
+                                                    <iframe
+                                                      w="100%"
+                                                      src={video[index]}
+                                                      fit="contain"
                                                     />
-                                                  </Draggable>
-                                                  {provided.placeholder}
-                                                </div>
-                                              )}
-                                            </Droppable>
-                                          </DragDropContext>
-                                          <Input
-                                            type="text"
-                                            w="530px"
-                                            h="48px"
-                                            {...field}
-                                          />
-                                        </FormControl>
-                                      );
-                                    }}
-                                  </Field>
-                                  <Text
-                                    fontSize="16px"
-                                    fontWeight="400"
-                                    mt="24px"
-                                    mb="8px"
-                                  >
-                                    Video
-                                    <Text as="span" color="#E53E3E">
-                                      &nbsp;*
-                                    </Text>
-                                  </Text>
-                                  {Boolean(video[index]) ? (
-                                    <Flex
-                                      w="100%"
-                                      h="100%"
-                                      position="relative"
-                                      mb="24px"
-                                    >
-                                      <iframe
-                                        w="100%"
-                                        src={video[index]}
-                                        fit="contain"
-                                      />
-                                      <Flex
-                                        w="32px"
-                                        h="32px"
-                                        borderRadius="full"
-                                        position="absolute"
-                                        top="5%"
-                                        right="65.5%"
-                                        bg="purple"
-                                        justify="center"
-                                        align="center"
-                                        sx={{
-                                          "&:hover": {
-                                            opacity: 0.5,
-                                          },
-                                        }}
-                                        cursor="pointer"
-                                        onClick={() => {
-                                          handleRemoveVideo(index);
-                                          action = "delete";
-                                        }}
-                                      >
-                                        <Image
-                                          src="/assets/misc/close-button.svg"
-                                          alt="close button"
-                                          w="11px"
-                                          h="11px"
-                                        />
-                                      </Flex>
-                                    </Flex>
-                                  ) : (
-                                    <label>
-                                      <Input
-                                        type="file"
-                                        hidden
-                                        //onChange={handleVideoChange}
-                                        // onChange={(event) => {
-                                        //   form.setFieldValue(
-                                        //     `sub_lessons.${index}.video_directory`,
-                                        //     event.target.files[0]
-                                        //   );
-                                        // }}
-                                        onChange={(event) => {
-                                          handleVideoChange(event, index);
-                                        }}
-                                      />
-                                      <Flex
-                                        w="160px"
-                                        h="160px"
-                                        direction="column"
-                                        justify="center"
-                                        align="center"
-                                        color="blue.400"
-                                        cursor="pointer"
-                                        bgColor="gray.200"
-                                        borderRadius="8px"
-                                      >
-                                        <Text fontSize="36px" fontWeight="200">
-                                          +
-                                        </Text>
-                                        <Text fontSize="14px" fontWeight="500">
-                                          Upload Video
-                                        </Text>
-                                      </Flex>
-                                    </label>
-                                  )}
-                                </Flex>
+                                                    <Flex
+                                                      w="32px"
+                                                      h="32px"
+                                                      borderRadius="full"
+                                                      position="absolute"
+                                                      top="5%"
+                                                      right="65.5%"
+                                                      bg="purple"
+                                                      justify="center"
+                                                      align="center"
+                                                      sx={{
+                                                        "&:hover": {
+                                                          opacity: 0.5,
+                                                        },
+                                                      }}
+                                                      cursor="pointer"
+                                                      onClick={() => {
+                                                        handleRemoveVideo(
+                                                          index
+                                                        );
+                                                        action = "delete";
+                                                      }}
+                                                    >
+                                                      <Image
+                                                        src="/assets/misc/close-button.svg"
+                                                        alt="close button"
+                                                        w="11px"
+                                                        h="11px"
+                                                      />
+                                                    </Flex>
+                                                  </Flex>
+                                                ) : (
+                                                  <label>
+                                                    <Input
+                                                      type="file"
+                                                      hidden
+                                                      //onChange={handleVideoChange}
+                                                      // onChange={(event) => {
+                                                      //   form.setFieldValue(
+                                                      //     `sub_lessons.${index}.video_directory`,
+                                                      //     event.target.files[0]
+                                                      //   );
+                                                      // }}
+                                                      onChange={(event) => {
+                                                        handleVideoChange(
+                                                          event,
+                                                          index
+                                                        );
+                                                      }}
+                                                    />
+                                                    <Flex
+                                                      w="160px"
+                                                      h="160px"
+                                                      direction="column"
+                                                      justify="center"
+                                                      align="center"
+                                                      color="blue.400"
+                                                      cursor="pointer"
+                                                      bgColor="gray.200"
+                                                      borderRadius="8px"
+                                                    >
+                                                      <Text
+                                                        fontSize="36px"
+                                                        fontWeight="200"
+                                                      >
+                                                        +
+                                                      </Text>
+                                                      <Text
+                                                        fontSize="14px"
+                                                        fontWeight="500"
+                                                      >
+                                                        Upload Video
+                                                      </Text>
+                                                    </Flex>
+                                                  </label>
+                                                )}
+                                              </Flex>
+                                            </Box>
+                                          )}
+                                        </Draggable>
+                                        {provided.placeholder}
+                                      </Box>
+                                    )}
+                                  </Droppable>
+                                </DragDropContext>
                               );
                             })}
-
                           {/* ! --------------- Add Form END----------------  */}
                           <Button
                             mt="24px"
