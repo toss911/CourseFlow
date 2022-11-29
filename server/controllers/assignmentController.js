@@ -128,16 +128,16 @@ export const putSubmitAssignment = async (req, res) => {
 };
 
 export const putSaveDraftAssignment = async (req, res) => {
-  // try {
-  const answer = req.body.answer;
-  const updatedDate = new Date();
-  const assignmentId = req.params.assignmentId;
-  const userId = req.query.byUser;
-  let status = req.body.status;
+  try {
+    const answer = req.body.answer;
+    const updatedDate = new Date();
+    const assignmentId = req.params.assignmentId;
+    const userId = req.query.byUser;
+    let status = req.body.status;
 
-  if (!/overdue/i.test(status)) {
-    let queryAssignmentStatus = await pool.query(
-      `
+    if (!/overdue/i.test(status)) {
+      let queryAssignmentStatus = await pool.query(
+        `
         SELECT sub_lessons.duration, users_assignments.accepted_date
         FROM assignments
         INNER JOIN users_assignments
@@ -146,31 +146,31 @@ export const putSaveDraftAssignment = async (req, res) => {
         ON assignments.sub_lesson_id = sub_lessons.sub_lesson_id
         WHERE assignments.assignment_id = $1 AND users_assignments.user_id = $2
         `,
-      [assignmentId, userId]
-    );
-    queryAssignmentStatus = queryAssignmentStatus.rows[0];
-    let daysAfterAccepted = Math.abs(
-      queryAssignmentStatus.accepted_date - new Date()
-    );
-    daysAfterAccepted = daysAfterAccepted / (1000 * 60 * 60 * 24);
-    if (daysAfterAccepted >= queryAssignmentStatus.duration) {
-      status = "overdue";
-    } else {
-      status = "in progress";
+        [assignmentId, userId]
+      );
+      queryAssignmentStatus = queryAssignmentStatus.rows[0];
+      let daysAfterAccepted = Math.abs(
+        queryAssignmentStatus.accepted_date - new Date()
+      );
+      daysAfterAccepted = daysAfterAccepted / (1000 * 60 * 60 * 24);
+      if (daysAfterAccepted >= queryAssignmentStatus.duration) {
+        status = "overdue";
+      } else {
+        status = "in progress";
+      }
     }
-  }
 
-  await pool.query(
-    `
+    await pool.query(
+      `
     UPDATE users_assignments SET answer = $1, updated_date = $2, status = $3
     WHERE assignment_id = $4 AND user_id = $5`,
-    [answer, updatedDate, status, assignmentId, userId]
-  );
+      [answer, updatedDate, status, assignmentId, userId]
+    );
 
-  return res.json({
-    message: "Assignment is saved.",
-  });
-  // } catch (error) {
-  //   return res.sendStatus(500);
-  // }
+    return res.json({
+      message: "Assignment is saved.",
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };

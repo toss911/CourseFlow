@@ -222,6 +222,9 @@ export const subscribedCourses = async (req, res) => {
       ORDER BY courses.course_id ASC`,
       [userId]
     );
+    for (let course of subscribedCourses.rows) {
+      course.cover_image_directory = JSON.parse(course.cover_image_directory);
+    }
     subscribedCourses = subscribedCourses.rows;
 
     let coursesStatus = await pool.query(
