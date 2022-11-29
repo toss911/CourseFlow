@@ -22,21 +22,20 @@ import {
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
+import { useNavigate } from "react-router-dom";
 let action;
-
 function AdminAddLesson() {
-  // *Add sub lesson ได้แล้ว
-  // *delete ได้แล้ว
-  // !ปัญหาคือ video
-  // ? สงสัยว่า <- กับ back ต่างยังไง
-  // todo จะทำ query course , drag and drop และแก้ปัญหาที่เหลือ
+  // * validate multi video
+  // * cancel button
+  // * todo back button
+  // todo drag and drop
 
   const { addLesson, setAddLesson } = useAdmin();
-  const [video, setVideo] = useState();
-  const [fileVideo, setFileVideo] = useState();
+  const [video, setVideo] = useState([]);
+  const [fileVideo, setFileVideo] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-
+  const navigate = useNavigate();
   const initialValues = {
     lesson_name: "",
     sub_lessons_count: "",
@@ -44,20 +43,30 @@ function AdminAddLesson() {
       {
         sequence: "",
         sub_lesson_name: "",
-        video_directory: "",
       },
     ],
+  };
+  const handleCancel = () => {
+    setVideo([]);
+    setFileVideo([]);
+  };
+  const handleAddSubLesson = () => {
+    video.push(null);
   };
 
   const handleVideoChange = (event, index) => {
     const currentFile = event.target.files[0];
-    // let arrayVideo = [];
-    // arrayVideo[index] = currentFile;
-    //setFileVideo(event.target.files[0]);
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
         action = "change";
-        setVideo(URL.createObjectURL(currentFile));
+        // get data file video to contextAPI
+        const dataVideo = [...fileVideo];
+        dataVideo[index] = currentFile;
+        setFileVideo([...dataVideo]);
+        // display upload video by index
+        const updateVideo = [...video];
+        updateVideo[index] = URL.createObjectURL(currentFile);
+        setVideo([...updateVideo]);
       } else {
         return toast({
           title: "File type must be .mp4 only!",
@@ -67,14 +76,34 @@ function AdminAddLesson() {
       }
     }
   };
-
-  const handleSubmit = (event) => {
-    // event.video_directory = fileVideo;
-    event.sub_lessons_count = event.sub_lessons.length;
-    setAddLesson(event);
-    console.log(event);
+  const handleRemoveVideo = (index) => {
+    //remove video by index at contextAPI
+    const newFileVideo = [...fileVideo];
+    newFileVideo[index] = null;
+    setFileVideo(newFileVideo);
+    // remove video by index
+    const newVideo = [...video];
+    newVideo[index] = null;
+    setVideo(newVideo);
   };
-
+  const handleDelete = (index) => {
+    //delete video by index at contextAPI
+    const newFileVideo = [...fileVideo];
+    newFileVideo.splice(index, 1);
+    setFileVideo(newFileVideo);
+    // delete video by index
+    const newVideo = [...video];
+    newVideo.splice(index, 1);
+    setVideo(newVideo);
+  };
+  const handleSubmit = (event) => {
+    event.sub_lessons_count = event.sub_lessons.length;
+    event.video_directory = fileVideo;
+    setAddLesson(event);
+    console.log(addLesson);
+  };
+  //console.log(video);
+  //console.log(fileVideo);
   return (
     <>
       {/* ------------- Wrap all ------------------ */}
@@ -82,15 +111,8 @@ function AdminAddLesson() {
         <Sidebar />
         <Flex flexDirection="column" w="100vw">
           {/* -------------Navbar add-lesson -----------------*/}
-          <Formik
-            initialValues={initialValues}
-            onSubmit={handleSubmit}
-            // onSubmit={async (values) => {
-            //   await new Promise((r) => setTimeout(r, 500));
-            //   alert(JSON.stringify(values, null, 2));
-            // }}
-          >
-            {({ values }) => (
+          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+            {({ values, resetForm }) => (
               <Form>
                 <Flex
                   flexDirection="row"
@@ -105,6 +127,10 @@ function AdminAddLesson() {
                       src="/assets/admin-lesson-page/arrow.svg"
                       arc="arrow"
                       ml="44px"
+                      _hover={{ opacity: 0.5 }}
+                      onClick={() => {
+                        navigate(-1);
+                      }}
                     />
                     <Flex
                       flexDirection="column"
@@ -136,10 +162,14 @@ function AdminAddLesson() {
                       h="60px"
                       variant="secondary"
                       shadow="shadow1"
+                      onClick={() => {
+                        resetForm();
+                        handleCancel();
+                      }}
                     >
                       Cancel
                     </Button>
-                    {video ? (
+                    {!video.includes(null) ? (
                       <Button
                         type="submit"
                         w="117px"
@@ -202,25 +232,32 @@ function AdminAddLesson() {
                 >
                   <Flex>
                     <Field name="lesson_name">
-                      {({ field, form }) => (
-                        <FormControl
-                          isInvalid={
-                            form.errors.lesson_name && form.touched.lesson_name
-                          }
-                          isRequired
-                        >
-                          <FormLabel mt="40px" fontSize="16px" fontWeight="400">
-                            Lesson name
-                          </FormLabel>
-                          <Input type="text" w="920px" h="48px" {...field} />
-                          <Box
-                            mt="40px"
-                            w="920px"
-                            borderBottom="1px"
-                            borderColor="gray.400"
-                          />
-                        </FormControl>
-                      )}
+                      {({ field, form }) => {
+                        return (
+                          <FormControl
+                            isInvalid={
+                              form.errors.lesson_name &&
+                              form.touched.lesson_name
+                            }
+                            isRequired
+                          >
+                            <FormLabel
+                              mt="40px"
+                              fontSize="16px"
+                              fontWeight="400"
+                            >
+                              Lesson name
+                            </FormLabel>
+                            <Input type="text" w="920px" h="48px" {...field} />
+                            <Box
+                              mt="40px"
+                              w="920px"
+                              borderBottom="1px"
+                              borderColor="gray.400"
+                            />
+                          </FormControl>
+                        );
+                      }}
                     </Field>
                   </Flex>
 
@@ -285,7 +322,10 @@ function AdminAddLesson() {
                                       top="28px"
                                       zIndex="1"
                                       type="button"
-                                      onClick={() => remove(index)}
+                                      onClick={() => {
+                                        remove(index);
+                                        handleDelete(index);
+                                      }}
                                     >
                                       Delete
                                     </Text>
@@ -295,7 +335,6 @@ function AdminAddLesson() {
                                     name={`sub_lessons.${index}.sub_lesson_name`}
                                   >
                                     {({ field, form }) => {
-                                      //console.log("field: ", field);
                                       return (
                                         <FormControl
                                           isInvalid={
@@ -342,7 +381,7 @@ function AdminAddLesson() {
                                     </Text>
                                   </Text>
 
-                                  {video ? (
+                                  {Boolean(video[index]) ? (
                                     <Flex
                                       w="100%"
                                       h="100%"
@@ -351,7 +390,7 @@ function AdminAddLesson() {
                                     >
                                       <iframe
                                         w="100%"
-                                        src={video}
+                                        src={video[index]}
                                         fit="contain"
                                       />
                                       <Flex
@@ -371,7 +410,7 @@ function AdminAddLesson() {
                                         }}
                                         cursor="pointer"
                                         onClick={() => {
-                                          setVideo();
+                                          handleRemoveVideo(index);
                                           action = "delete";
                                         }}
                                       >
@@ -385,65 +424,38 @@ function AdminAddLesson() {
                                     </Flex>
                                   ) : (
                                     <label>
-                                      <Field
-                                        name={`sub_lessons.${index}.video_directory`}
-                                      >
-                                        {({ field, form }) => {
-                                          //sub_lesson.video_directory = "";
-                                          return (
-                                            <FormControl
-                                              isInvalid={
-                                                form.errors.video_directory &&
-                                                form.touched.video_directory
-                                              }
-                                              isRequired
-                                            >
-                                              <Input
-                                                type="file"
-                                                hidden
-                                                {...field}
-                                                onChange={handleVideoChange}
-                                                // onChange={(event) => {
-                                                //   form.setFieldValue(
-                                                //     `sub_lessons.${index}.video_directory`,
-                                                //     event.target.files[0]
-                                                //   );
-                                                // }}
-                                                // onChange={(event, index) => {
-                                                //   handleVideoChange(
-                                                //     event,
-                                                //     index
-                                                //   );
-                                                // }}
-                                              />
-                                              <Flex
-                                                w="160px"
-                                                h="160px"
-                                                direction="column"
-                                                justify="center"
-                                                align="center"
-                                                color="blue.400"
-                                                cursor="pointer"
-                                                bgColor="gray.200"
-                                                borderRadius="8px"
-                                              >
-                                                <Text
-                                                  fontSize="36px"
-                                                  fontWeight="200"
-                                                >
-                                                  +
-                                                </Text>
-                                                <Text
-                                                  fontSize="14px"
-                                                  fontWeight="500"
-                                                >
-                                                  Upload Video
-                                                </Text>
-                                              </Flex>
-                                            </FormControl>
-                                          );
+                                      <Input
+                                        type="file"
+                                        hidden
+                                        //onChange={handleVideoChange}
+                                        // onChange={(event) => {
+                                        //   form.setFieldValue(
+                                        //     `sub_lessons.${index}.video_directory`,
+                                        //     event.target.files[0]
+                                        //   );
+                                        // }}
+                                        onChange={(event) => {
+                                          handleVideoChange(event, index);
                                         }}
-                                      </Field>
+                                      />
+                                      <Flex
+                                        w="160px"
+                                        h="160px"
+                                        direction="column"
+                                        justify="center"
+                                        align="center"
+                                        color="blue.400"
+                                        cursor="pointer"
+                                        bgColor="gray.200"
+                                        borderRadius="8px"
+                                      >
+                                        <Text fontSize="36px" fontWeight="200">
+                                          +
+                                        </Text>
+                                        <Text fontSize="14px" fontWeight="500">
+                                          Upload Video
+                                        </Text>
+                                      </Flex>
                                     </label>
                                   )}
                                 </Flex>
@@ -458,13 +470,13 @@ function AdminAddLesson() {
                             variant="secondary"
                             shadow="shadow1"
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              handleAddSubLesson();
                               push({
                                 sequence: "",
                                 sub_lesson_name: "",
-                                video_directory: "",
-                              })
-                            }
+                              });
+                            }}
                           >
                             + Add Sub-lesson
                           </Button>
