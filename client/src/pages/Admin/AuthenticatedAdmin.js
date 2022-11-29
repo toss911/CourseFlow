@@ -6,6 +6,7 @@ import AdminAddCoursesPage from "./AdminAddCoursesPage";
 import AdminError from "./AdminErrorPage";
 import AdminAssignmentList from "./AdminAssignmentListPage";
 import AdminAddLesson from "./AdminAddLessonPage";
+import AdminEditLesson from "./AdminEditLessonPage";
 import AdminEditCourses from "./AdminEditCoursesPage";
 
 function AuthenticatedAdmin() {
@@ -20,6 +21,10 @@ function AuthenticatedAdmin() {
         element={<AdminEditAssignment />}
       />
       <Route path="*" element={<AdminError />} />
+      <Route
+        path="/edit-course/:courseId/edit-lesson"
+        element={<AdminEditLesson />}
+      />
       <Route path="/add-lesson" element={<AdminAddLesson />} />
       <Route path="/edit-courses" element={<AdminEditCourses />} />
     </Routes>
