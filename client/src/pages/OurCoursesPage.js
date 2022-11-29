@@ -95,11 +95,13 @@ function OurCourses() {
         ) : !Object.keys(courses).length > 0 ? null : courses.data.length >
           0 ? (
           <Flex
+            ml="7.5%"
             flexDirection="row"
-            justifyContent="center"
+            justifyContent="flex-start"
+            alignItems="center"
             mb="180px"
             flexWrap="wrap"
-            w="85%"
+            w="100vw"
           >
             {courses.data.map((course, key) => {
               return (

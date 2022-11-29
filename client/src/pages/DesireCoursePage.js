@@ -35,7 +35,7 @@ function DesireCourse() {
   };
 
   return (
-    <Stack direction="column" spacing="49px">
+    <Stack direction="column">
       <Navbar />
       <Box>
         <Image w="100%" src="/assets/courseCard/bgOc.svg" position="relative" />
@@ -44,7 +44,7 @@ function DesireCourse() {
             <Heading variant="headline2" mb="60px">
               Desired Courses
             </Heading>
-            <Center>
+            <Flex>
               {isLoading ? (
                 <Spinner
                   thickness="4px"
@@ -57,11 +57,13 @@ function DesireCourse() {
               ) : !Object.keys(desiredCourses).length >
                 0 ? null : desiredCourses.data.length > 0 ? (
                 <Flex
+                  ml="7.5%"
                   flexDirection="row"
-                  justifyContent="center"
                   mb="180px"
                   flexWrap="wrap"
-                  w="90%"
+                  w="100vw"
+                  justifyContent="flex-start"
+                  alignItems="center"
                 >
                   {desiredCourses.data.map((course, key) => {
                     return (
@@ -78,11 +80,13 @@ function DesireCourse() {
                   })}
                 </Flex>
               ) : (
-                <Text as="i" color="black" mb="187px">
-                  No Desired Course
-                </Text>
+                <Center p="10vh" mb="16.2vh">
+                  <Text as="i" color="black">
+                    No Desired Course
+                  </Text>
+                </Center>
               )}
-            </Center>
+            </Flex>
           </Flex>
         </Box>
         <Center mb="20">
