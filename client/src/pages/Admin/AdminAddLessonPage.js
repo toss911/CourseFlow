@@ -101,12 +101,15 @@ function AdminAddLesson() {
   };
   const handleSubmit = (event) => {
     event.sub_lessons_count = event.sub_lessons.length;
-    event.video_directory = fileVideo;
+    //event.video_directory = fileVideo;
+    for (let i = 0; i < fileVideo.length; i++) {
+      event.sub_lessons[i].video_directory = fileVideo[i];
+    }
     setAddLesson(event);
     if (Boolean(courseId)) {
-      navigate(`/edit-course/${courseId}`);
+      navigate(`/admin/edit-course/${courseId}`);
     } else {
-      navigate(`/add-course`);
+      navigate(`/admin/add-course`);
     }
   };
   //console.log(video);
@@ -379,7 +382,7 @@ function AdminAddLesson() {
                                                     type="button"
                                                     onClick={() => {
                                                       remove(index);
-                                                      handleRemoveVideo(index);
+                                                      handleDelete(index);
                                                     }}
                                                   >
                                                     Delete
