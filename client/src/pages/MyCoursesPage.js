@@ -16,11 +16,13 @@ import {
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 
 function MyCourses() {
   const [courses, setCourses] = useState([]);
   const [coursesCount, setCoursesCount] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
 
@@ -54,6 +56,14 @@ function MyCourses() {
           </Heading>
           <Box justifyContent="center">
             <Tabs
+              isLazy
+              index={
+                searchParams.get("filter") === "in_progress"
+                  ? 1
+                  : searchParams.get("filter") === "completed"
+                  ? 2
+                  : 0
+              }
               pb="16px"
               sx={{
                 ".css-1oezttv": {
@@ -67,9 +77,27 @@ function MyCourses() {
               }}
             >
               <TabList justifyContent={"center"} gap={"16px"} border={"0px"}>
-                <Tab>All Courses</Tab>
-                <Tab>In progress</Tab>
-                <Tab>Completed</Tab>
+                <Tab
+                  onClick={() => {
+                    setSearchParams();
+                  }}
+                >
+                  All Courses
+                </Tab>
+                <Tab
+                  onClick={() => {
+                    setSearchParams({ filter: "in_progress" });
+                  }}
+                >
+                  In progress
+                </Tab>
+                <Tab
+                  onClick={() => {
+                    setSearchParams({ filter: "completed" });
+                  }}
+                >
+                  Completed
+                </Tab>
               </TabList>
 
               <Box
