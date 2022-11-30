@@ -4,7 +4,6 @@ export default function jwtInterceptor() {
   axios.interceptors.request.use((req) => {
     const hasToken = Boolean(window.localStorage.getItem("token"));
     const hasAdminToken = Boolean(window.localStorage.getItem("adminToken"));
-    console.log(window.localStorage.getItem("adminToken"));
     if (hasToken || hasAdminToken) {
       req.headers = {
         ...req.headers,

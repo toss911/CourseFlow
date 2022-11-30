@@ -39,7 +39,7 @@ function AdminAddLesson() {
   const navigate = useNavigate();
   const { courseId } = useParams();
   const { contextAdminState } = useAuth();
-  const adminId = contextAdminState.user.adminId;
+  const adminId = contextAdminState.user.admin_id;
 
   useEffect(() => {
     async function fetchData() {

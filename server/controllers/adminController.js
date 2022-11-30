@@ -892,8 +892,8 @@ export const deleteAssignment = async (req, res) => {
 
 // get course for edit-lesson-page
 export const getCourseLesson = async (req, res) => {
-  const courseId = req.params.courseId;
-  const adminId = req.query.byAdmin;
+  const course_id = req.params.courseId;
+  const admin_id = req.query.byAdmin;
 
   /* Validate whether this admin owned the course or not */
   let doesAdminOwnThisCourse = await pool.query(
@@ -907,7 +907,7 @@ export const getCourseLesson = async (req, res) => {
   ON lessons.lesson_id = sub_lessons.lesson_id
   WHERE courses.admin_id = $1 AND courses.course_id = $2)
   `,
-    [adminId, courseId]
+    [admin_id, course_id]
   );
   doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
   if (!doesAdminOwnThisCourse) {
@@ -928,7 +928,7 @@ export const getCourseLesson = async (req, res) => {
   INNER JOIN sub_lessons
   ON sub_lessons.lesson_id = lessons.lesson_id
   WHERE courses.course_id = $1 AND courses.admin_id = $2`,
-    [courseId, adminId]
+    [course_id, admin_id]
   );
 
   data = data.rows[0];
