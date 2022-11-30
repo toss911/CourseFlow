@@ -216,7 +216,6 @@ function AdminViewCourses() {
                               _hover={{ opacity: 0.5 }}
                               onClick={() => {
                                 course_id = course.course_id;
-                                console.log("course_id: ", course_id);
                                 onConfirmModalOpen();
                               }}
                             />
@@ -226,7 +225,9 @@ function AdminViewCourses() {
                               cursor="pointer"
                               _hover={{ opacity: 0.5 }}
                               onClick={() =>
-                                navigate(`/admin/edit-course/${course.course_id}`)
+                                navigate(
+                                  `/admin/edit-course/${course.course_id}`
+                                )
                               }
                             />
                           </Flex>

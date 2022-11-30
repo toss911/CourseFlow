@@ -18,8 +18,6 @@ import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import LessonTable from "../../components/LessonsTable";
-import AdminNavbarAdd from "../../components/AdminNavbarAdd";
-import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
 
@@ -36,7 +34,6 @@ const AdminAddCourses = () => {
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
-  let action;
 
   // this function will be triggered after user clicks on 'create course' button
   const addCourse = async () => {
@@ -669,7 +666,7 @@ const AdminAddCourses = () => {
                             <Flex
                               className="files-upload"
                               direction="column"
-                              gap="8px"
+                              gap="20px"
                             >
                               <Text variant="body2" color="black">
                                 Attach File (Optional)
@@ -856,7 +853,7 @@ const AdminAddCourses = () => {
                       </Field>
                     </Flex>
                   </Flex>
-                  {/* <LessonTable /> */}
+                  <LessonTable />
                 </Box>
               </Flex>
             </Flex>
