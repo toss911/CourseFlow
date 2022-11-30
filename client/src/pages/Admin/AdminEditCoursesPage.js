@@ -58,8 +58,8 @@ function AdminEditCourses() {
     setCoverImageFile(results[0].fileData);
     setVideo(results[1].fileUrl.url);
     setVideoFile(results[1].fileData);
-    setSubLesson(results[2].fileUrl);
-    setSubLessonFile(results[2].fileData);
+    // setSubLesson(results[2].fileUrl);
+    // setSubLessonFile(results[2].fileData);
     setFiles(results.slice(3));
   };
 
@@ -114,16 +114,14 @@ function AdminEditCourses() {
     // formData.append("action", action);
     formData.append("lesson_name", "test lesson name");
     formData.append("lesson_sequence", 3);
-    formData.append("sub_lesson_name", "test sub_lesson_name");
-    formData.append("sub_lesson_sequence", 4);
-    // if (/change/i.test(action)) {
+    if (/change/i.test(action)) {
       formData.append("course_cover_images", coverImageFile);
       formData.append("course_video_trailers", videoFile);
       formData.append("sub_lesson_videos", subLessonFile); // check again
       files.forEach((file) => {
         formData.append("course_attached_files", file);
       });
-    // }
+    }
     for (let i of formData) {
       console.log(i);
     }

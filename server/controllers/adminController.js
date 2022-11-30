@@ -168,18 +168,24 @@ export const getCourse = async (req, res) => {
 
   const courseData = await pool.query(
     `
-  SELECT courses.course_name, courses.summary, courses.detail, courses.price,
-  courses.learning_time, courses.cover_image_directory, courses.video_trailer_directory,
-  courses.created_date, courses.category, lessons.lesson_name, lessons.sequence,
-  sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
-  FROM courses
-  INNER JOIN lessons
-  ON lessons.course_id = courses.course_id
-  INNER JOIN sub_lessons
-  ON sub_lessons.lesson_id = lessons.lesson_id
-  WHERE courses.course_id = $1 AND courses.admin_id = $2`,
+  SELECT * from courses
+  WHERE course_id = $1 AND admin_id = $2`,
     [courseId, adminId]
   );
+
+  const subLessonCount = await pool.query(
+    `
+    SELECT lessons.lesson_id, lessons.lesson_name, COUNT(sub_lessons.sub_lesson_id)
+    FROM courses
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    INNER JOIN sub_lessons
+    ON lessons.lesson_id = sub_lessons.lesson_id
+    WHERE courses.course_id = $1
+    GROUP BY lessons.lesson_id
+    `,
+    [courseId]
+  )
 
   const courseAttachedFiles = await pool.query(
     `
@@ -212,13 +218,14 @@ export const getCourse = async (req, res) => {
 
   return res.json({
     data: courseData.rows[0],
+    subLessonsPerLesson: subLessonCount.rows,
     filesMetaData: filesMetaData,
     allMediaUrls: [
       courseData.rows[0].cover_image_directory,
       courseData.rows[0].video_trailer_directory,
-      courseData.rows[0].video_directory,
+      courseData.rows[0].video_directory, // sub-lesson video directory
       ...arrOfFilesDirectory,
-    ], // create a file object out of these media urls.
+    ] // create a file object out of these media urls.
   });
 };
 
