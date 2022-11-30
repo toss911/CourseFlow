@@ -33,9 +33,6 @@ import { useAuth } from "../../contexts/authentication";
 
 const AdminAddCourses = () => {
   let courseData = [];
-  const [coverImage, setCoverImage] = useState();
-  const [video, setVideo] = useState();
-  const [files, setFiles] = useState([]);
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
@@ -100,22 +97,6 @@ const AdminAddCourses = () => {
         });
       }
     }
-  };
-
-  const handleFilesChange = (event) => {
-    const newFiles = event.target.files;
-    if (files) {
-      setFiles([...files, ...newFiles]);
-    } else {
-      setFiles([...newFiles]);
-    }
-  };
-
-  const handleDeleteFiles = (uniqueIdentifier) => {
-    let filesLeftAfterDelete = files.filter((file) => {
-      return file.lastModified != uniqueIdentifier;
-    });
-    setFiles([...filesLeftAfterDelete]);
   };
 
   // *- input validation -* //
@@ -202,6 +183,7 @@ const AdminAddCourses = () => {
         category: "",
         cover_image: null,
         video_trailer: null,
+        files: [],
       }}
       onSubmit={handleSubmit}
     >
@@ -380,12 +362,13 @@ const AdminAddCourses = () => {
                             <FormErrorMessage>
                               {form.errors.course_summary}
                             </FormErrorMessage>
-                            {!form.errors.course_summary ? (
+                            {form.errors.course_summary &&
+                            form.touched.course_summary ? null : (
                               <FormHelperText>
                                 Character length must be not more than 120
                                 characters
                               </FormHelperText>
-                            ) : null}
+                            )}
                           </FormControl>
                         )}
                       </Field>
@@ -687,123 +670,182 @@ const AdminAddCourses = () => {
                               <Text variant="body2" color="black">
                                 Attach File (Optional)
                               </Text>
-                              <Flex
-                                w="160px"
-                                h="160px"
-                                direction="column"
-                                justify="center"
-                                align="center"
-                                color="blue.400"
-                                bg="gray.100"
-                                borderRadius="8px"
-                              >
-                                {field.value ? (
-                                  field.value.map((file) => {
-                                    return (
-                                      <Flex
-                                        w="100%"
-                                        h="100%"
-                                        position="relative"
-                                      >
+                              {field.value.length > 0 ? (
+                                <>
+                                  <Flex wrap="wrap" w="100%" gap="20px 30px">
+                                    {field.value.map((file, key) => {
+                                      return (
                                         <Flex
-                                          w="50px"
-                                          h="50px"
-                                          m="16px 29px 16px 16px"
-                                          bg="white"
-                                          borderRadius="4px"
-                                          justify="center"
-                                          align="center"
-                                        >
-                                          <Box w="20px">
-                                            {/^image/i.test(file.type) ? (
-                                              <Image
-                                                src="../../../assets/course-detail-page/image-icon.svg"
-                                                alt="image icon"
-                                              />
-                                            ) : /^audio/i.test(file.type) ? (
-                                              <Image
-                                                src="../../../assets/course-detail-page/audio-icon.svg"
-                                                alt="audio icon"
-                                              />
-                                            ) : /^video/i.test(file.type) ? (
-                                              <Image
-                                                src="../../../assets/course-detail-page/video-icon.svg"
-                                                alt="video icon"
-                                              />
-                                            ) : (
-                                              <Image
-                                                src="/assets/course-detail-page/file-icon.svg"
-                                                alt="file icon"
-                                              />
-                                            )}
-                                          </Box>
-                                        </Flex>
-                                        <Text variant="body3" fontSize="xl">
-                                          {file.name}
-                                        </Text>
-                                        <Flex
-                                          w="32px"
-                                          h="32px"
-                                          borderRadius="full"
-                                          position="absolute"
-                                          top="-18px"
-                                          right="-18px"
-                                          bg="purple"
-                                          justify="center"
-                                          align="center"
+                                          key={key}
+                                          position="relative"
+                                          display="flex"
+                                          alignItems="center"
+                                          h="82px"
+                                          w="240px"
+                                          bg="blue.100"
+                                          borderRadius="8px"
                                           sx={{
                                             "&:hover": {
-                                              opacity: 0.5,
+                                              bg: "blue.200",
                                             },
                                           }}
-                                          cursor="pointer"
-                                          onClick={() => {
-                                            form.setFieldValue("files", "");
-                                          }}
                                         >
-                                          <Image
-                                            src="/assets/misc/close-button.svg"
-                                            alt="close button"
-                                            w="11px"
-                                            h="11px"
-                                          />
+                                          <Flex
+                                            align="center"
+                                            gap="29px"
+                                            p="16px"
+                                            w="100%"
+                                            h="100%"
+                                          >
+                                            <Flex
+                                              w="50px"
+                                              h="50px"
+                                              bg="white"
+                                              borderRadius="4px"
+                                              justify="center"
+                                              align="center"
+                                            >
+                                              <Box w="20px">
+                                                {/^image/i.test(file.type) ? (
+                                                  <Image
+                                                    src="../../../assets/course-detail-page/image-icon.svg"
+                                                    alt="image icon"
+                                                  />
+                                                ) : /^audio/i.test(
+                                                    file.type
+                                                  ) ? (
+                                                  <Image
+                                                    src="../../../assets/course-detail-page/audio-icon.svg"
+                                                    alt="audio icon"
+                                                  />
+                                                ) : /^video/i.test(
+                                                    file.type
+                                                  ) ? (
+                                                  <Image
+                                                    src="../../../assets/course-detail-page/video-icon.svg"
+                                                    alt="video icon"
+                                                  />
+                                                ) : (
+                                                  <Image
+                                                    src="/assets/course-detail-page/file-icon.svg"
+                                                    alt="file icon"
+                                                  />
+                                                )}
+                                              </Box>
+                                            </Flex>
+                                            <Text
+                                              variant="body3"
+                                              w="60%"
+                                              noOfLines={1}
+                                            >
+                                              {file.name}
+                                            </Text>
+                                          </Flex>
+                                          <Flex
+                                            w="32px"
+                                            h="32px"
+                                            borderRadius="full"
+                                            position="absolute"
+                                            top="-18px"
+                                            right="-18px"
+                                            bg="purple"
+                                            justify="center"
+                                            align="center"
+                                            sx={{
+                                              "&:hover": {
+                                                opacity: 0.5,
+                                              },
+                                            }}
+                                            cursor="pointer"
+                                            onClick={() => {
+                                              const newFieldValue = [
+                                                ...field.value,
+                                              ];
+                                              newFieldValue.splice(key, 1);
+                                              form.setFieldValue(
+                                                "files",
+                                                newFieldValue
+                                              );
+                                            }}
+                                          >
+                                            <Image
+                                              src="/assets/misc/close-button.svg"
+                                              alt="close button"
+                                              w="11px"
+                                              h="11px"
+                                            />
+                                          </Flex>
                                         </Flex>
-                                      </Flex>
-                                    );
-                                  })
-                                ) : (
-                                  <FormControl
-                                    isInvalid={
-                                      form.errors.files && form.touched.files
-                                    }
-                                  >
+                                      );
+                                    })}
+                                  </Flex>
+                                  {/* Add more file */}
+                                  <Flex>
                                     <label>
                                       <Input
                                         type="file"
                                         display="none"
+                                        multiple
                                         onChange={(event) => {
-                                          handleCoverImageChange(
-                                            event.currentTarget.files[0],
-                                            form.setFieldValue
+                                          const newFieldValue = [
+                                            ...field.value,
+                                            ...Object.values(
+                                              event.currentTarget.files
+                                            ),
+                                          ];
+                                          form.setFieldValue(
+                                            "files",
+                                            newFieldValue
                                           );
                                         }}
                                       />
-                                      <Flex
-                                        direction="column"
-                                        justify="center"
-                                        align="center"
-                                        color="blue.400"
+                                      <Text
+                                        variant="add-more-files"
                                         cursor="pointer"
-                                        w="160px"
-                                        h="160px"
                                       >
-                                        <Text fontSize="36px">+</Text>
-                                        <Text variant="body2">Upload file</Text>
-                                      </Flex>
+                                        Add more files
+                                      </Text>
                                     </label>
-                                  </FormControl>
-                                )}
-                              </Flex>
+                                  </Flex>
+                                </>
+                              ) : (
+                                <Flex
+                                  w="160px"
+                                  h="160px"
+                                  direction="column"
+                                  justify="center"
+                                  align="center"
+                                  color="blue.400"
+                                  bg="gray.100"
+                                  borderRadius="8px"
+                                >
+                                  <label>
+                                    <Input
+                                      type="file"
+                                      display="none"
+                                      multiple
+                                      onChange={(event) => {
+                                        form.setFieldValue(
+                                          "files",
+                                          Object.values(event.target.files)
+                                        );
+                                      }}
+                                    />
+                                    <Flex
+                                      direction="column"
+                                      justify="center"
+                                      align="center"
+                                      color="blue.400"
+                                      cursor="pointer"
+                                      w="160px"
+                                      h="160px"
+                                    >
+                                      <Text fontSize="36px">+</Text>
+                                      <Text variant="body2">Upload file</Text>
+                                    </Flex>
+                                  </label>
+                                </Flex>
+                              )}
                             </Flex>
                           );
                         }}
