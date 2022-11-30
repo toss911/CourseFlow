@@ -7,6 +7,7 @@ const cloudinaryUpload = async (file, action, nameFolder) => {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: `courseflow/${nameFolder}`,
         type: "private",
+        resource_type: "auto"
       });
       await fs.unlink(file.path);
       return { url: result.secure_url, public_id: result.public_id };
@@ -19,5 +20,6 @@ const cloudinaryUpload = async (file, action, nameFolder) => {
     console.log("Error from uploading:", error);
   }
 };
+
 
 export { cloudinaryUpload };
