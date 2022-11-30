@@ -515,6 +515,8 @@ const AdminAddCourses = () => {
                                       form.errors.cover_image &&
                                       form.touched.cover_image
                                     }
+                                    w="100%"
+                                    h="100%"
                                   >
                                     <label>
                                       <Input
@@ -533,8 +535,8 @@ const AdminAddCourses = () => {
                                         align="center"
                                         color="blue.400"
                                         cursor="pointer"
-                                        w="240px"
-                                        h="240px"
+                                        w="100%"
+                                        h="100%"
                                       >
                                         <Text fontSize="36px">+</Text>
                                         <Text variant="body2">
@@ -621,6 +623,8 @@ const AdminAddCourses = () => {
                                       form.errors.video_trailer &&
                                       form.touched.video_trailer
                                     }
+                                    w="100%"
+                                    h="100%"
                                   >
                                     <label>
                                       <Input
@@ -639,8 +643,8 @@ const AdminAddCourses = () => {
                                         align="center"
                                         color="blue.400"
                                         cursor="pointer"
-                                        w="240px"
-                                        h="240px"
+                                        w="100%"
+                                        h="100%"
                                       >
                                         <Text fontSize="36px">+</Text>
                                         <Text variant="body2">
