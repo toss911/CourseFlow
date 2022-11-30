@@ -273,7 +273,7 @@ export const updateCourse = async (req, res) => {
         returning course_id
       )
         UPDATE lessons
-          SET lesson_name = unnest($10::text[]), sequence = unnest($11::int[])
+          SET lesson_name = $10, sequence = $11
         WHERE course_id IN (SELECT course_id FROM course_update)
       
       `,
