@@ -34,7 +34,7 @@ function AuthenticatedAdmin() {
         path="/edit-course/:courseId/edit-lesson/:lessonId"
         element={<AdminEditLesson />}
       />
-      <Route path="/edit-course" element={<AdminEditCourses />} />
+      <Route path="/edit-course/:courseId" element={<AdminEditCourses />} />
     </Routes>
   );
 }
