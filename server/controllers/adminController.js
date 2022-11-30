@@ -1,7 +1,7 @@
 import { pool } from "../utils/db.js";
 import { cloudinaryUpload } from "../utils/upload.js";
 
-// POST course 
+// POST course
 
 export const addCourse = async (req, res) => {
   const adminId = req.query.adminId;
@@ -17,7 +17,6 @@ export const addCourse = async (req, res) => {
     courseAttachFiles: [],
   };
 
-
   newCourse.courseCoverImage = await cloudinaryUpload(
     ...req.files.course_cover_images,
     "upload",
@@ -29,7 +28,7 @@ export const addCourse = async (req, res) => {
     "course_video_trailers"
   );
 
-  const newLesson = { lessonNames: [], lessonSequence: []};
+  const newLesson = { lessonNames: [], lessonSequence: [] };
 
   for (let lesson of req.body.lesson_name) {
     newLesson.lessonNames.push(lesson);
@@ -39,7 +38,11 @@ export const addCourse = async (req, res) => {
     newLesson.lessonSequence.push(lesson);
   }
 
-  const newSubLesson = { subLessonNames: [], subLessonSequence: [], subLessonVideos: []};
+  const newSubLesson = {
+    subLessonNames: [],
+    subLessonSequence: [],
+    subLessonVideos: [],
+  };
 
   for (let subLesson of req.body.sub_lesson_name) {
     newSubLesson.subLessonNames.push(subLesson);
@@ -50,7 +53,11 @@ export const addCourse = async (req, res) => {
   }
 
   for (let video of req.files.sub_lesson_videos) {
-    newSubLesson.subLessonVideos.push(JSON.stringify(await cloudinaryUpload(video, "upload", "sub_lesson_videos")))
+    newSubLesson.subLessonVideos.push(
+      JSON.stringify(
+        await cloudinaryUpload(video, "upload", "sub_lesson_videos")
+      )
+    );
   }
 
   // If there are attached files
@@ -168,17 +175,23 @@ export const getCourse = async (req, res) => {
 
   const courseData = await pool.query(
     `
-  SELECT courses.course_name, courses.summary, courses.detail, courses.price,
-  courses.learning_time, courses.cover_image_directory, courses.video_trailer_directory,
-  courses.created_date, courses.category, lessons.lesson_name, lessons.sequence,
-  sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
-  FROM courses
-  INNER JOIN lessons
-  ON lessons.course_id = courses.course_id
-  INNER JOIN sub_lessons
-  ON sub_lessons.lesson_id = lessons.lesson_id
-  WHERE courses.course_id = $1 AND courses.admin_id = $2`,
+  SELECT * from courses
+  WHERE course_id = $1 AND admin_id = $2`,
     [courseId, adminId]
+  );
+
+  const subLessonCount = await pool.query(
+    `
+    SELECT lessons.lesson_id, lessons.lesson_name, COUNT(sub_lessons.sub_lesson_id)
+    FROM courses
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    INNER JOIN sub_lessons
+    ON lessons.lesson_id = sub_lessons.lesson_id
+    WHERE courses.course_id = $1
+    GROUP BY lessons.lesson_id
+    `,
+    [courseId]
   );
 
   const courseAttachedFiles = await pool.query(
@@ -202,21 +215,18 @@ export const getCourse = async (req, res) => {
     {
       file_name: "video trailer",
       video_directory: courseData.rows[0].video_trailer_directory,
-    },
-    {
-      file_name: "sub lesson video",
-      sub_lesson_videos: courseData.rows[0].video_directory,
     }
   );
   // console.log(filesMetaData);
 
   return res.json({
     data: courseData.rows[0],
+    subLessonsPerLesson: subLessonCount.rows,
     filesMetaData: filesMetaData,
     allMediaUrls: [
       courseData.rows[0].cover_image_directory,
       courseData.rows[0].video_trailer_directory,
-      courseData.rows[0].video_directory,
+      // courseData.rows[0].video_directory, // sub-lesson video directory
       ...arrOfFilesDirectory,
     ], // create a file object out of these media urls.
   });
@@ -228,7 +238,7 @@ export const updateCourse = async (req, res) => {
   const courseId = req.params.courseId;
   const adminId = req.query.adminId;
   const mediaFiles = req.files;
-  console.log(req.files.course_attached_files);
+  console.log(mediaFiles);
 
   const updatedCourse = {
     courseName: req.body.course_name,
@@ -245,10 +255,10 @@ export const updateCourse = async (req, res) => {
     sequence: req.body.lesson_sequence,
   };
 
-  const updatedSubLesson = {
-    subLessonName: req.body.sub_lesson_name,
-    sequence: req.body.sub_lesson_sequence,
-  };
+  // const updatedSubLesson = {
+  //   subLessonName: req.body.sub_lesson_name,
+  //   sequence: req.body.sub_lesson_sequence,
+  // };
 
   if (Object.keys(mediaFiles).length === 0) {
     // if admin did not change any media
@@ -261,17 +271,11 @@ export const updateCourse = async (req, res) => {
         updated_date= $6, category = $7
         WHERE course_id = $8 AND admin_id = $9
         returning course_id
-      ),
-      lesson_update as (
+      )
         UPDATE lessons
           SET lesson_name = $10, sequence = $11
         WHERE course_id IN (SELECT course_id FROM course_update)
-        RETURNING lesson_id
-      )
-        UPDATE sub_lessons
-        SET sub_lesson_name = $12, 
-        sequence = $13
-        WHERE lesson_id IN (SELECT lesson_id FROM lesson_update)
+      
       `,
       [
         updatedCourse.courseName,
@@ -285,8 +289,6 @@ export const updateCourse = async (req, res) => {
         adminId,
         updatedLesson.lessonName,
         updatedLesson.sequence,
-        updatedSubLesson.subLessonName,
-        updatedSubLesson.sequence,
       ]
     );
     return res.json({
@@ -295,33 +297,26 @@ export const updateCourse = async (req, res) => {
   } else {
     const courseMediaFiles = await pool.query(
       `
-    SELECT courses.cover_image_directory, courses.video_trailer_directory, sub_lessons.video_directory
+    SELECT courses.cover_image_directory, courses.video_trailer_directory
     FROM courses
-    INNER join lessons
-    ON lessons.course_id = courses.course_id
-    INNER JOIN sub_lessons
-    ON sub_lessons.lesson_id = lessons.lesson_id
     WHERE courses.course_id = $1 AND admin_id = $2
     `,
       [courseId, adminId]
     );
 
     let filesPublicIdForDelete = [];
-
-    // If there are attached files
-
-    if (req.files.course_attached_files != undefined) {
-      const courseAttachedFiles = await pool.query(
-        `
+    
+    const courseAttachedFiles = await pool.query(
+      `
       SELECT * from files where course_id = $1
       `,
-        [courseId]
-      );
+      [courseId]
+    );
 
-      for (let file of courseAttachedFiles.rows) {
-        filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
-      }
+    for (let file of courseAttachedFiles.rows) {
+      filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
     }
+    // }
 
     for (let publicId of Object.values(courseMediaFiles.rows[0])) {
       // console.log(JSON.parse(publicId).public_id);
@@ -331,6 +326,13 @@ export const updateCourse = async (req, res) => {
     for (let filePublicId of filesPublicIdForDelete) {
       await cloudinaryUpload(filePublicId, "delete");
     }
+
+    await pool.query(
+      `
+    DELETE from files WHERE course_id = $1
+    `,
+      [courseId]
+    );
 
     // upload everything to cloudinary again
     updatedCourse.courseCoverImage = await cloudinaryUpload(
@@ -345,34 +347,6 @@ export const updateCourse = async (req, res) => {
       "course_video_trailers"
     );
 
-    updatedSubLesson.subLessonVideo = await cloudinaryUpload(
-      ...req.files.sub_lesson_videos,
-      "upload",
-      "sub_lesson_videos"
-    );
-
-    let fileName = [];
-      let fileType = [];
-      let fileSize = [];
-
-    if (req.files.course_attached_files != undefined) {
-    
-
-      for (let file of req.files.course_attached_files) {
-        updatedCourse.courseAttachFiles.push(
-          JSON.stringify(
-            await cloudinaryUpload(file, "upload", "course_attached_files")
-          )
-        );
-
-        console.log(updateCourse.courseAttachFiles);
-
-        fileName.push(file.originalname);
-        fileType.push(file.mimetype);
-        fileSize.push(file.size);
-      }
-    }
-
     // update the files' directory except for attached files
     await pool.query(
       `
@@ -384,17 +358,10 @@ with course_update as (
   updated_date= $8, category = $9
   WHERE course_id = $10 AND admin_id = $11
   returning course_id
-),
-lesson_update as (
+)
   UPDATE lessons
     SET lesson_name = $12, sequence = $13
   WHERE course_id IN (SELECT course_id FROM course_update)
-  RETURNING lesson_id
-)
-  UPDATE sub_lessons
-  SET sub_lesson_name = $14, video_directory = $15,
-  sequence = $16
-  WHERE lesson_id IN (SELECT lesson_id FROM lesson_update)
 
 `,
       [
@@ -411,20 +378,25 @@ lesson_update as (
         adminId,
         updatedLesson.lessonName,
         updatedLesson.sequence,
-        updatedSubLesson.subLessonName,
-        updatedSubLesson.subLessonVideo,
-        updatedLesson.sequence,
       ]
     );
 
+    let fileName = [];
+    let fileType = [];
+    let fileSize = [];
 
     if (req.files.course_attached_files != undefined) {
-      await pool.query(
-        `
-      DELETE from files WHERE course_id = $1
-      `,
-        [courseId]
-      );
+      for (let file of req.files.course_attached_files) {
+        updatedCourse.courseAttachFiles.push(
+          JSON.stringify(
+            await cloudinaryUpload(file, "upload", "course_attached_files")
+          )
+        );
+
+        fileName.push(file.originalname);
+        fileType.push(file.mimetype);
+        fileSize.push(file.size);
+      }
 
       await pool.query(
         `
