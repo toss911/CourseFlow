@@ -49,12 +49,11 @@ function AdminEditCourses() {
     // setFilesObj(results); // this is an array of all file objects
     // console.log(results);
 
-    console.log(result.data.subLessonsPerLesson)
+    console.log(result.data.subLessonsPerLesson);
     setCoverImageFile(results[0]);
     setVideoFile(results[1]);
     setFiles(results.slice(2));
   };
-
 
   // Convert media urls into file objects:
   const convertToFileObj = async (filesMetaData, allMediaUrls) => {
@@ -260,24 +259,40 @@ function AdminEditCourses() {
                 {/* Right Section */}
                 <Flex direction="column" w="100%" h="100vh" overflowY="auto">
                   {/* Right-Top Section */}
+                  {/* navbar */}
                   <Flex
-                    w="100%"
-                    bg="white"
-                    justify="space-between"
-                    align="center"
-                    px="40px"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    px="30px"
+                    h="92px"
                     py="16px"
+                    w="100%"
                     borderBottom="1px"
                     borderColor="gray.400"
-                    position="sticky"
-                    top="0"
-                    zIndex="sticky"
                   >
-                    <Heading variant="headline3">Add Course</Heading>
-                    <Flex>
+                    <Flex alignItems="center" gap="20px">
+                      <Image
+                        src="../../../assets/admin-page/back.svg"
+                        alt="back"
+                        sx={{
+                          "&:hover": {
+                            opacity: 0.5,
+                          },
+                        }}
+                        onClick={console.log("navigate to view courses")}
+                      />
+                      <Flex gap="8px">
+                        <Heading variant="headline3" color="gray.600">
+                          Course
+                        </Heading>
+                        <Heading variant="headline3">
+                          {courseData.course_name}
+                        </Heading>
+                      </Flex>
+                    </Flex>
+                    <Flex alignItems="center" gap="16px">
                       <Button
                         variant="secondary"
-                        mr="16px"
                         onClick={() => props.resetForm()}
                       >
                         Cancel
@@ -287,10 +302,12 @@ function AdminEditCourses() {
                         type="submit"
                         isLoading={props.isSubmitting}
                       >
-                        Create
+                        Save edits
                       </Button>
                     </Flex>
                   </Flex>
+                  {/* navbar */}
+
                   {/* Right-Bottom Section */}
                   <Box backgroundColor="gray.100">
                     <Flex
@@ -834,8 +851,8 @@ function AdminEditCourses() {
                                                   ...field.value,
                                                 ];
                                                 newFieldValue.splice(key, 1);
-                                                console.log(newFieldValue)
-                                                setFiles(newFieldValue)
+                                                console.log(newFieldValue);
+                                                setFiles(newFieldValue);
                                                 form.setFieldValue(
                                                   "files",
                                                   newFieldValue
@@ -906,7 +923,9 @@ function AdminEditCourses() {
                                             "files",
                                             Object.values(event.target.files)
                                           );
-                                          setFiles(Object.values(event.target.files))
+                                          setFiles(
+                                            Object.values(event.target.files)
+                                          );
                                         }}
                                       />
                                       <Flex
