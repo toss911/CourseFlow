@@ -30,6 +30,7 @@ import { useAuth } from "../../contexts/authentication.js";
 let action;
 function AdminAddLesson() {
   const [courseData, setCourseData] = useState();
+  const [subLessonData, setSubLessonData] = useState();
   const { addLesson, setAddLesson } = useAdmin();
   const [video, setVideo] = useState([]);
   const [fileVideo, setFileVideo] = useState([]);
@@ -37,7 +38,7 @@ function AdminAddLesson() {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
-  const { courseId } = useParams();
+  const { courseId, lessonId } = useParams();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
 
@@ -45,6 +46,7 @@ function AdminAddLesson() {
     async function fetchData() {
       setIsLoading(true);
       await getCourseData();
+      await getSubLessonData();
       setIsLoading(false);
     }
     fetchData();
@@ -57,7 +59,14 @@ function AdminAddLesson() {
     );
     setCourseData(result.data.data);
   };
-  console.log(courseData);
+  // Querying a sub_lesson data
+  const getSubLessonData = async () => {
+    let result = await axios.get(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`
+    );
+    setSubLessonData(result.data.data);
+  };
+  console.log(subLessonData);
   const handleCancel = () => {
     setVideo([]);
     setFileVideo([]);
@@ -119,15 +128,22 @@ function AdminAddLesson() {
       navigate(`/admin/add-course`);
     }
   };
+  console.log("Boolean(courseData): ", Boolean(courseData));
   //console.log(video);
   //console.log(fileVideo);
   const initialValues = {
-    lesson_name: Boolean(courseData) ? courseData.lesson_name : "",
+    lesson_name: Boolean(subLessonData)
+      ? courseData[subLessonData.course_id].lessons[subLessonData.lesson_id]
+          .lesson_name
+      : "",
     sub_lessons_count: "",
     sub_lessons: [
       {
         sequence: "",
-        sub_lesson_name: Boolean(courseData) ? courseData.sub_lesson_name : "",
+        sub_lesson_name: Boolean(subLessonData)
+          ? courseData[subLessonData.course_id].lessons[subLessonData.lesson_id]
+              .sub_lessons[subLessonData.sub_lesson_id].sub_lesson_name
+          : "",
       },
     ],
   };
@@ -139,7 +155,11 @@ function AdminAddLesson() {
         <Sidebar />
         <Flex flexDirection="column" w="100vw">
           {/* -------------Navbar add-lesson -----------------*/}
-          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+          <Formik
+            initialValues={initialValues}
+            enableReinitialize
+            onSubmit={handleSubmit}
+          >
             {({ values, resetForm, setFieldValue }) => (
               <Form>
                 <Flex
@@ -272,7 +292,16 @@ function AdminAddLesson() {
                   bgColor="white"
                 >
                   <Flex>
-                    <Field name="lesson_name">
+                    <Field
+                      name="lesson_name"
+                      validate={(value) => {
+                        let error;
+                        if (!Boolean(value)) {
+                          error = "Please enter the lesson name";
+                        }
+                        return error;
+                      }}
+                    >
                       {({ field, form }) => {
                         return (
                           <FormControl
@@ -289,18 +318,10 @@ function AdminAddLesson() {
                             >
                               Lesson name
                             </FormLabel>
-                            <Input
-                              type="text"
-                              w="920px"
-                              h="48px"
-                              {...field}
-                              onChange={(event) => {
-                                setFieldValue(
-                                  "lesson_name",
-                                  event.target.value
-                                );
-                              }}
-                            />
+                            <Input type="text" w="920px" h="48px" {...field} />
+                            <FormErrorMessage>
+                              {form.errors.lesson_name}
+                            </FormErrorMessage>
                             <Box
                               mt="40px"
                               w="920px"

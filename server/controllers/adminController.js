@@ -893,6 +893,7 @@ export const deleteAssignment = async (req, res) => {
 // get course for edit-lesson-page
 export const getCourseLesson = async (req, res) => {
   const course_id = req.params.courseId;
+  const lesson_id = req.params.lessonId;
   const admin_id = req.query.byAdmin;
 
   /* Validate whether this admin owned the course or not */
@@ -918,17 +919,17 @@ export const getCourseLesson = async (req, res) => {
 
   let data = await pool.query(
     `
-  SELECT courses.course_name, courses.summary, courses.detail, courses.price,
+  SELECT courses.course_id,courses.course_name, courses.summary, courses.detail, courses.price,
   courses.learning_time, courses.cover_image_directory, courses.video_trailer_directory,
-  courses.created_date, courses.category, lessons.lesson_name, lessons.sequence,
-  sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
+  courses.created_date, courses.category, lessons.lesson_id, lessons.lesson_name, lessons.sequence,
+  sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
   FROM courses
   INNER JOIN lessons
   ON lessons.course_id = courses.course_id
   INNER JOIN sub_lessons
   ON sub_lessons.lesson_id = lessons.lesson_id
-  WHERE courses.course_id = $1 AND courses.admin_id = $2`,
-    [course_id, admin_id]
+  WHERE courses.course_id = $1 AND courses.admin_id = $2 AND sub_lessons.lesson_id = $3`,
+    [course_id, admin_id, lesson_id]
   );
 
   data = data.rows[0];
