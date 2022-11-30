@@ -3,24 +3,32 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const useCourses = () => {
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState({});
   const [course, setCourse] = useState({});
   const [category, setCategory] = useState([]);
   const [isError, setIsError] = useState(null);
   const [isLoading, setIsLoading] = useState(null);
-  const [desireCourses, setDesireCourses] = useState([]);
+  const [desiredCourses, setDesiredCourses] = useState({});
   const params = useParams();
 
-  const getCourses = async (input) => {
+  const getCourses = async (keyword, page) => {
     try {
-      const { keywords } = input;
+      /* In case of no keyword => transform keyword into empty string (instead of null) */
+      if (!keyword) {
+        keyword = "";
+      }
+      /* If there is no page value => set its value to be 1 (first page) */
+      if (!page) {
+        page = 1;
+      }
+      setIsLoading(true);
       const query = new URLSearchParams();
-      query.append("keywords", keywords);
-      setIsError(false);
+      query.append("keyword", keyword);
+      query.append("page", page);
       const results = await axios.get(
         `http://localhost:4000/courses?${query.toString()}`
       );
-      setCourses(results.data.data);
+      setCourses({ data: results.data.data, count: results.data.count });
       setIsLoading(false);
     } catch (error) {
       setIsError(true);
@@ -63,17 +71,21 @@ const useCourses = () => {
     }
   };
 
-  const getDesiredCourses = async (userId) => {
+  const getDesiredCourses = async (userId, page) => {
     try {
-      setIsError(false);
+      /* If there is no page value => set its value to be 1 (first page) */
+      if (!page) {
+        page = 1;
+      }
       setIsLoading(true);
       const desireCourseData = await axios.get(
-        `http://localhost:4000/user/desired?byUser=${userId}`
+        `http://localhost:4000/user/desired?byUser=${userId}&page=${page}`
       );
-
-      setDesireCourses(desireCourseData.data.data);
+      setDesiredCourses({
+        data: desireCourseData.data.data,
+        count: desireCourseData.data.count,
+      });
       setIsLoading(false);
-      console.log(desireCourses.data.data);
     } catch (error) {
       setIsError(true);
       setIsLoading(false);
@@ -108,7 +120,7 @@ const useCourses = () => {
     isError,
     setIsError,
     getDesiredCourses,
-    desireCourses,
+    desiredCourses,
   };
 };
 

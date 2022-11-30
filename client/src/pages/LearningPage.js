@@ -27,6 +27,7 @@ import {
   Skeleton,
   Link,
 } from "@chakra-ui/react";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Navbar } from "../components/Navbar.js";
 import { Footer } from "../components/Footer.js";
 import { useEffect, useState } from "react";
@@ -67,11 +68,9 @@ function LearningPage() {
       const result = await getCourseLearningById(userId);
       let i = 0;
       for (let lessonId in result.lessons) {
-        for (let subLessonId in result.lessons[lessonId].sub_lessons) {
-          if (subLessonId == params.subLessonId) {
-            setOpenAccordionIndex([Number(i)]);
-            break;
-          }
+        if (params.subLessonId in result.lessons[lessonId].sub_lessons) {
+          setOpenAccordionIndex([Number(i)]);
+          break;
         }
         i++;
       }
@@ -171,172 +170,206 @@ function LearningPage() {
       <Navbar />
       <Skeleton isLoaded={!isCourseLoading}>
         <Flex
-          pt="100px"
           flexDirection="row"
           alignItems="start"
           justifyContent="center"
+          pt="100px"
         >
           {/* //------------------------- Left Column ----------------------// */}
-          <Flex
-            flexDirection="column"
-            alignItems="start"
-            justifyContent="start"
-            width="372px"
-            height="1035px"
-            shadow="shadow1"
-            mr="25px"
-            pl="24px"
-            overflowY="auto"
-          >
-            <Text mt="32px" color="orange.500" fontSize="14px" fontWeight="400">
-              Course
-            </Text>
-
-            <Heading variant="headline3" mt="24px">
-              {course.course_name}
-            </Heading>
-            <Text variant="body2" color="gray.700" mt="8px">
-              {course.summary}
-            </Text>
-            <Text variant="body3" mt="24px">
-              {course.percentProgress}% Complete
-            </Text>
-            <Box>
-              <Progress
-                mt="8px"
-                height="10px"
-                width="309px"
-                value={course.percentProgress}
-                sx={{
-                  ".css-1jrtelv": {
-                    background:
-                      "linear-gradient(109.54deg, #95BEFF 18.21%, #0040E6 95.27%)",
-                    borderRadius: "full",
-                  },
-                }}
-              />
-            </Box>
-            {!Boolean(openAccordionIndex) ? null : (
-              <Accordion
-                defaultIndex={openAccordionIndex}
-                allowMultiple
-                w="300px"
-                mt="24px"
+          <Flex direction="column">
+            <Flex mb="12px">
+              <Link
+                pl="12px"
+                onClick={() => navigate(`/courses/${params.courseId}`)}
               >
-                {Object.keys(course).length === 0
-                  ? null
-                  : Object.values(course.lessons).map((lesson, key) => {
-                      let numberLesson = null;
-                      if (key < 10) {
-                        numberLesson = "0" + (key + 1);
-                      } else {
-                        numberLesson = key + 1;
-                      }
-                      return (
-                        <AccordionItem border="0px" key={key}>
-                          <AccordionButton
-                            _hover={{ backgroundColor: "gray.100" }}
-                            borderBottom="1px solid #D6D9E4"
-                            pl="0"
-                            pt="12px"
-                          >
-                            <Box
-                              flex="1"
-                              textAlign="left"
-                              display="flex"
-                              color="black"
-                            >
-                              <Text
-                                color="gray.700"
-                                display="flex"
-                                variant="body2"
-                              >
-                                {numberLesson}
-                              </Text>
-                              <Text ml="24px" variant="body2">
-                                {lesson.lesson_name}
-                              </Text>
-                            </Box>
-                            <AccordionIcon />
-                          </AccordionButton>
-                          <AccordionPanel pb={4}>
-                            <UnorderedList>
-                              {Object.keys(lesson.sub_lessons).map(
-                                (subLessonId, keySub) => {
-                                  return (
-                                    <Flex
-                                      flexDirection="row"
-                                      alignItems="start"
-                                      justifyContent="start"
-                                      mt="24px"
-                                      key={keySub}
-                                      _hover={{ backgroundColor: "gray.100" }}
-                                      _active={{ backgroundColor: "gray.200" }}
-                                      bg={
-                                        subLessonId === params.subLessonId
-                                          ? "gray.200"
-                                          : "white"
-                                      }
-                                    >
-                                      {(lesson.sub_lessons[subLessonId]
-                                        .watched_status === "watched" &&
-                                        lesson.sub_lessons[subLessonId]
-                                          .assign_status === "completed") ||
-                                      (lesson.sub_lessons[subLessonId]
-                                        .watched_status === "watched" &&
-                                        lesson.sub_lessons[subLessonId]
-                                          .assign_status ===
-                                          "no-assignment") ? (
-                                        <Image
-                                          src="/assets/learning-page/success-circle.svg"
-                                          alt="success-circle"
-                                          mt="3px"
-                                          mr="15px"
-                                        />
-                                      ) : lesson.sub_lessons[subLessonId]
-                                          .watched_status === "watched" ||
-                                        lesson.sub_lessons[subLessonId]
-                                          .assign_status === "completed" ? (
-                                        <Image
-                                          src="/assets/learning-page/half-circle.svg"
-                                          alt="half-circle"
-                                          mt="3px"
-                                          mr="15px"
-                                        />
-                                      ) : (
-                                        <Image
-                                          src="/assets/learning-page/circle.svg"
-                                          alt="empty-circle"
-                                          mt="3px"
-                                          mr="15px"
-                                        />
-                                      )}
-
-                                      <Text
-                                        cursor="pointer"
-                                        variant="body2"
-                                        onClick={() => {
-                                          navigate(
-                                            `/courses/${params.courseId}/learning/${subLessonId}`
-                                          );
-                                        }}
-                                      >
-                                        {
-                                          lesson.sub_lessons[subLessonId]
-                                            .sub_lesson_name
-                                        }
-                                      </Text>
-                                    </Flex>
+                <ArrowBackIcon mr="10px" color="blue.500" />
+                Back
+              </Link>
+            </Flex>
+            <Flex
+              flexDirection="column"
+              alignItems="start"
+              justifyContent="start"
+              width="372px"
+              height="1035px"
+              shadow="shadow1"
+              mr="25px"
+              pl="24px"
+              overflowY="auto"
+            >
+              <Text
+                mt="32px"
+                color="orange.500"
+                fontSize="14px"
+                fontWeight="400"
+              >
+                Course
+              </Text>
+              <Heading variant="headline3" mt="24px">
+                {course.course_name}
+              </Heading>
+              <Text variant="body2" color="gray.700" mt="8px">
+                {course.summary}
+              </Text>
+              <Text variant="body3" mt="24px">
+                {course.percentProgress}% Complete
+              </Text>
+              <Box>
+                <Progress
+                  mt="8px"
+                  height="10px"
+                  width="309px"
+                  value={course.percentProgress}
+                  sx={{
+                    ".css-1jrtelv": {
+                      background:
+                        "linear-gradient(109.54deg, #95BEFF 18.21%, #0040E6 95.27%)",
+                      borderRadius: "full",
+                    },
+                  }}
+                />
+              </Box>
+              {!Boolean(openAccordionIndex) ? null : (
+                <Accordion
+                  index={openAccordionIndex}
+                  allowMultiple
+                  w="300px"
+                  mt="24px"
+                >
+                  {Object.keys(course).length === 0
+                    ? null
+                    : Object.values(course.lessons).map((lesson, key) => {
+                        let numberLesson = null;
+                        if (key < 10) {
+                          numberLesson = "0" + (key + 1);
+                        } else {
+                          numberLesson = key + 1;
+                        }
+                        return (
+                          <AccordionItem border="0px" key={key}>
+                            <AccordionButton
+                              _hover={{ backgroundColor: "gray.100" }}
+                              borderBottom="1px solid #D6D9E4"
+                              pl="0"
+                              pt="12px"
+                              onClick={() => {
+                                if (openAccordionIndex.includes(key)) {
+                                  const newAccordion = [...openAccordionIndex];
+                                  newAccordion.splice(
+                                    newAccordion.indexOf(key),
+                                    1
                                   );
+                                  setOpenAccordionIndex(newAccordion);
+                                } else {
+                                  setOpenAccordionIndex([
+                                    ...openAccordionIndex,
+                                    key,
+                                  ]);
                                 }
-                              )}
-                            </UnorderedList>
-                          </AccordionPanel>
-                        </AccordionItem>
-                      );
-                    })}
-              </Accordion>
-            )}
+                              }}
+                            >
+                              <Box
+                                flex="1"
+                                textAlign="left"
+                                display="flex"
+                                color="black"
+                              >
+                                <Text
+                                  color="gray.700"
+                                  display="flex"
+                                  variant="body2"
+                                >
+                                  {numberLesson}
+                                </Text>
+                                <Text ml="24px" variant="body2">
+                                  {lesson.lesson_name}
+                                </Text>
+                              </Box>
+                              <AccordionIcon />
+                            </AccordionButton>
+                            <AccordionPanel p={0}>
+                              <UnorderedList m="16px 0px">
+                                {Object.keys(lesson.sub_lessons).map(
+                                  (subLessonId, keySub) => {
+                                    return (
+                                      <Flex
+                                        flexDirection="row"
+                                        alignItems="start"
+                                        justifyContent="start"
+                                        p="8px 24px"
+                                        key={keySub}
+                                        _hover={{
+                                          backgroundColor: "gray.200",
+                                        }}
+                                        _active={{
+                                          backgroundColor: "gray.100",
+                                        }}
+                                        bg={
+                                          subLessonId === params.subLessonId
+                                            ? "gray.200"
+                                            : "white"
+                                        }
+                                      >
+                                        {(lesson.sub_lessons[subLessonId]
+                                          .watched_status === "watched" &&
+                                          lesson.sub_lessons[subLessonId]
+                                            .assign_status === "completed") ||
+                                        (lesson.sub_lessons[subLessonId]
+                                          .watched_status === "watched" &&
+                                          lesson.sub_lessons[subLessonId]
+                                            .assign_status ===
+                                            "no-assignment") ? (
+                                          <Image
+                                            src="/assets/learning-page/success-circle.svg"
+                                            alt="success-circle"
+                                            mt="3px"
+                                            mr="15px"
+                                          />
+                                        ) : lesson.sub_lessons[subLessonId]
+                                            .watched_status === "watched" ||
+                                          lesson.sub_lessons[subLessonId]
+                                            .assign_status === "completed" ? (
+                                          <Image
+                                            src="/assets/learning-page/half-circle.svg"
+                                            alt="half-circle"
+                                            mt="3px"
+                                            mr="15px"
+                                          />
+                                        ) : (
+                                          <Image
+                                            src="/assets/learning-page/circle.svg"
+                                            alt="empty-circle"
+                                            mt="3px"
+                                            mr="15px"
+                                          />
+                                        )}
+
+                                        <Text
+                                          cursor="pointer"
+                                          variant="body2"
+                                          onClick={() => {
+                                            navigate(
+                                              `/courses/${params.courseId}/learning/${subLessonId}`
+                                            );
+                                          }}
+                                        >
+                                          {
+                                            lesson.sub_lessons[subLessonId]
+                                              .sub_lesson_name
+                                          }
+                                        </Text>
+                                      </Flex>
+                                    );
+                                  }
+                                )}
+                              </UnorderedList>
+                            </AccordionPanel>
+                          </AccordionItem>
+                        );
+                      })}
+                </Accordion>
+              )}
+            </Flex>
           </Flex>
           {/* //---------------------------- Right Column -----------------------// */}
 
@@ -533,9 +566,26 @@ function LearningPage() {
                               Save Draft
                             </Button>
                             <Spacer />
-                            <Text pt="20px" color="gray.700">
-                              Submit within {subLessonData.duration} days
-                            </Text>
+                            <Flex direction="column" align="end">
+                              <Text pt="20px" color="gray.700" variant="body3">
+                                {userAssignment.assignments[assignmentId]
+                                  .days_until_deadline === 0
+                                  ? `Submit within today`
+                                  : userAssignment.assignments[assignmentId]
+                                      .days_until_deadline === 1
+                                  ? `Submit with 1 day`
+                                  : userAssignment.assignments[assignmentId]
+                                      .days_until_deadline > 1
+                                  ? `Submit within ${userAssignment.assignments[assignmentId].days_until_deadline} days`
+                                  : null}
+                              </Text>
+                              <Text color="gray.700" variant="body4">
+                                {userAssignment.assignments[assignmentId]
+                                  .days_until_deadline >= 0
+                                  ? `Deadline: ${userAssignment.assignments[assignmentId].deadline}`
+                                  : null}
+                              </Text>
+                            </Flex>
                           </Flex>
                         ) : null}
                       </Flex>
@@ -564,6 +614,14 @@ function LearningPage() {
                 sequence[sequence.indexOf(Number(params.subLessonId)) - 1];
               navigate(`/courses/${params.courseId}/learning/${prevLessonId}`);
               window.scrollTo(0, 150);
+              let i = 0;
+              for (let lessonId in course.lessons) {
+                if (prevLessonId in course.lessons[lessonId].sub_lessons) {
+                  setOpenAccordionIndex([Number(i)]);
+                  break;
+                }
+                i++;
+              }
             }}
           >
             {Object.keys(course).length === 0
@@ -600,6 +658,14 @@ function LearningPage() {
                 sequence[sequence.indexOf(Number(params.subLessonId)) + 1];
               navigate(`/courses/${params.courseId}/learning/${nextLessonId}`);
               window.scrollTo(0, 150);
+              let i = 0;
+              for (let lessonId in course.lessons) {
+                if (nextLessonId in course.lessons[lessonId].sub_lessons) {
+                  setOpenAccordionIndex([Number(i)]);
+                  break;
+                }
+                i++;
+              }
             }}
           >
             {Object.keys(course).length === 0

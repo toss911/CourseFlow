@@ -44,7 +44,7 @@ export const Navbar = () => {
           onClick={() => navigate("/")}
           cursor="pointer"
         />
-        <HStack spacing="75px">
+        <Flex gridColumnGap="75px" align="center">
           <Link color="#191C77" onClick={() => navigate("/courses")}>
             Our Courses
           </Link>
@@ -136,7 +136,7 @@ export const Navbar = () => {
               Log in
             </Button>
           )}
-        </HStack>
+        </Flex>
       </Flex>
     </Flex>
   );

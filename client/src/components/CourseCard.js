@@ -27,8 +27,13 @@ export function CourseCard(props) {
       }}
       cursor="pointer"
     >
-      <Box w="357px" h="240px">
-        <Image w="357px" src={props.courseImg} />
+      <Box>
+        <Image
+          w="357px"
+          h="240px"
+          objectFit="cover"
+          src={props.courseImg.url}
+        />
       </Box>
       <Box>
         <Flex w="325px" h="115px" flexDirection="column" ml="16px">

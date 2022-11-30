@@ -17,10 +17,24 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authentication.js";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 
 function MyHomework() {
   // *- States and variables -* //
-  const [homework, setHomework] = useState([{}]);
+  const [homework, setHomework] = useState([]);
+  const homeworkPending = homework.filter((hw) => {
+    return hw.status === "pending";
+  });
+  const homeworkInProgress = homework.filter((hw) => {
+    return hw.status === "in progress";
+  });
+  const homeworkOverdue = homework.filter((hw) => {
+    return hw.status === "overdue";
+  });
+  const homeworkSubmitted = homework.filter((hw) => {
+    return hw.status === "submitted";
+  });
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const { contextState } = useAuth();
   const userId = contextState.user.user_id;
@@ -46,7 +60,6 @@ function MyHomework() {
       `http://localhost:4000/assignment/${courseId}/submit/${assignmentId}?byUser=${userId}`,
       body
     );
-    window.location.reload();
     getHomeworkDetails();
   };
 
@@ -61,7 +74,6 @@ function MyHomework() {
       `http://localhost:4000/assignment/${courseId}/save/${assignmentId}?byUser=${userId}`,
       body
     );
-    window.location.reload();
     getHomeworkDetails();
   };
 
@@ -87,10 +99,21 @@ function MyHomework() {
               <Heading variant="headline2">My Homework</Heading>
               <Tabs
                 w="470px"
-                // h="40px"
                 mt="60px"
                 gap="16px"
                 textColor="gray.600"
+                isLazy
+                index={
+                  searchParams.get("status") === "pending"
+                    ? 1
+                    : searchParams.get("status") === "in_progress"
+                    ? 2
+                    : searchParams.get("status") === "submitted"
+                    ? 3
+                    : searchParams.get("status") === "overdue"
+                    ? 4
+                    : 0
+                }
                 sx={{
                   ".css-1oezttv": {
                     borderColor: "white",
@@ -103,19 +126,39 @@ function MyHomework() {
                 }}
               >
                 <TabList>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams();
+                    }}
+                  >
                     <Text variant="body2">All</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "pending" });
+                    }}
+                  >
                     <Text variant="body2">Pending</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "in_progress" });
+                    }}
+                  >
                     <Text variant="body2">In progress</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "submitted" });
+                    }}
+                  >
                     <Text variant="body2">Submitted</Text>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    onClick={() => {
+                      setSearchParams({ status: "overdue" });
+                    }}
+                  >
                     <Text variant="body2">Overdue</Text>
                   </Tab>
                 </TabList>
@@ -129,12 +172,6 @@ function MyHomework() {
                       size="xl"
                     />
                   </Center>
-                ) : homework.length === 0 ? (
-                  <Flex h="40vh" justify="center" align="center">
-                    <Text color="black" as="i">
-                      No homework
-                    </Text>
-                  </Flex>
                 ) : (
                   <TabPanels mt="40px">
                     <TabPanel>
@@ -145,29 +182,39 @@ function MyHomework() {
                           w="1120px"
                           mb="145px"
                         >
-                          {homework.map((hw, key) => {
-                            return (
-                              <HomeworkBox
-                                key={key}
-                                courseName={hw.course_name}
-                                lessonName={hw.lesson_name}
-                                subLessonId={hw.sub_lesson_id}
-                                subLessonName={hw.sub_lesson_name}
-                                status={hw.status}
-                                hwDetail={hw.detail}
-                                daysUntilDeadline={hw.days_until_deadline}
-                                answer={hw.answer}
-                                dayOrDays={
-                                  hw.days_until_deadline <= 1 ? "day" : "days"
-                                }
-                                courseId={hw.course_id}
-                                submitHomework={submitHomework}
-                                saveAnswerDraft={saveAnswerDraft}
-                                assignmentId={hw.assignment_id}
-                                submittedDate={hw.submitted_date}
-                              />
-                            );
-                          })}
+                          {homework.length === 0 ? (
+                            <Flex h="40vh" justify="center" align="center">
+                              <Text color="black" as="i">
+                                No homework
+                              </Text>
+                            </Flex>
+                          ) : (
+                            homework.map((hw, key) => {
+                              return (
+                                <HomeworkBox
+                                  key={key}
+                                  courseName={hw.course_name}
+                                  lessonName={hw.lesson_name}
+                                  subLessonId={hw.sub_lesson_id}
+                                  subLessonName={hw.sub_lesson_name}
+                                  status={hw.status}
+                                  hwDetail={hw.detail}
+                                  daysUntilDeadline={hw.days_until_deadline}
+                                  answer={hw.answer}
+                                  dayOrDays={
+                                    hw.days_until_deadline <= 1 ? "day" : "days"
+                                  }
+                                  courseId={hw.course_id}
+                                  submitHomework={submitHomework}
+                                  saveAnswerDraft={saveAnswerDraft}
+                                  assignmentId={hw.assignment_id}
+                                  submittedDate={hw.submitted_date}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
+                                />
+                              );
+                            })
+                          )}
                         </Flex>
                       </Center>
                     </TabPanel>
@@ -179,11 +226,14 @@ function MyHomework() {
                           w="1120px"
                           mb="145px"
                         >
-                          {homework
-                            .filter((hw) => {
-                              return hw.status == "pending";
-                            })
-                            .map((hw, key) => {
+                          {homeworkPending.length === 0 ? (
+                            <Flex h="40vh" justify="center" align="center">
+                              <Text color="black" as="i">
+                                No homework
+                              </Text>
+                            </Flex>
+                          ) : (
+                            homeworkPending.map((hw, key) => {
                               return (
                                 <HomeworkBox
                                   key={key}
@@ -203,9 +253,12 @@ function MyHomework() {
                                   assignmentId={hw.assignment_id}
                                   submittedDate={hw.submitted_date}
                                   saveAnswerDraft={saveAnswerDraft}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
-                            })}
+                            })
+                          )}
                         </Flex>
                       </Center>
                     </TabPanel>
@@ -217,11 +270,14 @@ function MyHomework() {
                           w="1120px"
                           mb="145px"
                         >
-                          {homework
-                            .filter((hw) => {
-                              return hw.status == "in progress";
-                            })
-                            .map((hw, key) => {
+                          {homeworkInProgress.length === 0 ? (
+                            <Flex h="40vh" justify="center" align="center">
+                              <Text color="black" as="i">
+                                No homework
+                              </Text>
+                            </Flex>
+                          ) : (
+                            homeworkInProgress.map((hw, key) => {
                               return (
                                 <HomeworkBox
                                   key={key}
@@ -241,9 +297,12 @@ function MyHomework() {
                                   saveAnswerDraft={saveAnswerDraft}
                                   submitHomework={submitHomework}
                                   courseId={hw.course_id}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
-                            })}
+                            })
+                          )}
                         </Flex>
                       </Center>
                     </TabPanel>
@@ -255,11 +314,14 @@ function MyHomework() {
                           w="1120px"
                           mb="145px"
                         >
-                          {homework
-                            .filter((hw) => {
-                              return hw.status == "submitted";
-                            })
-                            .map((hw, key) => {
+                          {homeworkSubmitted.length === 0 ? (
+                            <Flex h="40vh" justify="center" align="center">
+                              <Text color="black" as="i">
+                                No homework
+                              </Text>
+                            </Flex>
+                          ) : (
+                            homeworkSubmitted.map((hw, key) => {
                               return (
                                 <HomeworkBox
                                   key={key}
@@ -278,9 +340,12 @@ function MyHomework() {
                                   submitHomework={submitHomework}
                                   submittedDate={hw.submitted_date}
                                   courseId={hw.course_id}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
-                            })}
+                            })
+                          )}
                         </Flex>
                       </Center>
                     </TabPanel>
@@ -292,11 +357,14 @@ function MyHomework() {
                           w="1120px"
                           mb="145px"
                         >
-                          {homework
-                            .filter((hw) => {
-                              return hw.status == "overdue";
-                            })
-                            .map((hw, key) => {
+                          {homeworkOverdue.length === 0 ? (
+                            <Flex h="40vh" justify="center" align="center">
+                              <Text color="black" as="i">
+                                No homework
+                              </Text>
+                            </Flex>
+                          ) : (
+                            homeworkOverdue.map((hw, key) => {
                               return (
                                 <HomeworkBox
                                   key={key}
@@ -316,9 +384,12 @@ function MyHomework() {
                                   saveAnswerDraft={saveAnswerDraft}
                                   submitHomework={submitHomework}
                                   courseId={hw.course_id}
+                                  acceptedDate={hw.accepted_date}
+                                  duration={hw.duration}
                                 />
                               );
-                            })}
+                            })
+                          )}
                         </Flex>
                       </Center>
                     </TabPanel>

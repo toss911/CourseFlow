@@ -3,8 +3,21 @@ import format from "pg-format";
 
 export const getAll = async (req, res) => {
   try {
-    let keywords = req.query.keywords || "";
-    keywords = "\\m" + keywords;
+    let keyword = req.query.keyword;
+    keyword = "\\m" + keyword;
+    const page = req.query.page;
+    const coursesPerPage = 12;
+    const offset = (page - 1) * coursesPerPage;
+
+    let coursesCount = await pool.query(
+      `
+      SELECT COUNT(course_id) AS courses_count
+      FROM courses
+      WHERE course_name ~* $1
+      `,
+      [keyword]
+    );
+    coursesCount = Number(coursesCount.rows[0].courses_count);
 
     const results = await pool.query(
       `
@@ -14,9 +27,10 @@ export const getAll = async (req, res) => {
       ON courses.course_id = lessons.course_id
       WHERE courses.course_name ~* $1
       GROUP BY courses.course_id
-      ORDER BY courses.course_id asc
+      ORDER BY courses.course_id DESC
+      LIMIT $2 OFFSET $3
       `,
-      [keywords]
+      [keyword, coursesPerPage, offset]
     );
 
     for (let course of results.rows) {
@@ -25,6 +39,7 @@ export const getAll = async (req, res) => {
 
     return res.json({
       data: results.rows,
+      count: coursesCount,
     });
   } catch (error) {
     return res.sendStatus(500);
@@ -168,16 +183,16 @@ export const postSubscribeOrAddCourse = async (req, res) => {
         );
       }
       await pool.query(
-        `INSERT INTO subscriptions(user_id, course_id, status)
-              VALUES ($1, $2, $3)`,
-        [userId, courseId, 0]
+        `INSERT INTO subscriptions(user_id, course_id, status, created_date)
+              VALUES ($1, $2, $3, $4)`,
+        [userId, courseId, 0, new Date()]
       );
       message = "The course has been successfully subscribed";
     } else if (/add/i.test(action)) {
       await pool.query(
-        `INSERT INTO desired_courses(user_id, course_id)
-              VALUES ($1, $2)`,
-        [userId, courseId]
+        `INSERT INTO desired_courses(user_id, course_id, created_date)
+              VALUES ($1, $2, $3)`,
+        [userId, courseId, new Date()]
       );
       message =
         "The course has been successfully added to the desired courses list";
@@ -464,7 +479,7 @@ export const postWatchedOrAccepted = async (req, res) => {
       const sqlStatement = format(
         `
         INSERT INTO users_assignments(user_id, assignment_id, accepted_date, updated_date, status)
-        VALUES (%s, UNNEST(ARRAY[%s]), %L, %L, %L)`, 
+        VALUES (%s, UNNEST(ARRAY[%s]), %L, %L, %L)`,
         userId,
         assignmentList,
         dateNow,
@@ -544,6 +559,16 @@ export const getSubLesson = async (req, res) => {
       }
     });
 
+    const findDaysUntilDeadline = (currentDate, deadline) => {
+      const dl = new Date(deadline);
+      const cd = new Date(currentDate);
+      const deadlineDateInMs = dl.getTime();
+      const currentDateInMs = cd.getTime();
+      const msDiff = deadlineDateInMs - currentDateInMs;
+      const daysUntilDeadline = msDiff / (1000 * 60 * 60 * 24);
+      return Math.round(daysUntilDeadline);
+    };
+
     let queryAssignmentStatus = await pool.query(
       `
     SELECT assignments.assignment_id, sub_lessons.duration, users_assignments.answer, users_assignments.accepted_date, users_assignments.status, users_assignments.user_assignment_id, users_assignments.answer, users_assignments.submitted_date
@@ -592,6 +617,19 @@ export const getSubLesson = async (req, res) => {
           }
           subLessonData.assignments[String(assignment.assignment_id)].status =
             assignment.status;
+          if (!/overdue/i.test(assignment.status)) {
+            let deadlineDate = new Date(assignment.accepted_date);
+            deadlineDate = new Date(
+              deadlineDate.setDate(deadlineDate.getDate() + assignment.duration)
+            );
+            const deadlineDateString = deadlineDate.toLocaleString("en-GB");
+            subLessonData.assignments[
+              String(assignment.assignment_id)
+            ].deadline = deadlineDateString;
+            subLessonData.assignments[String(assignment.assignment_id)][
+              "days_until_deadline"
+            ] = findDaysUntilDeadline(new Date(), deadlineDate);
+          }
         }
       });
     } else {

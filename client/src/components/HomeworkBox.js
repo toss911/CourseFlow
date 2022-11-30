@@ -14,6 +14,10 @@ import { useState } from "react";
 const HomeworkBox = (props) => {
   const navigate = useNavigate();
   const [answer, setAnswer] = useState({ answer: props.answer });
+  let deadlineDate = new Date(props.acceptedDate);
+  deadlineDate = new Date(
+    deadlineDate.setDate(deadlineDate.getDate() + props.duration)
+  ).toLocaleString("en-GB");
 
   // *- Change status badge color -* //
   const changeBadgeColor = (status) => {
@@ -39,16 +43,16 @@ const HomeworkBox = (props) => {
     let display;
     switch (status) {
       case "submitted":
-        display = "hidden";
+        display = "none";
         break;
       case "overdue":
-        display = "hidden";
+        display = "none";
         break;
       case "in progress":
-        display = "visible";
+        display = "block";
         break;
       case "pending":
-        display = "visible";
+        display = "block";
         break;
     }
     return display;
@@ -63,124 +67,82 @@ const HomeworkBox = (props) => {
       <Flex
         flexDirection="column"
         w="1120px"
-        h="354px"
-        padding="40px, 96px"
+        padding="40px 96px"
         alignItems="center"
         mb="24px"
         backgroundColor="blue.100"
         borderRadius="8px"
       >
-        <Flex w="925px" h="66px" mt="40px" gap="24px">
-          <Flex flexDirection="column" w="746px" h="66px" gap="12px">
+        <Flex w="925px" justify="space-between">
+          <Flex flexDirection="column" w="700px" gap="12px">
             <Heading variant="headline3">Course: {props.courseName}</Heading>
             <Text variant="body2" textColor="gray.700">
               {props.lessonName}: {props.subLessonName}
             </Text>
           </Flex>
-          <Flex
-            flexDirection="column"
-            w="155px"
-            h="64px"
-            gap="12px"
-            alignItems="flex-end"
-          >
+          <Flex flexDirection="column" alignItems="flex-end">
             <Badge
               variant={changeBadgeColor(props.status)}
               sx={{ textTransform: "capitalize" }}
             >
               <Text variant="body3">{props.status}</Text>
             </Badge>
-            {props.daysUntilDeadline === 0 ? (
-              <Text
-                w="165px"
-                variant="body2"
-                textColor="gray.700"
-                visibility={displayOrNot(props.status)}
-              >
-                Submit within today
-              </Text>
-            ) : (
-              <Text
-                w="165px"
-                variant="body2"
-                textColor="gray.700"
-                visibility={displayOrNot(props.status)}
-              >
-                Submit within {props.daysUntilDeadline} {props.dayOrDays}
-              </Text>
-            )}
+            <Text
+              mt="12px"
+              variant="body2"
+              textColor="gray.700"
+              display={displayOrNot(props.status)}
+            >
+              {props.daysUntilDeadline === 0
+                ? `Submit within today`
+                : `Submit within ${props.daysUntilDeadline} ${props.dayOrDays}`}
+            </Text>
+            <Text
+              variant="body3"
+              textColor="gray.700"
+              display={displayOrNot(props.status)}
+            >
+              Deadline: {deadlineDate}
+            </Text>
           </Flex>
         </Flex>
         <Flex
           w="928px"
-          h="180px"
           mt="36px"
           backgroundColor="white"
           borderRadius="8px"
+          p="24px"
+          justify="space-between"
         >
           <Flex
             flexDirection="column"
             w="719px"
-            h="124px"
             gap="4px"
             alignItems="flex-start"
-            m="24px"
           >
-            <label>
-              <Text variant="body2" textColor="black">
-                {props.hwDetail}
-              </Text>
-            </label>
+            <Text variant="body2" textColor="black">
+              {props.hwDetail}
+            </Text>
             {/* Change text area depending on status */}
             {props.submittedDate ? (
-              <Box w="719px" h="96px">
+              <Box w="719px" minH="100px">
                 {props.answer}
               </Box>
-            ) : props.answer ? (
+            ) : (
               <Textarea
-                placeholder="Answer here..."
                 w="719px"
-                h="96px"
+                h="100%"
+                placeholder="Answer here..."
+                resize="none"
                 textAlign="start"
                 color="black"
                 onChange={handleTextChange}
                 defaultValue={props.answer}
               />
-            ) : (
-              <Textarea
-                placeholder="Answer here..."
-                w="719px"
-                h="96px"
-                textAlign="start"
-                color="black"
-                onChange={handleTextChange}
-              />
             )}
-
-            <Button
-              variant="secondary"
-              pt="0px"
-              pb="0px"
-              pl="10px"
-              pr="10px"
-              size="xs"
-              mt="5px"
-              onClick={() =>
-                props.saveAnswerDraft(
-                  props.assignmentId,
-                  answer,
-                  props.status,
-                  props.courseId
-                )
-              }
-              visibility={props.submittedDate ? "hidden" : "visible"}
-            >
-              Save draft
-            </Button>
           </Flex>
-          <Flex flexDirection="column" gap="16px" w="137px" h="108px" mt="40px">
+          <Flex direction="column" w="137px" gap="6px">
             <Button
-              p="4px"
               onClick={() =>
                 props.submitHomework(
                   props.assignmentId,
@@ -192,6 +154,20 @@ const HomeworkBox = (props) => {
               display={props.submittedDate ? "none" : "block"}
             >
               Submit
+            </Button>
+            <Button
+              variant="save draft"
+              onClick={() =>
+                props.saveAnswerDraft(
+                  props.assignmentId,
+                  answer,
+                  props.status,
+                  props.courseId
+                )
+              }
+              display={props.submittedDate ? "none" : "block"}
+            >
+              Save draft
             </Button>
             <Flex
               justify="center"
