@@ -119,6 +119,7 @@ function AdminEditCourses() {
       if (/video/gi.test(currentFile.type)) {
         if (currentFile.size <= 1.2e9) {
           setFieldValue("video_trailer", currentFile);
+          setVideoFile(currentFile);
         } else {
           return toast({
             title: "Video size must be less than 1.2GB!",
@@ -142,6 +143,7 @@ function AdminEditCourses() {
       if (/jpeg|png/gi.test(currentFile.type)) {
         if (currentFile.size <= 2e6) {
           setFieldValue("cover_image", currentFile);
+          setCoverImageFile(currentFile);
         } else {
           return toast({
             title: "File size must be less than 2MB!",
@@ -870,6 +872,7 @@ function AdminEditCourses() {
                                               "files",
                                               newFieldValue
                                             );
+                                            setFiles(newFieldValue);
                                           }}
                                         />
                                         <Text
@@ -903,6 +906,7 @@ function AdminEditCourses() {
                                             "files",
                                             Object.values(event.target.files)
                                           );
+                                          setFiles(Object.values(event.target.files))
                                         }}
                                       />
                                       <Flex
