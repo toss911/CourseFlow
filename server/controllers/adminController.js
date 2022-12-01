@@ -956,6 +956,7 @@ export const editLesson = async (req, res) => {
   // try {
   const admin_id = req.query.byAdmin;
   const lesson_id = req.params.lessonId;
+  const lesson_name = req.body.lesson_name;
   const sub_lesson_name = req.body.sub_lesson_name;
   const sub_lesson_id = req.body.sub_lesson_id;
   const video = req.body.video;
@@ -978,7 +979,17 @@ export const editLesson = async (req, res) => {
       .json({ message: "You have no permission to edit this lesson" });
   }
 
-  /* Update duration of assignments in "sub_lessons" table */
+  /* Update lesson_name in "lessons" table */
+  await pool.query(
+    `
+  UPDATE lessons
+  SET lesson_name = $1
+  WHERE lesson_id = $2
+  `,
+    [lesson_name, lesson_id]
+  );
+
+  /* Update sub_lesson_name and video in "sub_lessons" table */
   await pool.query(
     `
     UPDATE sub_lessons

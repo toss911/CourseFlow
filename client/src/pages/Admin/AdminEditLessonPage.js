@@ -142,9 +142,9 @@ function AdminEditLesson() {
     const newLesson = [...addLesson];
     newLesson[lessonId - 1] = value;
     setAddLesson(newLesson);
-    // let body = [];
     for (let i = 0; i < value.sub_lessons.length; i++) {
       const body = {
+        lesson_name: value.lesson_name,
         sub_lesson_name: value.sub_lessons[i].sub_lesson_name,
         sub_lesson_id: Number(value.sub_lessons[i].sub_lesson_id),
         video: `{ "url" :"https://res.cloudinary.com/dfsomhrhl/video/private/s--FQcRZGby--/v1669824296/courseflow/course_video_trailers/klejw1frqb2azseup6ih.mp4",
