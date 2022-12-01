@@ -11,25 +11,31 @@ import {
   TableContainer,
   Text,
   Image,
-  Box,
-  List,
-  UnorderedList,
-  ListItem,
-  Container,
-  Grid,
-  GridItem,
   Center,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Divider,
 } from "@chakra-ui/react";
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useState } from "react";
 import { useAdmin } from "../contexts/admin.js";
 import { useNavigate, useParams } from "react-router-dom";
+let lessonDeleteIndex;
 
 const LessonTable = () => {
   const { addLesson, setAddLesson } = useAdmin();
   const navigate = useNavigate();
   const { courseId } = useParams();
+  const {
+    isOpen: isConfirmModalOpen,
+    onOpen: onConfirmModalOpen,
+    onClose: onConfirmModalClose,
+  } = useDisclosure();
 
   const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -119,7 +125,7 @@ const LessonTable = () => {
                                 {row.lesson_name}
                               </Td>
                               <Td w="40%" color="black">
-                                {row.sub_lessons.length}
+                                {courseId ? row.count : row.sub_lessons.length}
                               </Td>
                               <Td w="10%">
                                 <Flex gap="20%">
@@ -130,10 +136,15 @@ const LessonTable = () => {
                                     h="24px"
                                     cursor="pointer"
                                     _hover={{ opacity: 0.5 }}
-                                    // onClick={() => {
-                                    //   course_id = course.course_id;
-                                    //   onConfirmModalOpen();
-                                    // }}
+                                    onClick={() => {
+                                      if (courseId) {
+                                        // Delete lesson from edit course page
+                                      } else {
+                                        // Delete lesson from add course page
+                                        lessonDeleteIndex = index;
+                                        onConfirmModalOpen();
+                                      }
+                                    }}
                                   />
                                   <Image
                                     src="../../../assets/admin-page/edit.svg"
@@ -142,9 +153,14 @@ const LessonTable = () => {
                                     h="24px"
                                     cursor="pointer"
                                     _hover={{ opacity: 0.5 }}
-                                    // onClick={() =>
-                                    //   navigate(`/admin/edit-course/${course.course_id}`)
-                                    // }
+                                    onClick={() => {
+                                      if (courseId) {
+                                        // Edit lesson from edit course page
+                                      } else {
+                                        // Edit lesson from add course page
+                                        navigate(`./edit-lesson/${index + 1}`);
+                                      }
+                                    }}
                                   />
                                 </Flex>
                               </Td>
@@ -161,6 +177,47 @@ const LessonTable = () => {
           </Droppable>
         </DragDropContext>
       </TableContainer>
+      <Modal
+        isCentered
+        isOpen={isConfirmModalOpen}
+        onClose={onConfirmModalClose}
+        closeOnOverlayClick={false}
+        preserveScrollBarGap
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader borderRadius="24px 24px 0px 0px">
+            <Text variant="body1" color="black">
+              Confirmation
+            </Text>
+          </ModalHeader>
+          <Divider sx={{ borderColor: "gray.300" }} />
+          <ModalCloseButton color="gray.500" />
+          <ModalBody p="24px 50px 24px 24px" color="black">
+            <Text variant="body2" color="gray.700" as="span">
+              Do you want to delete this lesson?
+            </Text>
+            <Flex mt="24px" width="600px">
+              <Button variant="secondary" onClick={onConfirmModalClose}>
+                No, I don't
+              </Button>
+              <Button
+                ml="16px"
+                // isLoading={isDeleting}
+                variant="primary"
+                onClick={() => {
+                  const newLessonsList = [...addLesson];
+                  newLessonsList.splice(lessonDeleteIndex, 1);
+                  setAddLesson(newLessonsList);
+                  onConfirmModalClose();
+                }}
+              >
+                Yes, I want to delete
+              </Button>
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 };
