@@ -170,7 +170,7 @@ function AdminEditLesson() {
                           </Text>
                         </Flex>
                       ) : null}
-                      <Heading variant="headline3">Add Lesson</Heading>
+                      <Heading variant="headline3">Edit Lesson</Heading>
                     </Flex>
                   </Flex>
                   {/* Button */}
@@ -184,7 +184,7 @@ function AdminEditLesson() {
                       Cancel
                     </Button>
                     <Button type="submit" isLoading={isSubmitting}>
-                      Create
+                      Save
                     </Button>
                   </Flex>
                 </Flex>
