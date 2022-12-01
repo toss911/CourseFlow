@@ -908,8 +908,9 @@ export const deleteAssignment = async (req, res) => {
 
 // get course for edit-lesson-page
 export const getCourseLesson = async (req, res) => {
-  const courseId = req.params.courseId;
-  const adminId = req.query.byAdmin;
+  const course_id = req.params.courseId;
+  const lesson_id = req.params.lessonId;
+  const admin_id = req.query.byAdmin;
 
   /* Validate whether this admin owned the course or not */
   let doesAdminOwnThisCourse = await pool.query(
@@ -923,7 +924,7 @@ export const getCourseLesson = async (req, res) => {
   ON lessons.lesson_id = sub_lessons.lesson_id
   WHERE courses.admin_id = $1 AND courses.course_id = $2)
   `,
-    [adminId, courseId]
+    [admin_id, course_id]
   );
   doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
   if (!doesAdminOwnThisCourse) {
@@ -934,25 +935,19 @@ export const getCourseLesson = async (req, res) => {
 
   let data = await pool.query(
     `
-  SELECT courses.course_name, courses.summary, courses.detail, courses.price,
-  courses.learning_time, courses.cover_image_directory, courses.video_trailer_directory,
-  courses.created_date, courses.category, lessons.lesson_name, lessons.sequence,
-  sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
+  SELECT courses.course_id,courses.course_name,
+   lessons.lesson_id, lessons.lesson_name, lessons.sequence,
+  sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
   FROM courses
   INNER JOIN lessons
   ON lessons.course_id = courses.course_id
   INNER JOIN sub_lessons
   ON sub_lessons.lesson_id = lessons.lesson_id
-  WHERE courses.course_id = $1 AND courses.admin_id = $2`,
-    [courseId, adminId]
+  WHERE courses.course_id = $1 AND courses.admin_id = $2 AND sub_lessons.lesson_id = $3`,
+    [course_id, admin_id, lesson_id]
   );
 
-  data = data.rows[0];
-  data = {
-    ...data,
-    course_id: String(data.course_id),
-    lesson_id: String(data.lesson_id),
-    sub_lesson_id: String(data.sub_lesson_id),
-  };
+  data = data.rows;
+
   return res.json({ data });
 };

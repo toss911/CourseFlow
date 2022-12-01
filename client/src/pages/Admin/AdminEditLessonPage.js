@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Flex,
@@ -11,28 +11,95 @@ import {
   FormErrorMessage,
   Input,
   useToast,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { DragHandleIcon } from "@chakra-ui/icons";
+import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
+import { useAuth } from "../../contexts/authentication.js";
+import axios from "axios";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
 import { useNavigate, useParams } from "react-router-dom";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 function AdminEditLesson() {
+  const {
+    isOpen: isSuccessModalOpen,
+    onOpen: onSuccessModalOpen,
+    onClose: onSuccessModalClose,
+  } = useDisclosure();
+  const [courseData, setCourseData] = useState();
   const { addLesson, setAddLesson } = useAdmin();
+  const [subLessonData, setSubLessonData] = useState();
+  const [modalMsg, setModalMsg] = useState();
   const toast = useToast();
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
-  const [videoKey, setVideoKey] = useState(0); // this state is for forcing video elements to be re-render after dragged and dropped
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
+  const [filesObj, setFilesObj] = useState([]);
+  const [videoKey, setVideoKey] = useState(0);
+  // this state is for forcing video elements to be re-render after dragged and dropped
 
   const forceUpdateVideo = () => {
     setVideoKey(videoKey + 1);
   };
+  useEffect(() => {
+    async function fetchData() {
+      await getCourseData();
+      await getSubLessonData();
+    }
+    fetchData();
+  }, []);
+
+  // Querying a course data
+  const getCourseData = async () => {
+    let result = await axios.get(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson?byAdmin=${adminId}`
+    );
+    setCourseData(result.data.data);
+  };
+  // Querying a sub_lesson data
+  const getSubLessonData = async () => {
+    let result = await axios.get(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`
+    );
+    setSubLessonData(result.data.data);
+  };
+
+  const convertToFileObj = async (url, fileName) => {
+    let fileVideo = "";
+    await fetch(url).then(async (response) => {
+      const blob = await response.blob();
+      const file = new File([blob], fileName, {
+        type: blob.type,
+      });
+      fileVideo = file;
+    });
+    //console.log("fileVideo: ", fileVideo);
+    return fileVideo;
+  };
+
+  let includeSubLesson = [];
+  if (Boolean(subLessonData)) {
+    for (let i = 0; i < subLessonData.length; i++) {
+      const url = JSON.parse(subLessonData[i].video_directory).url;
+      const fileVideo = convertToFileObj(url, `video-sub-lesson${i}`);
+      includeSubLesson[i] = {
+        sub_lesson_name: subLessonData[i].sub_lesson_name,
+        video: url,
+      };
+    }
+    //console.log(subLessonData);
+    //console.log("includeSubLesson ", includeSubLesson);
+  }
 
   const handleVideoChange = (currentFile, index, setFieldValue) => {
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
-        setFieldValue(`sub_lessons.${index}.video`, currentFile);
+        setFieldValue(
+          `sub_lessons.${index}.video`,
+          URL.createObjectURL(currentFile)
+        );
       } else {
         return toast({
           title: "File type must be video only!",
@@ -43,11 +110,22 @@ function AdminEditLesson() {
     }
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (value) => {
     const newLesson = [...addLesson];
-    newLesson[lessonId - 1] = values;
+    newLesson[lessonId - 1] = value;
     setAddLesson(newLesson);
-    if (Boolean(courseId)) {
+    const body = {
+      sub_lesson_name: value.sub_lesson_name,
+      video: value.video,
+    };
+    const result = await axios.put(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
+      body
+    );
+    if (/successfully/i.test(result.data.message)) {
+      setModalMsg("edited");
+      onSuccessModalOpen();
+    } else if (Boolean(courseId)) {
       navigate(`/admin/edit-course/${courseId}`);
     } else {
       navigate(`/admin/add-course`);
@@ -106,19 +184,19 @@ function AdminEditLesson() {
       initialValues={
         courseId
           ? {
-              lesson_name: "",
-              sub_lessons: [
-                {
-                  sub_lesson_name: "",
-                  video: null,
-                },
-              ],
+              lesson_name: Boolean(subLessonData)
+                ? courseData[subLessonData[0].course_id].lessons[
+                    subLessonData[0].lesson_id
+                  ].lesson_name
+                : "",
+              sub_lessons: includeSubLesson,
             }
           : {
               lesson_name: addLesson[lessonId - 1].lesson_name,
               sub_lessons: [...addLesson[lessonId - 1].sub_lessons],
             }
       }
+      enableReinitialize
       onSubmit={handleSubmit}
     >
       {({ values, resetForm, isSubmitting, setFieldValue }) => {
@@ -160,17 +238,32 @@ function AdminEditLesson() {
                       }}
                     />
                     <Flex direction="column">
-                      {Boolean(courseId) ? (
-                        <Flex gap="8px">
-                          <Text variant="body3" color="gray.600">
-                            Course
-                          </Text>
-                          <Text variant="body3" color="black">
-                            'Service Design Essentials'
-                          </Text>
+                      {Boolean(courseId) && Boolean(subLessonData) ? (
+                        <>
+                          <Flex gap="8px">
+                            <Text variant="body3" color="gray.600">
+                              Course
+                            </Text>
+                            <Text variant="body3" color="black">
+                              '{subLessonData[0].course_name}'
+                            </Text>
+                          </Flex>
+                          <Flex direction="row">
+                            <Heading color="gray.600" variant="headline3">
+                              Lesson
+                            </Heading>
+                            <Heading ml="8px" variant="headline3">
+                              {subLessonData[0].lesson_name}
+                            </Heading>
+                          </Flex>
+                        </>
+                      ) : (
+                        <Flex direction="row">
+                          <Heading ml="8px" variant="headline3">
+                            Edit Lesson
+                          </Heading>
                         </Flex>
-                      ) : null}
-                      <Heading variant="headline3">Edit Lesson</Heading>
+                      )}
                     </Flex>
                   </Flex>
                   {/* Button */}
@@ -461,9 +554,9 @@ function AdminEditLesson() {
                                                                   key={videoKey}
                                                                 >
                                                                   <source
-                                                                    src={URL.createObjectURL(
+                                                                    src={
                                                                       field.value
-                                                                    )}
+                                                                    }
                                                                   />
                                                                 </video>
                                                                 <Flex

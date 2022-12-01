@@ -18,6 +18,11 @@ adminRouter.get("/get-course/:courseId", admin_controller.getCourse);
 adminRouter.get(
   "/edit-course/:courseId/edit-lesson",
   protect,
+  admin_controller.getAllCoursesData
+);
+adminRouter.get(
+  "/edit-course/:courseId/edit-lesson/:lessonId",
+  protect,
   admin_controller.getCourseLesson
 );
 adminRouter.get("/courses", protect, admin_controller.getAdminCourses);
