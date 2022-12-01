@@ -2,17 +2,34 @@ import React, { useState, useEffect } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Flex,
-  Text,
-  Image,
-  Heading,
-  Button,
   FormControl,
   FormLabel,
   FormErrorMessage,
-  Input,
-  useToast,
+  Select,
+  Skeleton,
+  Heading,
+  Button,
+  Text,
+  Textarea,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
   useDisclosure,
+  Link,
+  Divider,
+  Input,
+  Image,
+  useToast,
 } from "@chakra-ui/react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { useAuth } from "../../contexts/authentication.js";
 import axios from "axios";
@@ -27,6 +44,13 @@ function AdminEditLesson() {
     onOpen: onSuccessModalOpen,
     onClose: onSuccessModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isConfirmModalOpen,
+    onOpen: onConfirmModalOpen,
+    onClose: onConfirmModalClose,
+  } = useDisclosure();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [courseData, setCourseData] = useState();
   const { addLesson, setAddLesson } = useAdmin();
   const [subLessonData, setSubLessonData] = useState();
@@ -45,8 +69,10 @@ function AdminEditLesson() {
   };
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       await getCourseData();
       await getSubLessonData();
+      setIsLoading(false);
     }
     fetchData();
   }, []);
@@ -86,6 +112,7 @@ function AdminEditLesson() {
       const fileVideo = convertToFileObj(url, `video-sub-lesson${i}`);
       includeSubLesson[i] = {
         sub_lesson_name: subLessonData[i].sub_lesson_name,
+        sub_lesson_id: subLessonData[i].sub_lesson_id,
         video: url,
       };
     }
@@ -115,23 +142,41 @@ function AdminEditLesson() {
     const newLesson = [...addLesson];
     newLesson[lessonId - 1] = value;
     setAddLesson(newLesson);
-    const body = {
-      sub_lesson_name: value.sub_lesson_name,
-      sub_lesson_id: value.sub_lesson_id,
-      video: value.video,
-    };
-    const result = await axios.put(
-      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
-      body
-    );
-    if (/successfully/i.test(result.data.message)) {
-      setModalMsg("edited");
-      onSuccessModalOpen();
-    } else if (Boolean(courseId)) {
-      navigate(`/admin/edit-course/${courseId}`);
-    } else {
-      navigate(`/admin/add-course`);
+    // let body = [];
+    for (let i = 0; i < value.sub_lessons.length; i++) {
+      const body = {
+        sub_lesson_name: value.sub_lessons[i].sub_lesson_name,
+        sub_lesson_id: Number(value.sub_lessons[i].sub_lesson_id),
+        video: `{ "url" :"https://res.cloudinary.com/dfsomhrhl/video/private/s--FQcRZGby--/v1669824296/courseflow/course_video_trailers/klejw1frqb2azseup6ih.mp4",
+        "public_id" :"courseflow/course_video_trailers/klejw1frqb2azseup6ih" }`,
+      };
+      const result = await axios.put(
+        `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
+        body
+      );
+      if (/successfully/i.test(result.data.message)) {
+        setModalMsg("edited");
+        onSuccessModalOpen();
+        // if (Boolean(courseId)) {
+        //   navigate(`admin/edit-course/${courseId}`);
+        // } else {
+        //   navigate(`admin/add-course`);
+        // }
+      }
     }
+  };
+
+  const handleDeleteAssignment = async () => {
+    // setIsDeleting(true);
+    // const result = await axios.delete(
+    //   `http://localhost:4000/admin/assignments/${assignmentId}?byAdmin=${adminId}`
+    // );
+    // setIsDeleting(false);
+    // if (/successfully/i.test(result.data.message)) {
+    //   onConfirmModalClose();
+    //   setModalMsg("deleted");
+    //   onSuccessModalOpen();
+    // }
   };
 
   /* Drag & drop */
@@ -279,7 +324,7 @@ function AdminEditLesson() {
                       Cancel
                     </Button>
                     <Button type="submit" isLoading={isSubmitting}>
-                      Save
+                      Edit
                     </Button>
                   </Flex>
                 </Flex>
@@ -690,8 +735,103 @@ function AdminEditLesson() {
                     </DragDropContext>
                   </Flex>
                 </Flex>
+                <Flex
+                  bgColor="gray.100"
+                  direction="column"
+                  align="end"
+                  justify="center"
+                >
+                  <Text
+                    cursor="pointer"
+                    color="blue.500"
+                    fontWeight="700"
+                    fontSize="16px"
+                    mt="83px"
+                    mr="40px"
+                    mb="112px"
+                    onClick={() => onConfirmModalOpen()}
+                  >
+                    Delete Lesson
+                  </Text>
+                </Flex>
               </Flex>
             </Flex>
+            <Modal
+              isCentered
+              isOpen={isSuccessModalOpen}
+              onClose={onSuccessModalClose}
+              onCloseComplete={async () => {
+                if (/deleted/i.test(modalMsg)) {
+                  navigate("/admin/assignment");
+                } else if (/edited/i.test(modalMsg)) {
+                  setIsLoading(true);
+                  await getCourseData();
+                  await getSubLessonData();
+                  setIsLoading(false);
+                }
+              }}
+              preserveScrollBarGap
+            >
+              <ModalOverlay />
+              <ModalContent borderRadius="24px">
+                <ModalHeader
+                  bg="blue.500"
+                  color="white"
+                  textAlign="center"
+                  borderRadius="24px 24px 0px 0px"
+                  fontSize="1.5rem"
+                >
+                  <CheckCircleIcon mr="0.5em" />
+                  Success
+                </ModalHeader>
+                <ModalBody
+                  textAlign="center"
+                  my="2em"
+                  color="black"
+                  fontSize="1rem"
+                >
+                  Lesson has been successfully {modalMsg}.
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+            <Modal
+              isCentered
+              isOpen={isConfirmModalOpen}
+              onClose={onConfirmModalClose}
+              closeOnOverlayClick={false}
+              preserveScrollBarGap
+            >
+              <ModalOverlay />
+              <ModalContent borderRadius="24px">
+                <ModalHeader borderRadius="24px 24px 0px 0px">
+                  <Text variant="body1" color="black">
+                    Confirmation
+                  </Text>
+                </ModalHeader>
+                <Divider sx={{ borderColor: "gray.300" }} />
+                <ModalCloseButton color="gray.500" />
+                <ModalBody p="24px 50px 24px 24px" color="black">
+                  <Text variant="body2" color="gray.700" as="span">
+                    Do you want to delete this lesson?
+                  </Text>
+                  <Flex mt="24px" width="600px">
+                    <Button variant="secondary" onClick={onConfirmModalClose}>
+                      No, I don't
+                    </Button>
+                    <Button
+                      ml="16px"
+                      isLoading={isDeleting}
+                      variant="primary"
+                      onClick={() => {
+                        handleDeleteAssignment();
+                      }}
+                    >
+                      Yes, I want to delete
+                    </Button>
+                  </Flex>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
           </Form>
         );
       }}

@@ -975,7 +975,7 @@ export const editLesson = async (req, res) => {
   if (!doesAdminOwnThisCourse) {
     return res
       .status(403)
-      .json({ message: "You have no permission to edit this course" });
+      .json({ message: "You have no permission to edit this lesson" });
   }
 
   /* Update duration of assignments in "sub_lessons" table */
@@ -983,15 +983,14 @@ export const editLesson = async (req, res) => {
     `
     UPDATE sub_lessons
     SET sub_lesson_name = $1,
-      sub_lesson_id = $2,
-      video_directory = $3
-    WHERE lesson_id = $4
+      video_directory = $2
+    WHERE sub_lesson_id = $3 AND lesson_id = $4
     `,
-    [sub_lesson_name, sub_lesson_id, video, lesson_id]
+    [sub_lesson_name, video, sub_lesson_id, lesson_id]
   );
 
   return res.json({ message: "Lesson has been successfully edited" });
   // } catch (error) {
-  // return res.sendStatus(500);
+  //   return res.sendStatus(500);
   // }
 };
