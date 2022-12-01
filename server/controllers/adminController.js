@@ -190,6 +190,7 @@ export const getCourse = async (req, res) => {
     ON lessons.lesson_id = sub_lessons.lesson_id
     WHERE courses.course_id = $1
     GROUP BY lessons.lesson_id
+    ORDER BY lessons.sequence asc
     `,
     [courseId]
   );
@@ -239,6 +240,8 @@ export const updateCourse = async (req, res) => {
   const adminId = req.query.adminId;
   const mediaFiles = req.files;
   console.log(mediaFiles);
+  console.log(req.body.lesson_id);
+  console.log(req.body.sequence);
 
   const updatedCourse = {
     courseName: req.body.course_name,
@@ -251,8 +254,8 @@ export const updateCourse = async (req, res) => {
   };
 
   const updatedLesson = {
-    lessonName: req.body.lesson_name,
-    sequence: req.body.lesson_sequence,
+    lessonId: req.body.lesson_id,
+    sequence: req.body.sequence,
   };
 
   if (Object.keys(mediaFiles).length === 0) {
@@ -267,10 +270,10 @@ export const updateCourse = async (req, res) => {
         WHERE course_id = $8 AND admin_id = $9
         returning course_id
       )
-        UPDATE lessons
-          SET lesson_name = $10, sequence = $11
-        WHERE course_id IN (SELECT course_id FROM course_update)
-      
+      UPDATE lessons as l
+      SET sequence = l2.sequence
+      FROM (SELECT UNNEST($10::int[]) as lesson_id, UNNEST($11::int[]) as sequence) AS l2
+      WHERE l.lesson_id = l2.lesson_id
       `,
       [
         updatedCourse.courseName,
@@ -282,7 +285,7 @@ export const updateCourse = async (req, res) => {
         updatedCourse.category,
         courseId,
         adminId,
-        updatedLesson.lessonName,
+        updatedLesson.lessonId,
         updatedLesson.sequence,
       ]
     );
@@ -354,9 +357,10 @@ with course_update as (
   WHERE course_id = $10 AND admin_id = $11
   returning course_id
 )
-  UPDATE lessons
-    SET lesson_name = $12, sequence = $13
-  WHERE course_id IN (SELECT course_id FROM course_update)
+UPDATE lessons as l
+SET sequence = l2.sequence
+FROM (SELECT UNNEST($12::int[]) as lesson_id, UNNEST($13::int[]) as sequence) AS l2
+WHERE l.lesson_id = l2.lesson_id
 
 `,
       [
@@ -371,7 +375,7 @@ with course_update as (
         updatedCourse.category,
         courseId,
         adminId,
-        updatedLesson.lessonName,
+        updatedLesson.lessonId,
         updatedLesson.sequence,
       ]
     );
@@ -972,14 +976,16 @@ export const deleteLesson = async (req, res) => {
   }
 
   // Step2 here
-    await pool.query(`
+  await pool.query(
+    `
     DELETE 
     FROM lessons
     WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
   `,
-    [lessonId, courseId]);
+    [lessonId, courseId]
+  );
 
   return res.json({
-    message: "Lesson deleted successfully"
+    message: "Lesson deleted successfully",
   });
 };

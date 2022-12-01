@@ -23,16 +23,14 @@ import axios from "axios";
 import { useParams } from "react-router";
 import { useAuth } from "../../contexts/authentication";
 import LessonTable from "../../components/LessonsTable";
+import { changeLessonSeq } from "../../components/LessonsTable";
 let action = "no files";
-
 
 function AdminEditCourses() {
   const [courseData, setCourseData] = useState({});
   const [coverImageFile, setCoverImageFile] = useState();
   const [videoFile, setVideoFile] = useState();
   const [files, setFiles] = useState([]);
-  const [filesObj, setFilesObj] = useState([]);
-  // const props = " Add more files";
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
@@ -58,6 +56,8 @@ function AdminEditCourses() {
     setAddLesson(result.data.lessonsAndSubCount);
   };
   console.log(addLesson);
+  console.log(changeLessonSeq);
+
   
 
   // Convert media urls into file objects:
@@ -96,15 +96,17 @@ function AdminEditCourses() {
     formData.append("course_summary", values.course_summary);
     formData.append("course_detail", values.course_detail);
     formData.append("category", values.category);
-    formData.append("lesson_name", "test lesson name");
-    formData.append("lesson_sequence", 3);
-    formData.append("action", action);
-    for (let lesson of addLesson) {
-      lesson.sequence = addLesson.indexOf(lesson) + 1;
+    // if the user changes lessons' sequence:
+    if (changeLessonSeq) {
+      for (let lesson of addLesson) {
+        lesson.sequence = addLesson.indexOf(lesson) + 1;
+      }
+      addLesson.forEach((lesson) => {
+        formData.append("lesson_id", lesson.lesson_id);
+        formData.append("sequence", lesson.sequence);
+      });   
     }
-    addLesson.forEach((lesson) => {
-      formData.append("lessons", lesson.lesson_name);
-    });
+    // if the user changes any files (cover image, video trailer or attached files):
     if (/change/i.test(action)) {
       formData.append("course_cover_images", coverImageFile);
       formData.append("course_video_trailers", videoFile);
@@ -962,7 +964,7 @@ function AdminEditCourses() {
                       </Flex>
                     </Flex>
                     {/* <LessonTable /> */}
-                    <LessonTable/>
+                    <LessonTable />
                   </Box>
                 </Flex>
               </Flex>

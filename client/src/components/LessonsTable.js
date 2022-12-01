@@ -26,6 +26,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useAdmin } from "../contexts/admin.js";
 import { useNavigate, useParams } from "react-router-dom";
 let lessonDeleteIndex;
+export let changeLessonSeq = false;
 
 const LessonTable = () => {
   const { addLesson, setAddLesson } = useAdmin();
@@ -60,7 +61,9 @@ const LessonTable = () => {
       result.destination.index
     );
     setAddLesson(items);
+    changeLessonSeq = true;
   };
+
 
   return (
     <Flex direction="column" mx="40px" my="50px">
@@ -210,6 +213,7 @@ const LessonTable = () => {
                   newLessonsList.splice(lessonDeleteIndex, 1);
                   setAddLesson(newLessonsList);
                   onConfirmModalClose();
+
                 }}
               >
                 Yes, I want to delete
