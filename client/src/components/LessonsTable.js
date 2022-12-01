@@ -119,7 +119,7 @@ const LessonTable = () => {
                                 {row.lesson_name}
                               </Td>
                               <Td w="40%" color="black">
-                                {row.sub_lessons.length}
+                                {courseId? row.count : row.sub_lessons.length}
                               </Td>
                               <Td w="10%">
                                 <Flex gap="20%">

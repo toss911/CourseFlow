@@ -60,5 +60,6 @@ adminRouter.delete(
   courseUpload,
   admin_controller.deleteCourse
 );
+adminRouter.delete("/delete-lesson/:lessonId", courseUpload, admin_controller.deleteLesson);
 
 export default adminRouter;
