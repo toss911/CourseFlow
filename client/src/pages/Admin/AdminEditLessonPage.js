@@ -111,11 +111,13 @@ function AdminEditLesson() {
   };
 
   const handleSubmit = async (value) => {
+    console.log("value: ", value);
     const newLesson = [...addLesson];
     newLesson[lessonId - 1] = value;
     setAddLesson(newLesson);
     const body = {
       sub_lesson_name: value.sub_lesson_name,
+      sub_lesson_id: value.sub_lesson_id,
       video: value.video,
     };
     const result = await axios.put(

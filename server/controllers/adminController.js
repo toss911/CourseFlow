@@ -305,7 +305,7 @@ export const updateCourse = async (req, res) => {
     );
 
     let filesPublicIdForDelete = [];
-    
+
     const courseAttachedFiles = await pool.query(
       `
       SELECT * from files where course_id = $1
@@ -950,4 +950,48 @@ export const getCourseLesson = async (req, res) => {
   data = data.rows;
 
   return res.json({ data });
+};
+
+export const editLesson = async (req, res) => {
+  // try {
+  const admin_id = req.query.byAdmin;
+  const lesson_id = req.params.lessonId;
+  const sub_lesson_name = req.body.sub_lesson_name;
+  const sub_lesson_id = req.body.sub_lesson_id;
+  const video = req.body.video;
+  /* Validate whether this admin owned the course or not */
+  let doesAdminOwnThisCourse = await pool.query(
+    `
+    SELECT EXISTS 
+    (SELECT *
+      FROM courses
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    WHERE courses.admin_id = $1 AND lessons.lesson_id = $2)
+    `,
+    [admin_id, lesson_id]
+  );
+  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+  if (!doesAdminOwnThisCourse) {
+    return res
+      .status(403)
+      .json({ message: "You have no permission to edit this course" });
+  }
+
+  /* Update duration of assignments in "sub_lessons" table */
+  await pool.query(
+    `
+    UPDATE sub_lessons
+    SET sub_lesson_name = $1,
+      sub_lesson_id = $2,
+      video_directory = $3
+    WHERE lesson_id = $4
+    `,
+    [sub_lesson_name, sub_lesson_id, video, lesson_id]
+  );
+
+  return res.json({ message: "Lesson has been successfully edited" });
+  // } catch (error) {
+  // return res.sendStatus(500);
+  // }
 };
