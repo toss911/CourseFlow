@@ -28,6 +28,7 @@ import LessonTable from "../../components/LessonsTable";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
 import { useAdmin } from "../../contexts/admin.js";
+import { useNavigate } from "react-router-dom";
 
 // Steps:
 // 1. Check if the user (admin) added at least one lesson and one sub-lesson:
@@ -38,12 +39,23 @@ import { useAdmin } from "../../contexts/admin.js";
 //            2. Display message 'Must add at least one lesson and one sub-lesson to continue'
 
 const AdminAddCourses = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { addLesson, addCourseFields } = useAdmin();
+  const {
+    isOpen: isErrorModalOpen,
+    onOpen: onErrorModalOpen,
+    onClose: onErrorModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isSuccessModalOpen,
+    onOpen: onSuccessModalOpen,
+    onClose: onSuccessModalClose,
+  } = useDisclosure();
+  const { addLesson, setAddLesson, addCourseFields, setAddCourseFields } =
+    useAdmin();
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
   const lessonTableRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     /* Prompt a pop-up message to warn the users if they are trying to refresh to web page */
@@ -60,10 +72,15 @@ const AdminAddCourses = () => {
     try {
       const formData = new FormData();
       for (let key in courseData) {
-        if (key === "files") {
-          // course_attached_files;
+        if (!/files|sub_lesson_videos/i.test(key)) {
+          formData.append(key, courseData[key]);
         }
-        formData.append(key, courseData[key]);
+      }
+      for (let file of courseData.files) {
+        formData.append("files", file);
+      }
+      for (let video of courseData.sub_lesson_videos) {
+        formData.append("sub_lesson_videos", video);
       }
       const result = await axios.post(
         `http://localhost:4000/admin/add-course?byAdmin=${adminId}`,
@@ -72,6 +89,12 @@ const AdminAddCourses = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
+
+      if (/success/i.test(result.data.message)) {
+        setAddLesson([]);
+        setAddCourseFields({});
+        onSuccessModalOpen();
+      }
     } catch (error) {
       alert(`ERROR: Please try again later`);
     }
@@ -81,14 +104,22 @@ const AdminAddCourses = () => {
     /* Checking that the submit data already has 1 lesson at least */
     if (!addLesson.length > 0) {
       // Redirect to lesson section
-      onOpen();
+      onErrorModalOpen();
       return false;
     }
     /* Included lesson data to course data */
     const courseData = { ...values };
-    courseData.lessons = addLesson;
+    courseData.sub_lesson_videos = [];
+    // Changing data structure of lesson data
+    const newAddLesson = structuredClone(addLesson);
+    for (let lesson of newAddLesson) {
+      for (let subLesson of lesson.sub_lessons) {
+        courseData.sub_lesson_videos.push(subLesson.video);
+        delete subLesson.video;
+      }
+    }
+    courseData.lessons = JSON.stringify(newAddLesson);
     addCourse(courseData);
-    /* ถ้า Submit เสร็จเรียบร้อยแล้ว ให้ลบ state ออก */
   };
 
   const handleVideoChange = (currentFile, setFieldValue) => {
@@ -904,8 +935,8 @@ const AdminAddCourses = () => {
             </Flex>
             <Modal
               isCentered
-              isOpen={isOpen}
-              onClose={onClose}
+              isOpen={isErrorModalOpen}
+              onClose={onErrorModalClose}
               onCloseComplete={() => lessonTableRef.current.scrollIntoView()}
               closeOnOverlayClick={false}
               preserveScrollBarGap
@@ -925,10 +956,45 @@ const AdminAddCourses = () => {
                 <ModalBody color="black" fontSize="1rem">
                   <Flex my="1em" direction="column" align="center" gap="1em">
                     <Text>Please add at least 1 lesson to create a course</Text>
-                    <Button w="fit-content" variant="error" onClick={onClose}>
+                    <Button
+                      w="fit-content"
+                      variant="error"
+                      onClick={onErrorModalClose}
+                    >
                       OK
                     </Button>
                   </Flex>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+            <Modal
+              isCentered
+              isOpen={isSuccessModalOpen}
+              onClose={onSuccessModalClose}
+              onCloseComplete={() => {
+                navigate("/admin");
+              }}
+              preserveScrollBarGap
+            >
+              <ModalOverlay />
+              <ModalContent borderRadius="24px">
+                <ModalHeader
+                  bg="blue.500"
+                  color="white"
+                  textAlign="center"
+                  borderRadius="24px 24px 0px 0px"
+                  fontSize="1.5rem"
+                >
+                  <CheckCircleIcon mr="0.5em" />
+                  Success
+                </ModalHeader>
+                <ModalBody
+                  textAlign="center"
+                  my="2em"
+                  color="black"
+                  fontSize="1rem"
+                >
+                  Course has been successfully created.
                 </ModalBody>
               </ModalContent>
             </Modal>

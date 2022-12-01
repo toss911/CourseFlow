@@ -141,7 +141,7 @@ const HomeworkBox = (props) => {
               />
             )}
           </Flex>
-          <Flex direction="column" w="137px" gap="6px">
+          <Flex direction="column" w="137px" gap="6px" pt="2em">
             <Button
               onClick={() =>
                 props.submitHomework(

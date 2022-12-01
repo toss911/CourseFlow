@@ -389,11 +389,7 @@ function LearningPage() {
                   controls
                   onEnded={() => handleVideoEnded(subLessonData.sub_lesson_id)}
                 >
-                  <source
-                    // src={subLessonData.video_directory}
-                    src="https://res.cloudinary.com/dxk5mdqoz/video/upload/v1668525048/Countdown_amqcom.mp4"
-                    type="video/mp4"
-                  />
+                  <source src={subLessonData.video_directory} />
                 </video>
               </AspectRatio>
               {Object.keys(userAssignment).length ===

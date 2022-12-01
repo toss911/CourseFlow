@@ -21,11 +21,15 @@ function LearningHome() {
           `http://localhost:4000/courses/${courseId}/learning/latest?byUser=${userId}`
         );
         latestSubLessonId = latestSubLessonId.data.data;
-        navigate(`/courses/${courseId}/learning/${latestSubLessonId}`);
+        navigate(`/courses/${courseId}/learning/${latestSubLessonId}`, {
+          replace: true,
+        });
       }
       getLatestSubLesson();
     } else {
-      navigate(`/courses/${courseId}/learning/${subLessonIdOfAssignment}`);
+      navigate(`/courses/${courseId}/learning/${subLessonIdOfAssignment}`, {
+        replace: true,
+      });
     }
   }, []);
 
