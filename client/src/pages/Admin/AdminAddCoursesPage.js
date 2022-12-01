@@ -13,13 +13,21 @@ import {
   Select,
   Button,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik } from "formik";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import LessonTable from "../../components/LessonsTable";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication";
+import { useAdmin } from "../../contexts/admin.js";
 
 // Steps:
 // 1. Check if the user (admin) added at least one lesson and one sub-lesson:
@@ -30,26 +38,57 @@ import { useAuth } from "../../contexts/authentication";
 //            2. Display message 'Must add at least one lesson and one sub-lesson to continue'
 
 const AdminAddCourses = () => {
-  let courseData = [];
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { addLesson, addCourseFields } = useAdmin();
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
+  const lessonTableRef = useRef();
+
+  useEffect(() => {
+    /* Prompt a pop-up message to warn the users if they are trying to refresh to web page */
+    const unloadCallback = (event) => {
+      event.preventDefault();
+      return (event.returnValue = "Changes you made may not be saved.");
+    };
+    window.addEventListener("beforeunload", unloadCallback);
+    return () => window.removeEventListener("beforeunload", unloadCallback);
+  }, []);
 
   // this function will be triggered after user clicks on 'create course' button
-  const addCourse = async () => {
-    const result = await axios.post("", courseData);
+  const addCourse = async (courseData) => {
+    try {
+      const formData = new FormData();
+      for (let key in courseData) {
+        if (key === "files") {
+          // course_attached_files;
+        }
+        formData.append(key, courseData[key]);
+      }
+      const result = await axios.post(
+        `http://localhost:4000/admin/add-course?byAdmin=${adminId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+    } catch (error) {
+      alert(`ERROR: Please try again later`);
+    }
   };
 
   const handleSubmit = (values) => {
-    console.log("values: ", values);
-    // check if user has added all info
-    // if (true) {
-    //   addCourse();
-    //   // pop up modal
-    //   // navigate to view courses page
-    // } else {
-    // }
-    return;
+    /* Checking that the submit data already has 1 lesson at least */
+    if (!addLesson.length > 0) {
+      // Redirect to lesson section
+      onOpen();
+      return false;
+    }
+    /* Included lesson data to course data */
+    const courseData = { ...values };
+    courseData.lessons = addLesson;
+    addCourse(courseData);
+    /* ถ้า Submit เสร็จเรียบร้อยแล้ว ให้ลบ state ออก */
   };
 
   const handleVideoChange = (currentFile, setFieldValue) => {
@@ -110,7 +149,9 @@ const AdminAddCourses = () => {
     if (!value) {
       error = "Please specify price";
     } else if (value <= 0) {
-      error = "Price can not be less than 0";
+      error = `Price can not be less than 0`;
+    } else if (value % 1 !== 0) {
+      error = "Price can not be decimal";
     }
     return error;
   };
@@ -172,15 +213,15 @@ const AdminAddCourses = () => {
   return (
     <Formik
       initialValues={{
-        course_name: "",
-        price: "",
-        learning_time: "",
-        course_summary: "",
-        course_detail: "",
-        category: "",
-        cover_image: null,
-        video_trailer: null,
-        files: [],
+        course_name: addCourseFields.course_name || "",
+        price: addCourseFields.price || "",
+        learning_time: addCourseFields.learning_time || "",
+        course_summary: addCourseFields.course_summary || "",
+        course_detail: addCourseFields.course_detail || "",
+        category: addCourseFields.category || "",
+        cover_image: addCourseFields.cover_image || null,
+        video_trailer: addCourseFields.video_trailer || null,
+        files: addCourseFields.files || [],
       }}
       onSubmit={handleSubmit}
     >
@@ -854,10 +895,43 @@ const AdminAddCourses = () => {
                       </Field>
                     </Flex>
                   </Flex>
-                  <LessonTable />
+                  <LessonTable
+                    innerRef={lessonTableRef}
+                    currentCourseData={props.values}
+                  />
                 </Box>
               </Flex>
             </Flex>
+            <Modal
+              isCentered
+              isOpen={isOpen}
+              onClose={onClose}
+              onCloseComplete={() => lessonTableRef.current.scrollIntoView()}
+              closeOnOverlayClick={false}
+              preserveScrollBarGap
+            >
+              <ModalOverlay />
+              <ModalContent borderRadius="24px">
+                <ModalHeader
+                  bg="#E53E3E"
+                  color="white"
+                  textAlign="center"
+                  borderRadius="24px 24px 0px 0px"
+                  fontSize="1.5rem"
+                >
+                  <WarningIcon mr="0.5em" />
+                  Error
+                </ModalHeader>
+                <ModalBody color="black" fontSize="1rem">
+                  <Flex my="1em" direction="column" align="center" gap="1em">
+                    <Text>Please add at least 1 lesson to create a course</Text>
+                    <Button w="fit-content" variant="error" onClick={onClose}>
+                      OK
+                    </Button>
+                  </Flex>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
           </Form>
         );
       }}

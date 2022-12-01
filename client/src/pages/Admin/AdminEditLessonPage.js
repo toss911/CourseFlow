@@ -11,6 +11,15 @@ import {
   FormErrorMessage,
   Input,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Divider,
+  Link,
 } from "@chakra-ui/react";
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
@@ -24,6 +33,21 @@ function AdminEditLesson() {
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
   const [videoKey, setVideoKey] = useState(0); // this state is for forcing video elements to be re-render after dragged and dropped
+  const {
+    isOpen: isConfirmModalOpen,
+    onOpen: onConfirmModalOpen,
+    onClose: onConfirmModalClose,
+  } = useDisclosure();
+
+  useEffect(() => {
+    /* Prompt a pop-up message to warn the users if they are trying to refresh to web page */
+    const unloadCallback = (event) => {
+      event.preventDefault();
+      return (event.returnValue = "Changes you made may not be saved.");
+    };
+    window.addEventListener("beforeunload", unloadCallback);
+    return () => window.removeEventListener("beforeunload", unloadCallback);
+  }, []);
 
   const forceUpdateVideo = () => {
     setVideoKey(videoKey + 1);
@@ -179,6 +203,7 @@ function AdminEditLesson() {
                       variant="secondary"
                       onClick={() => {
                         resetForm();
+                        setVideoKey(videoKey + 1);
                       }}
                     >
                       Cancel
@@ -189,7 +214,14 @@ function AdminEditLesson() {
                   </Flex>
                 </Flex>
                 {/* Form Section */}
-                <Flex w="100%" minW="1200px" bg="gray.100" p="40px">
+                <Flex
+                  w="100%"
+                  minW="1200px"
+                  bg="gray.100"
+                  p="40px"
+                  direction="column"
+                  gap="80px"
+                >
                   <Flex
                     w="100%"
                     direction="column"
@@ -594,9 +626,57 @@ function AdminEditLesson() {
                       </Droppable>
                     </DragDropContext>
                   </Flex>
+                  <Link alignSelf="end" onClick={() => onConfirmModalOpen()}>
+                    Delete lesson
+                  </Link>
                 </Flex>
               </Flex>
             </Flex>
+            <Modal
+              isCentered
+              isOpen={isConfirmModalOpen}
+              onClose={onConfirmModalClose}
+              closeOnOverlayClick={false}
+              preserveScrollBarGap
+            >
+              <ModalOverlay />
+              <ModalContent borderRadius="24px">
+                <ModalHeader borderRadius="24px 24px 0px 0px">
+                  <Text variant="body1" color="black">
+                    Confirmation
+                  </Text>
+                </ModalHeader>
+                <Divider sx={{ borderColor: "gray.300" }} />
+                <ModalCloseButton color="gray.500" />
+                <ModalBody p="24px 50px 24px 24px" color="black">
+                  <Text variant="body2" color="gray.700" as="span">
+                    Do you want to delete this lesson?
+                  </Text>
+                  <Flex mt="24px" width="600px">
+                    <Button variant="secondary" onClick={onConfirmModalClose}>
+                      No, I don't
+                    </Button>
+                    <Button
+                      ml="16px"
+                      // isLoading={isDeleting}
+                      variant="primary"
+                      onClick={() => {
+                        if (Boolean(courseId)) {
+                          navigate(`/admin/edit-course/${courseId}`);
+                        } else {
+                          navigate(`/admin/add-course`);
+                        }
+                        const newLessonsList = [...addLesson];
+                        newLessonsList.splice(lessonId - 1, 1);
+                        setAddLesson(newLessonsList);
+                      }}
+                    >
+                      Yes, I want to delete
+                    </Button>
+                  </Flex>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
           </Form>
         );
       }}

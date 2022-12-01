@@ -4,7 +4,7 @@ import { cloudinaryUpload } from "../utils/upload.js";
 // POST course
 
 export const addCourse = async (req, res) => {
-  const adminId = req.query.adminId;
+  const adminId = req.query.byAdmin;
   const createdDate = new Date();
 
   const newCourse = {
@@ -305,7 +305,7 @@ export const updateCourse = async (req, res) => {
     );
 
     let filesPublicIdForDelete = [];
-    
+
     const courseAttachedFiles = await pool.query(
       `
       SELECT * from files where course_id = $1

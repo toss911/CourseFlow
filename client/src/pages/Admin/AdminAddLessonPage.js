@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Flex,
@@ -24,6 +24,16 @@ function AdminAddLesson() {
   const navigate = useNavigate();
   const { courseId } = useParams();
   const [videoKey, setVideoKey] = useState(0); // this state is for forcing video elements to be re-render after dragged and dropped
+
+  useEffect(() => {
+    /* Prompt a pop-up message to warn the users if they are trying to refresh to web page */
+    const unloadCallback = (event) => {
+      event.preventDefault();
+      return (event.returnValue = "Changes you made may not be saved.");
+    };
+    window.addEventListener("beforeunload", unloadCallback);
+    return () => window.removeEventListener("beforeunload", unloadCallback);
+  }, []);
 
   const forceUpdateVideo = () => {
     setVideoKey(videoKey + 1);
