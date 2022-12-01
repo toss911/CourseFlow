@@ -14,6 +14,7 @@ import {
   Heading,
   FormHelperText,
 } from "@chakra-ui/react";
+import { useAdmin } from "../../contexts/admin.js";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
@@ -23,6 +24,7 @@ import { useParams } from "react-router";
 import { useAuth } from "../../contexts/authentication";
 import LessonTable from "../../components/LessonsTable";
 let action = "no files";
+
 
 function AdminEditCourses() {
   const [courseData, setCourseData] = useState({});
@@ -36,6 +38,7 @@ function AdminEditCourses() {
   const adminId = contextAdminState.user.admin_id;
   const params = useParams();
   const courseId = params.courseId;
+  const { addLesson, setAddLesson } = useAdmin();
 
   const getCourseData = async () => {
     const result = await axios.get(
@@ -49,12 +52,13 @@ function AdminEditCourses() {
 
     // setFilesObj(results); // this is an array of all file objects
     // console.log(results);
-
-    console.log(result.data.subLessonsPerLesson);
     setCoverImageFile(results[0]);
     setVideoFile(results[1]);
     setFiles(results.slice(2));
+    setAddLesson(result.data.lessonsAndSubCount);
   };
+  console.log(addLesson);
+  
 
   // Convert media urls into file objects:
   const convertToFileObj = async (filesMetaData, allMediaUrls) => {
@@ -83,6 +87,7 @@ function AdminEditCourses() {
   }, []);
 
   const handleSubmit = async (values) => {
+
     console.log(action);
     const formData = new FormData();
     formData.append("course_name", values.course_name);
@@ -94,6 +99,12 @@ function AdminEditCourses() {
     formData.append("lesson_name", "test lesson name");
     formData.append("lesson_sequence", 3);
     formData.append("action", action);
+    for (let lesson of addLesson) {
+      lesson.sequence = addLesson.indexOf(lesson) + 1;
+    }
+    addLesson.forEach((lesson) => {
+      formData.append("lessons", lesson.lesson_name);
+    });
     if (/change/i.test(action)) {
       formData.append("course_cover_images", coverImageFile);
       formData.append("course_video_trailers", videoFile);
@@ -951,6 +962,7 @@ function AdminEditCourses() {
                       </Flex>
                     </Flex>
                     {/* <LessonTable /> */}
+                    <LessonTable/>
                   </Box>
                 </Flex>
               </Flex>

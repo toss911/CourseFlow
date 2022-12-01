@@ -180,9 +180,9 @@ export const getCourse = async (req, res) => {
     [courseId, adminId]
   );
 
-  const subLessonCount = await pool.query(
+  const lessonsAndSubCount = await pool.query(
     `
-    SELECT lessons.lesson_id, lessons.lesson_name, COUNT(sub_lessons.sub_lesson_id)
+    SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
     FROM courses
     INNER JOIN lessons
     ON courses.course_id = lessons.course_id
@@ -221,7 +221,7 @@ export const getCourse = async (req, res) => {
 
   return res.json({
     data: courseData.rows[0],
-    subLessonsPerLesson: subLessonCount.rows,
+    lessonsAndSubCount: lessonsAndSubCount.rows,
     filesMetaData: filesMetaData,
     allMediaUrls: [
       courseData.rows[0].cover_image_directory,
@@ -254,11 +254,6 @@ export const updateCourse = async (req, res) => {
     lessonName: req.body.lesson_name,
     sequence: req.body.lesson_sequence,
   };
-
-  // const updatedSubLesson = {
-  //   subLessonName: req.body.sub_lesson_name,
-  //   sequence: req.body.sub_lesson_sequence,
-  // };
 
   if (Object.keys(mediaFiles).length === 0) {
     // if admin did not change any media
@@ -305,7 +300,7 @@ export const updateCourse = async (req, res) => {
     );
 
     let filesPublicIdForDelete = [];
-    
+
     const courseAttachedFiles = await pool.query(
       `
       SELECT * from files where course_id = $1
@@ -950,4 +945,41 @@ export const getCourseLesson = async (req, res) => {
   data = data.rows;
 
   return res.json({ data });
+};
+
+// DELETE Lesson
+
+export const deleteLesson = async (req, res) => {
+  // Step1: Get all cloudinary public_id of sub-lesson videos of that lesson and delete it from cloudinary
+  // Step2: Delete that lesson
+  const lessonId = req.params.lessonId;
+  const courseId = req.query.courseId;
+
+  // Step1 here
+  const result = await pool.query(
+    `
+  SELECT video_directory from sub_lessons 
+  WHERE lesson_id = $1
+`,
+    [lessonId]
+  );
+
+  const videoMetaDataFromCloudinary = result.rows;
+
+  for (let video of videoMetaDataFromCloudinary) {
+    let public_id = JSON.parse(video.video_directory).public_id;
+    await cloudinaryUpload(public_id, "delete");
+  }
+
+  // Step2 here
+    await pool.query(`
+    DELETE 
+    FROM lessons
+    WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
+  `,
+    [lessonId, courseId]);
+
+  return res.json({
+    message: "Lesson deleted successfully"
+  });
 };
