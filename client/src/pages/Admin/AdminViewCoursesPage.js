@@ -94,7 +94,7 @@ function AdminViewCourses() {
         <AdminNavbar
           heading="Course"
           action="+ Add Course"
-          url="course/add"
+          url="add-course"
           searchParams={searchParams}
         />
         {/* Right-Bottom Section */}

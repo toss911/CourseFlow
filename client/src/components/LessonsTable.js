@@ -24,28 +24,12 @@ import { DragHandleIcon } from "@chakra-ui/icons";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useState } from "react";
 import { useAdmin } from "../contexts/admin.js";
-
-const data = [
-  {
-    id: 1,
-    title: "aaaaaaa",
-    name: "11 ",
-  },
-  {
-    id: 2,
-    title: "bbbssssvv",
-    name: "12 ",
-  },
-  {
-    id: 3,
-    title: "cccvvvvvvv",
-    name: "13",
-  },
-];
+import { useNavigate, useParams } from "react-router-dom";
 
 const LessonTable = () => {
-  const { addLesson } = useAdmin();
-  const [rows, setRows] = useState(data);
+  const { addLesson, setAddLesson } = useAdmin();
+  const navigate = useNavigate();
+  const { courseId } = useParams();
 
   const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -64,8 +48,12 @@ const LessonTable = () => {
     if (!result.destination) {
       return;
     }
-    const items = reorder(rows, result.source.index, result.destination.index);
-    setRows(items);
+    const items = reorder(
+      addLesson,
+      result.source.index,
+      result.destination.index
+    );
+    setAddLesson(items);
   };
 
   return (
@@ -75,7 +63,14 @@ const LessonTable = () => {
         <Heading variant="headline3" w="933.5px">
           Lesson
         </Heading>
-        <Button variant="primary">+ Add Lesson</Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            navigate("./add-lesson");
+          }}
+        >
+          + Add Lesson
+        </Button>
       </Flex>
       {/* Lesson Table */}
       <TableContainer bg="white" borderRadius="8px" mt="40px">
@@ -84,22 +79,22 @@ const LessonTable = () => {
             {(provided) => {
               return (
                 <Table ref={provided.innerRef}>
-                  <Thead py="10px" bg="gray.300" color="gray.800">
+                  <Thead py="10px" bg="gray.300">
                     <Tr>
                       <Th></Th>
                       <Th></Th>
-                      <Th>Lesson name</Th>
-                      <Th>Sub-lesson</Th>
-                      <Th>Action</Th>
+                      <Th color="gray.800">Lesson name</Th>
+                      <Th color="gray.800">Sub-lesson</Th>
+                      <Th color="gray.800">Action</Th>
                     </Tr>
                   </Thead>
 
                   <Tbody>
-                    {rows.map((row, index) => {
+                    {addLesson.map((row, index) => {
                       return (
                         <Draggable
-                          key={row.id}
-                          draggableId={String(row.id)}
+                          key={index}
+                          draggableId={String(index)}
                           index={index}
                         >
                           {(provided, snapshot) => (
@@ -114,12 +109,18 @@ const LessonTable = () => {
                             >
                               <Td w="5%">
                                 <Center>
-                                  <DragHandleIcon />
+                                  <DragHandleIcon color="#D6D9E4" />
                                 </Center>
                               </Td>
-                              <Td w="5%">{index + 1}</Td>
-                              <Td w="40%">{row.title}</Td>
-                              <Td w="40%">{row.title}</Td>
+                              <Td w="5%" color="black">
+                                {index + 1}
+                              </Td>
+                              <Td w="40%" color="black">
+                                {row.lesson_name}
+                              </Td>
+                              <Td w="40%" color="black">
+                                {row.sub_lessons.length}
+                              </Td>
                               <Td w="10%">
                                 <Flex gap="20%">
                                   <Image

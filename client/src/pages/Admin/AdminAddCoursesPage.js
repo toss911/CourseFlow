@@ -191,10 +191,11 @@ const AdminAddCourses = () => {
               {/* Left Section */}
               <Sidebar />
               {/* Right Section */}
-              <Flex direction="column" w="100%" h="100vh" overflowY="auto">
+              <Flex direction="column" w="100%" h="100vh" overflow="auto">
                 {/* Right-Top Section */}
                 <Flex
                   w="100%"
+                  minW="1200px"
                   bg="white"
                   justify="space-between"
                   align="center"
@@ -225,7 +226,7 @@ const AdminAddCourses = () => {
                   </Flex>
                 </Flex>
                 {/* Right-Bottom Section */}
-                <Box backgroundColor="gray.100">
+                <Box backgroundColor="gray.100" w="100%" minW="1200px">
                   <Flex
                     m="40px"
                     px="100px"

@@ -96,6 +96,10 @@ export const getById = async (req, res) => {
       [course_data.category, courseId]
     );
 
+    filterCategory.rows.map((item) => {
+      item.cover_image_directory = JSON.parse(item.cover_image_directory);
+    });
+
     const files = await pool.query(
       `
         SELECT file_name, size, directory, type

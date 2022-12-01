@@ -1,14 +1,4 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Flex,
-  Text,
-  Image,
-  Tabs,
-  TabList,
-  Tab,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Flex, Text, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authentication";
 
