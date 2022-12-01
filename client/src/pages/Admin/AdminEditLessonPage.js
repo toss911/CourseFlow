@@ -189,26 +189,28 @@ function AdminEditLesson() {
                     }}
                   />
                   <Flex direction="column">
-                    {console.log(subLessonData[0].course_name)}
-                    {Boolean(courseId) ? (
-                      <Flex gap="8px">
-                        <Text variant="body3" color="gray.600">
-                          Course
-                        </Text>
-                        <Text variant="body3" color="black">
-                          '{subLessonData[0].course_name}'
-                          {subLessonData[0].lesson_name}
-                        </Text>
-                      </Flex>
+                    {Boolean(courseId) && Boolean(subLessonData) ? (
+                      <>
+                        <Flex gap="8px">
+                          <Text variant="body3" color="gray.600">
+                            Course
+                          </Text>
+                          <Text variant="body3" color="black">
+                            '{subLessonData[0].course_name}'
+                            {subLessonData[0].lesson_name}
+                          </Text>
+                        </Flex>
+
+                        <Flex direction="row">
+                          <Heading variant="headline3" color="gray.600">
+                            Lesson
+                          </Heading>
+                          <Heading ml="8px" variant="headline3">
+                            {subLessonData[0].lesson_name}
+                          </Heading>
+                        </Flex>
+                      </>
                     ) : null}
-                    <Flex direction="row">
-                      <Heading variant="headline3" color="gray.600">
-                        Lesson
-                      </Heading>
-                      <Heading ml="8px" variant="headline3">
-                        {subLessonData[0].lesson_name}
-                      </Heading>
-                    </Flex>
                   </Flex>
                 </Flex>
                 {/* Button */}
