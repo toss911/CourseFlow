@@ -28,9 +28,14 @@ import axios from "axios";
 import { useAuth } from "../../contexts/authentication.js";
 
 function AdminEditLesson() {
+  const {
+    isOpen: isSuccessModalOpen,
+    onOpen: onSuccessModalOpen,
+    onClose: onSuccessModalClose,
+  } = useDisclosure();
   const [courseData, setCourseData] = useState();
   const [subLessonData, setSubLessonData] = useState();
-  const { addLesson, setAddLesson } = useAdmin();
+  const [modalMsg, setModalMsg] = useState();
   const toast = useToast();
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
@@ -104,9 +109,19 @@ function AdminEditLesson() {
     }
   };
 
-  const handleSubmit = (values) => {
-    setAddLesson([...addLesson, values]);
-    if (Boolean(courseId)) {
+  const handleSubmit = async (value) => {
+    const body = {
+      sub_lesson_name: value.sub_lesson_name,
+      video: value.video,
+    };
+    const result = await axios.put(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
+      body
+    );
+    if (/successfully/i.test(result.data.message)) {
+      setModalMsg("edited");
+      onSuccessModalOpen();
+    } else if (Boolean(courseId)) {
       navigate(`/admin/edit-course/${courseId}`);
     } else {
       navigate(`/admin/add-course`);
@@ -560,6 +575,28 @@ function AdminEditLesson() {
                     </FieldArray>
                   </Flex>
                 </Flex>
+              </Flex>
+              <Flex
+                bgColor="gray.100"
+                direction="column"
+                align="end"
+                justify="center"
+              >
+                <Text
+                  cursor="pointer"
+                  color="blue.500"
+                  fontWeight="700"
+                  fontSize="16px"
+                  mt="83px"
+                  mr="40px"
+                  mb="112px"
+                  right="24px"
+                  top="28px"
+                  zIndex="1"
+                  onClick={() => {}}
+                >
+                  Delete Lesson
+                </Text>
               </Flex>
             </Flex>
           </Flex>
