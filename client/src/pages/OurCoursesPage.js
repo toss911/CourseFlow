@@ -90,7 +90,7 @@ function OurCourses() {
             emptyColor="gray.200"
             color="blue.500"
             size="xl"
-            mb="187px"
+            mb="17%"
           />
         ) : !Object.keys(courses).length > 0 ? null : courses.data.length >
           0 ? (
@@ -118,7 +118,7 @@ function OurCourses() {
             })}
           </Flex>
         ) : (
-          <Text as="i" color="black" mb="187px">
+          <Text as="i" color="black" mb="17%">
             Course not found
           </Text>
         )}
