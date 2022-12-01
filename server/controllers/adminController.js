@@ -919,9 +919,8 @@ export const getCourseLesson = async (req, res) => {
 
   let data = await pool.query(
     `
-  SELECT courses.course_id,courses.course_name, courses.summary, courses.detail, courses.price,
-  courses.learning_time, courses.cover_image_directory, courses.video_trailer_directory,
-  courses.created_date, courses.category, lessons.lesson_id, lessons.lesson_name, lessons.sequence,
+  SELECT courses.course_id,courses.course_name,
+   lessons.lesson_id, lessons.lesson_name, lessons.sequence,
   sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
   FROM courses
   INNER JOIN lessons
@@ -932,12 +931,7 @@ export const getCourseLesson = async (req, res) => {
     [course_id, admin_id, lesson_id]
   );
 
-  data = data.rows[0];
-  data = {
-    ...data,
-    course_id: String(data.course_id),
-    lesson_id: String(data.lesson_id),
-    sub_lesson_id: String(data.sub_lesson_id),
-  };
+  data = data.rows;
+
   return res.json({ data });
 };

@@ -28,7 +28,7 @@ import axios from "axios";
 import { useAuth } from "../../contexts/authentication.js";
 
 let action;
-function AdminAddLesson() {
+function AdminEditLesson() {
   const [courseData, setCourseData] = useState();
   const [subLessonData, setSubLessonData] = useState();
   const { addLesson, setAddLesson } = useAdmin();
@@ -66,7 +66,6 @@ function AdminAddLesson() {
     );
     setSubLessonData(result.data.data);
   };
-  console.log(subLessonData);
   const handleCancel = () => {
     setVideo([]);
     setFileVideo([]);
@@ -76,7 +75,8 @@ function AdminAddLesson() {
   };
 
   const handleVideoChange = (event, index) => {
-    const currentFile = event.target.files[0];
+    let currentFile = event.target.files[0];
+
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
         action = "change";
@@ -128,25 +128,40 @@ function AdminAddLesson() {
       navigate(`/admin/add-course`);
     }
   };
-  console.log("Boolean(courseData): ", Boolean(courseData));
+  //console.log(subLessonData);
+  // console.log(courseData);
   //console.log(video);
   //console.log(fileVideo);
+  let includeSubLesson = [];
+  if (Boolean(subLessonData)) {
+    for (let i = 0; i < subLessonData.length; i++) {
+      includeSubLesson[i] = {
+        sub_lesson_name: subLessonData[i].sub_lesson_name,
+      };
+    }
+    console.log("includeSubLesson ", includeSubLesson);
+    //console.log("include", includeSubLesson);
+  }
   const initialValues = {
     lesson_name: Boolean(subLessonData)
-      ? courseData[subLessonData.course_id].lessons[subLessonData.lesson_id]
-          .lesson_name
+      ? courseData[subLessonData[0].course_id].lessons[
+          subLessonData[0].lesson_id
+        ].lesson_name
       : "",
     sub_lessons_count: "",
-    sub_lessons: [
-      {
-        sequence: "",
-        sub_lesson_name: Boolean(subLessonData)
-          ? courseData[subLessonData.course_id].lessons[subLessonData.lesson_id]
-              .sub_lessons[subLessonData.sub_lesson_id].sub_lesson_name
-          : "",
-      },
-    ],
+    sub_lessons: includeSubLesson,
   };
+
+  //   sub_lessons: [
+  //     {
+  //       sub_lesson_name: Boolean(subLessonData)
+  //         ? courseData[subLessonData[0].course_id].lessons[
+  //             subLessonData[0].lesson_id
+  //           ].sub_lessons[subLessonData[0].sub_lesson_id].sub_lesson_name
+  //         : "",
+  //     },
+  //   ],
+  // };
 
   return (
     <>
@@ -354,8 +369,6 @@ function AdminAddLesson() {
                         <>
                           {values.sub_lessons.length > 0 &&
                             values.sub_lessons.map((sub_lesson, index) => {
-                              sub_lesson.sequence = index + 1;
-
                               // const reorder = (
                               //   sub_lesson,
                               //   startIndex,
@@ -590,7 +603,6 @@ function AdminAddLesson() {
                             onClick={() => {
                               handleAddSubLesson();
                               push({
-                                sequence: "",
                                 sub_lesson_name: "",
                               });
                             }}
@@ -611,4 +623,4 @@ function AdminAddLesson() {
   );
 }
 
-export default AdminAddLesson;
+export default AdminEditLesson;
