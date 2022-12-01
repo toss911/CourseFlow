@@ -157,26 +157,26 @@ function AdminEditLesson() {
       if (/successfully/i.test(result.data.message)) {
         setModalMsg("edited");
         onSuccessModalOpen();
-        // if (Boolean(courseId)) {
-        //   navigate(`admin/edit-course/${courseId}`);
-        // } else {
-        //   navigate(`admin/add-course`);
-        // }
+        if (Boolean(courseId)) {
+          navigate(`admin/edit-course/${courseId}`);
+        } else {
+          navigate(`admin/add-course`);
+        }
       }
     }
   };
 
-  const handleDeleteAssignment = async () => {
-    // setIsDeleting(true);
-    // const result = await axios.delete(
-    //   `http://localhost:4000/admin/assignments/${assignmentId}?byAdmin=${adminId}`
-    // );
-    // setIsDeleting(false);
-    // if (/successfully/i.test(result.data.message)) {
-    //   onConfirmModalClose();
-    //   setModalMsg("deleted");
-    //   onSuccessModalOpen();
-    // }
+  const handleDeleteLesson = async () => {
+    setIsDeleting(true);
+    const result = await axios.delete(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`
+    );
+    setIsDeleting(false);
+    if (/successfully/i.test(result.data.message)) {
+      onConfirmModalClose();
+      setModalMsg("deleted");
+      onSuccessModalOpen();
+    }
   };
 
   /* Drag & drop */
@@ -762,7 +762,11 @@ function AdminEditLesson() {
               onClose={onSuccessModalClose}
               onCloseComplete={async () => {
                 if (/deleted/i.test(modalMsg)) {
-                  navigate("/admin/assignment");
+                  if (Boolean(courseId)) {
+                    navigate(`admin/edit-course/${courseId}`);
+                  } else {
+                    navigate(`admin/add-course`);
+                  }
                 } else if (/edited/i.test(modalMsg)) {
                   setIsLoading(true);
                   await getCourseData();
@@ -823,7 +827,7 @@ function AdminEditLesson() {
                       isLoading={isDeleting}
                       variant="primary"
                       onClick={() => {
-                        handleDeleteAssignment();
+                        handleDeleteLesson();
                       }}
                     >
                       Yes, I want to delete

@@ -20,6 +20,7 @@ adminRouter.get(
   protect,
   admin_controller.getAllCoursesData
 );
+
 adminRouter.get(
   "/edit-course/:courseId/edit-lesson/:lessonId",
   protect,
@@ -29,6 +30,11 @@ adminRouter.put(
   "/edit-course/:courseId/edit-lesson/:lessonId",
   protect,
   admin_controller.editLesson
+);
+adminRouter.delete(
+  "/edit-course/:courseId/edit-lesson/:lessonId",
+  protect,
+  admin_controller.deleteLesson
 );
 adminRouter.get("/courses", protect, admin_controller.getAdminCourses);
 adminRouter.delete(

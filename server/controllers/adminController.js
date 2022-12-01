@@ -1005,3 +1005,42 @@ export const editLesson = async (req, res) => {
   //   return res.sendStatus(500);
   // }
 };
+
+// DELETE Lesson
+
+export const deleteLesson = async (req, res) => {
+  // Step1: Get all cloudinary public_id of sub-lesson videos of that lesson and delete it from cloudinary
+  // Step2: Delete that lesson
+  const lessonId = req.params.lessonId;
+  const courseId = req.params.courseId;
+
+  // Step1 here
+  const result = await pool.query(
+    `
+  SELECT video_directory from sub_lessons 
+  WHERE lesson_id = $1
+`,
+    [lessonId]
+  );
+
+  const videoMetaDataFromCloudinary = result.rows;
+
+  for (let video of videoMetaDataFromCloudinary) {
+    let public_id = JSON.parse(video.video_directory).public_id;
+    await cloudinaryUpload(public_id, "delete");
+  }
+
+  // Step2 here
+  await pool.query(
+    `
+    DELETE 
+    FROM lessons
+    WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
+  `,
+    [lessonId, courseId]
+  );
+
+  return res.json({
+    message: "Lesson deleted successfully",
+  });
+};
