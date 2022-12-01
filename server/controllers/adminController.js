@@ -423,6 +423,10 @@ WHERE l.lesson_id = l2.lesson_id
 export const deleteCourse = async (req, res) => {
   const courseId = req.params.courseId;
   const adminId = req.query.adminId;
+  console.log(adminId);
+  console.log(courseId);
+
+  // check if there are media files in the database
 
   // Step1: Delete all media related to that course from cloudinary
 
@@ -434,7 +438,7 @@ export const deleteCourse = async (req, res) => {
   ON lessons.course_id = courses.course_id
   INNER JOIN sub_lessons
   ON sub_lessons.lesson_id = lessons.lesson_id
-  WHERE courses.course_id = $1 AND admin_id = $2
+  WHERE courses.course_id = $1 AND courses.admin_id = $2
   `,
     [courseId, adminId]
   );
@@ -465,11 +469,11 @@ export const deleteCourse = async (req, res) => {
 
   // Step2: Delete course from database
 
-  await pool.query(
-    `
-  DELETE from courses WHERE course_id = $1 AND admin_id = $2`,
-    [courseId, adminId]
-  );
+  // await pool.query(
+  //   `
+  // DELETE from courses WHERE course_id = $1 AND admin_id = $2`,
+  //   [courseId, adminId]
+  // );
 
   return res.json({
     message: "course deleted",

@@ -19,6 +19,7 @@ import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import { useState, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router";
 import axios from "axios";
 import { useParams } from "react-router";
 import { useAuth } from "../../contexts/authentication";
@@ -37,6 +38,7 @@ function AdminEditCourses() {
   const params = useParams();
   const courseId = params.courseId;
   const { addLesson, setAddLesson } = useAdmin();
+  const navigate = useNavigate();
 
   const getCourseData = async () => {
     const result = await axios.get(
@@ -57,8 +59,6 @@ function AdminEditCourses() {
   };
   console.log(addLesson);
   console.log(changeLessonSeq);
-
-  
 
   // Convert media urls into file objects:
   const convertToFileObj = async (filesMetaData, allMediaUrls) => {
@@ -87,7 +87,6 @@ function AdminEditCourses() {
   }, []);
 
   const handleSubmit = async (values) => {
-
     console.log(action);
     const formData = new FormData();
     formData.append("course_name", values.course_name);
@@ -104,7 +103,7 @@ function AdminEditCourses() {
       addLesson.forEach((lesson) => {
         formData.append("lesson_id", lesson.lesson_id);
         formData.append("sequence", lesson.sequence);
-      });   
+      });
     }
     // if the user changes any files (cover image, video trailer or attached files):
     if (/change/i.test(action)) {
@@ -173,6 +172,13 @@ function AdminEditCourses() {
       }
     }
   };
+
+  const handleDeleteCourse = async () => {
+
+    const result = await axios.delete(`http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`)
+    console.log(result.data.message);
+
+  }
 
   // *- input validation -* //
   const validateCourseName = (value) => {
@@ -293,7 +299,7 @@ function AdminEditCourses() {
                             opacity: 0.5,
                           },
                         }}
-                        onClick={console.log("navigate to view courses")}
+                        onClick={() => navigate("/admin")}
                       />
                       <Flex gap="8px">
                         <Heading variant="headline3" color="gray.600">
@@ -963,8 +969,13 @@ function AdminEditCourses() {
                         </Field>
                       </Flex>
                     </Flex>
-                    {/* <LessonTable /> */}
+                    {/* Lessons Table */}
                     <LessonTable />
+                    <Flex w="100%" mb="87px" justifyContent="flex-end">
+                      <Button variant="ghost" mr="40px" onClick={handleDeleteCourse}>
+                        Delete this course
+                      </Button>
+                    </Flex>
                   </Box>
                 </Flex>
               </Flex>

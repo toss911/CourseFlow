@@ -14,7 +14,11 @@ const cloudinaryUpload = async (file, action, nameFolder) => {
     } else if (/delete/i.test(action)) {
       await cloudinary.uploader.destroy(file, {
         type: "private",
+        resource_type: "raw"
       });
+      // await cloudinary.v2.api.delete_resources(file, {
+      //   type: "private",
+      // })
     }
   } catch (error) {
     console.log("Error from uploading:", error);
