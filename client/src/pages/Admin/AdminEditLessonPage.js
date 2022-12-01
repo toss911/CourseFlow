@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Box,
@@ -18,7 +19,6 @@ import {
   ModalBody,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
@@ -27,27 +27,20 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import axios from "axios";
 import { useAuth } from "../../contexts/authentication.js";
 
-let action;
 function AdminEditLesson() {
   const [courseData, setCourseData] = useState();
   const [subLessonData, setSubLessonData] = useState();
   const { addLesson, setAddLesson } = useAdmin();
-  const [video, setVideo] = useState([]);
-  const [fileVideo, setFileVideo] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
-
+  const [filesObj, setFilesObj] = useState([]);
   useEffect(() => {
     async function fetchData() {
-      setIsLoading(true);
       await getCourseData();
       await getSubLessonData();
-      setIsLoading(false);
     }
     fetchData();
   }, []);
@@ -66,257 +59,191 @@ function AdminEditLesson() {
     );
     setSubLessonData(result.data.data);
   };
-  const handleCancel = () => {
-    setVideo([]);
-    setFileVideo([]);
-  };
-  const handleAddSubLesson = () => {
-    video.push(null);
+
+  const convertToFileObj = async (url, fileName) => {
+    let fileVideo = "";
+    await fetch(url).then(async (response) => {
+      const blob = await response.blob();
+      const file = new File([blob], fileName, {
+        type: blob.type,
+      });
+      fileVideo = file;
+    });
+    //console.log("fileVideo: ", fileVideo);
+    return fileVideo;
   };
 
-  const handleVideoChange = (event, index) => {
-    let currentFile = event.target.files[0];
+  let includeSubLesson = [];
+  if (Boolean(subLessonData)) {
+    for (let i = 0; i < subLessonData.length; i++) {
+      const url = JSON.parse(subLessonData[i].video_directory).url;
+      const fileVideo = convertToFileObj(url, `video-sub-lesson${i}`);
+      includeSubLesson[i] = {
+        sub_lesson_name: subLessonData[i].sub_lesson_name,
+        video: url,
+      };
+    }
+    //console.log(subLessonData);
+    //console.log("includeSubLesson ", includeSubLesson);
+  }
 
+  const handleVideoChange = (currentFile, index, setFieldValue) => {
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
-        action = "change";
-        // get data file video to contextAPI
-        const dataVideo = [...fileVideo];
-        dataVideo[index] = currentFile;
-        setFileVideo([...dataVideo]);
-        // display upload video by index
-        const updateVideo = [...video];
-        updateVideo[index] = URL.createObjectURL(currentFile);
-        setVideo([...updateVideo]);
+        setFieldValue(
+          `sub_lessons.${index}.video`,
+          URL.createObjectURL(currentFile)
+        );
       } else {
         return toast({
-          title: "File type must be .mp4 only!",
+          title: "File type must be video only!",
           status: "error",
           isClosable: true,
         });
       }
     }
   };
-  const handleRemoveVideo = (index) => {
-    //remove video by index at contextAPI
-    const newFileVideo = [...fileVideo];
-    newFileVideo[index] = null;
-    setFileVideo(newFileVideo);
-    // remove video by index
-    const newVideo = [...video];
-    newVideo[index] = null;
-    setVideo(newVideo);
-  };
-  const handleDelete = (index) => {
-    //delete video by index at contextAPI
-    const newFileVideo = [...fileVideo];
-    newFileVideo.splice(index, 1);
-    setFileVideo(newFileVideo);
-    // delete video by index
-    const newVideo = [...video];
-    newVideo.splice(index, 1);
-    setVideo(newVideo);
-  };
-  const handleSubmit = (event) => {
-    event.sub_lessons_count = event.sub_lessons.length;
-    event.video_directory = fileVideo;
-    setAddLesson(event);
-    console.log(addLesson);
+
+  const handleSubmit = (values) => {
+    setAddLesson([...addLesson, values]);
     if (Boolean(courseId)) {
       navigate(`/admin/edit-course/${courseId}`);
     } else {
       navigate(`/admin/add-course`);
     }
   };
-  //console.log(subLessonData);
-  // console.log(courseData);
-  //console.log(video);
-  //console.log(fileVideo);
-  let includeSubLesson = [];
-  if (Boolean(subLessonData)) {
-    for (let i = 0; i < subLessonData.length; i++) {
-      includeSubLesson[i] = {
-        sub_lesson_name: subLessonData[i].sub_lesson_name,
-      };
+
+  /* Input Validation */
+  const validateLessonName = (value) => {
+    let error;
+    if (!value) {
+      error = "Please specify lesson name";
     }
-    console.log("includeSubLesson ", includeSubLesson);
-    //console.log("include", includeSubLesson);
-  }
-  const initialValues = {
-    lesson_name: Boolean(subLessonData)
-      ? courseData[subLessonData[0].course_id].lessons[
-          subLessonData[0].lesson_id
-        ].lesson_name
-      : "",
-    sub_lessons_count: "",
-    sub_lessons: includeSubLesson,
+    return error;
   };
 
-  //   sub_lessons: [
-  //     {
-  //       sub_lesson_name: Boolean(subLessonData)
-  //         ? courseData[subLessonData[0].course_id].lessons[
-  //             subLessonData[0].lesson_id
-  //           ].sub_lessons[subLessonData[0].sub_lesson_id].sub_lesson_name
-  //         : "",
-  //     },
-  //   ],
-  // };
+  const validateSubLessonName = (value) => {
+    let error;
+    if (!value) {
+      error = "Please specify sub-lesson name";
+    }
+    return error;
+  };
+
+  const validateVideo = (value) => {
+    let error;
+    if (!value) {
+      error = "Please upload sub-lesson video";
+    }
+    return error;
+  };
 
   return (
-    <>
-      {/* ------------- Wrap all ------------------ */}
-      <Flex flexDirection="row" alignItems="start" bgColor="gray.100">
-        <Sidebar />
-        <Flex flexDirection="column" w="100vw">
-          {/* -------------Navbar add-lesson -----------------*/}
-          <Formik
-            initialValues={initialValues}
-            enableReinitialize
-            onSubmit={handleSubmit}
-          >
-            {({ values, resetForm, setFieldValue }) => (
-              <Form>
-                <Flex
-                  flexDirection="row"
-                  borderBottom="1px"
-                  borderColor="gray.400"
-                  alignItems="center"
-                  h="92px"
-                  bgColor="white"
-                >
-                  <Flex flexDirection="row">
-                    <Image
-                      src="/assets/admin-lesson-page/arrow.svg"
-                      arc="arrow"
-                      ml="44px"
-                      _hover={{ opacity: 0.5 }}
-                      onClick={() => {
-                        if (Boolean(courseId)) {
-                          navigate(`/admin/edit-course/${courseId}`);
-                        } else {
-                          navigate(`/admin/add-course`);
-                        }
-                      }}
-                    />
-                    <Flex
-                      flexDirection="column"
-                      alignItems="start"
-                      justifyContent="start"
-                      ml="20px"
-                    >
-                      <Flex
-                        flexDirection="row"
-                        alignItems="start"
-                        justifyContent="start"
-                      >
+    <Formik
+      initialValues={{
+        lesson_name: Boolean(subLessonData)
+          ? courseData[subLessonData[0].course_id].lessons[
+              subLessonData[0].lesson_id
+            ].lesson_name
+          : "",
+        sub_lessons: includeSubLesson,
+      }}
+      enableReinitialize
+      onSubmit={handleSubmit}
+    >
+      {({ values, resetForm, isSubmitting }) => (
+        <Form>
+          <Flex w="100vw">
+            {/* Left Section */}
+            <Sidebar />
+            {/* Right Section */}
+            <Flex direction="column" w="100%" h="100vh" overflow="auto">
+              {/* Right-Top Section */}
+              <Flex
+                w="100%"
+                minW="1200px"
+                bg="white"
+                justify="space-between"
+                align="center"
+                px="40px"
+                py="16px"
+                borderBottom="1px"
+                borderColor="gray.400"
+                position="sticky"
+                top="0"
+                zIndex="sticky"
+              >
+                {/* Heading */}
+                <Flex gap="20px" w="70%">
+                  <Image
+                    src="/assets/admin-lesson-page/arrow.svg"
+                    arc="arrow"
+                    cursor="pointer"
+                    _hover={{ opacity: 0.5 }}
+                    onClick={() => {
+                      if (Boolean(courseId)) {
+                        navigate(`/admin/edit-course/${courseId}`);
+                      } else {
+                        navigate(`/admin/add-course`);
+                      }
+                    }}
+                  />
+                  <Flex direction="column">
+                    {console.log(subLessonData[0].course_name)}
+                    {Boolean(courseId) ? (
+                      <Flex gap="8px">
                         <Text variant="body3" color="gray.600">
                           Course
                         </Text>
-                        <Text ml="8px" variant="body3" color="black">
-                          'Service Design Essentials'Introduction
+                        <Text variant="body3" color="black">
+                          '{subLessonData[0].course_name}'
+                          {subLessonData[0].lesson_name}
                         </Text>
                       </Flex>
-                      <Flex
-                        flexDirection="row"
-                        alignItems="start"
-                        justifyContent="start"
-                      >
-                        <Heading variant="headline3" color="gray.600">
-                          Lesson
-                        </Heading>
-                        <Heading ml="8px" variant="headline3" w="796px">
-                          'Introduction'
-                        </Heading>
-                      </Flex>
+                    ) : null}
+                    <Flex direction="row">
+                      <Heading variant="headline3" color="gray.600">
+                        Lesson
+                      </Heading>
+                      <Heading ml="8px" variant="headline3">
+                        {subLessonData[0].lesson_name}
+                      </Heading>
                     </Flex>
                   </Flex>
-
-                  <Flex gap="16px" alignItems="start">
-                    <Button
-                      w="119px"
-                      h="60px"
-                      variant="secondary"
-                      shadow="shadow1"
-                      onClick={() => {
-                        resetForm();
-                        handleCancel();
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    {!video.includes(null) ? (
-                      <Button
-                        type="submit"
-                        w="95px"
-                        h="60px"
-                        shadow="shadow1"
-                        mr="40px"
-                      >
-                        Edit
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          onClick={onOpen}
-                          w="95px"
-                          h="60px"
-                          shadow="shadow1"
-                          mr="40px"
-                        >
-                          Edit
-                        </Button>
-                        <Modal isCentered isOpen={isOpen} onClose={onClose}>
-                          <ModalOverlay />
-                          <ModalContent borderRadius="24px">
-                            <ModalHeader
-                              bg="#E53E3E"
-                              color="white"
-                              textAlign="center"
-                              borderRadius="24px 24px 0px 0px"
-                              fontSize="1.5rem"
-                            >
-                              <WarningIcon mr="0.5em" />
-                              Warning
-                            </ModalHeader>
-                            <ModalBody
-                              textAlign="center"
-                              my="2em"
-                              color="#E53E3E"
-                              fontSize="1rem"
-                            >
-                              Upload video on your lesson !!
-                            </ModalBody>
-                          </ModalContent>
-                        </Modal>
-                      </>
-                    )}
-                  </Flex>
                 </Flex>
-                {/* -------------Form add-lesson -----------------*/}
+                {/* Button */}
+                <Flex gap="16px">
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      resetForm();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" isLoading={isSubmitting}>
+                    Create
+                  </Button>
+                </Flex>
+              </Flex>
+              {/* Form Section */}
+              <Flex w="100%" minW="1200px" bg="gray.100" p="40px">
                 <Flex
-                  flexDirection="column"
-                  alignItems="center"
-                  justifyContent="center"
-                  w="1120px"
-                  ml="40px"
-                  mt="40px"
+                  w="100%"
+                  direction="column"
                   borderRadius="16px"
-                  borderColor="gray.200"
-                  borderWidth="1px"
-                  bgColor="white"
+                  border="1px solid #E6E7EB"
+                  bg="white"
+                  p="40px 100px"
                 >
-                  <Flex>
-                    <Field
-                      name="lesson_name"
-                      validate={(value) => {
-                        let error;
-                        if (!Boolean(value)) {
-                          error = "Please enter the lesson name";
-                        }
-                        return error;
-                      }}
-                    >
+                  {/* Lesson name field */}
+                  <Flex
+                    w="920px"
+                    borderBottom="1px"
+                    borderColor="gray.400"
+                    pb="40px"
+                  >
+                    <Field name="lesson_name" validate={validateLessonName}>
                       {({ field, form }) => {
                         return (
                           <FormControl
@@ -324,302 +251,319 @@ function AdminEditLesson() {
                               form.errors.lesson_name &&
                               form.touched.lesson_name
                             }
-                            isRequired
                           >
-                            <FormLabel
-                              mt="40px"
-                              fontSize="16px"
-                              fontWeight="400"
-                            >
-                              Lesson name
+                            <FormLabel variant="body2" color="black">
+                              Lesson name{" "}
+                              <Text variant="body2" as="span" color="red">
+                                *
+                              </Text>
                             </FormLabel>
-                            <Input type="text" w="920px" h="48px" {...field} />
+                            <Input
+                              type="text"
+                              h="48px"
+                              placeholder="Enter lesson name"
+                              {...field}
+                            />
                             <FormErrorMessage>
                               {form.errors.lesson_name}
                             </FormErrorMessage>
-                            <Box
-                              mt="40px"
-                              w="920px"
-                              borderBottom="1px"
-                              borderColor="gray.400"
-                            />
                           </FormControl>
                         );
                       }}
                     </Field>
                   </Flex>
 
-                  <Flex
-                    flexDirection="column"
-                    alignItems="start"
-                    justifyContent="center"
-                  >
+                  <Flex direction="column">
                     <Text
-                      mt="40px"
+                      my="40px"
                       fontSize="20px"
                       fontWeight="600"
                       color="gray.700"
                     >
                       Sub-Lesson
                     </Text>
-                    {/* ! --------------- Add Form START----------------  */}
-
                     <FieldArray name="sub_lessons">
-                      {({ insert, remove, push }) => (
-                        <>
-                          {values.sub_lessons.length > 0 &&
-                            values.sub_lessons.map((sub_lesson, index) => {
-                              // const reorder = (
-                              //   sub_lesson,
-                              //   startIndex,
-                              //   endIndex
-                              // ) => {
-                              //   const result = Array.from(sub_lesson);
-                              //   console.log(result);
-                              //   const removed = result.splice(startIndex, 1);
-                              //   console.log(removed);
-                              //   result.splice(endIndex, 0, removed);
-                              //   console.log(result);
-                              //   return result;
-                              // };
-
-                              // const onEnd = (result) => {
-                              //   console.log(result);
-                              //   sub_lesson = reorder(
-                              //     sub_lesson,
-                              //     result.source.index,
-                              //     result.destination.index
-                              //   );
-                              // };
+                      {(forms) => {
+                        return (
+                          <>
+                            {values.sub_lessons.map((sub_lesson, index) => {
                               return (
-                                //  <DragDropContext onDragEnd={onEnd}>
-                                //    <Droppable droppableId="1" type="PERSON">
-                                //     {(provided) => (
-                                //        <div
-                                //         key={index}
-                                //         ref={provided.innerRef}
-                                //         {...provided.droppableProps}
-                                //       >
-                                //          <Draggable
-                                //           // key={index}
-                                //           draggableId={index.toString()}
-                                //           // index={index}
-                                //           key={1}
-                                //           index={0}
-                                //         >
-                                //             {(provided) => (
-                                //              <div
-                                //                ref={provided.innerRef}
-                                //                {...provided.draggableProps}
-                                //                {...provided.dragHandleProps}
-                                //              >
                                 <Flex
                                   key={index}
-                                  flexDirection="column"
-                                  alignItems="start"
-                                  justifyContent="center"
-                                  mt="40px"
+                                  direction="column"
+                                  align="start"
+                                  justify="center"
                                   pl="66px"
-                                  pb="24px"
+                                  pt="24px"
+                                  pb="36px"
                                   w="920px"
-                                  bgColor="gray.100"
+                                  bg="gray.100"
                                   borderRadius="16px"
                                   borderColor="gray.300"
                                   borderWidth="1px"
                                   position="relative"
+                                  gap="24px"
+                                  mb="24px"
                                 >
-                                  {index === 0 ? (
-                                    <Text
-                                      cursor="pointer"
-                                      color="gray.500"
-                                      fontWeight="700"
-                                      fontSize="16px"
-                                      position="absolute"
-                                      right="24px"
-                                      top="28px"
-                                      zIndex="1"
-                                    >
-                                      Delete
-                                    </Text>
-                                  ) : (
-                                    <Text
-                                      cursor="pointer"
-                                      color="blue.500"
-                                      fontWeight="700"
-                                      fontSize="16px"
-                                      position="absolute"
-                                      right="24px"
-                                      top="28px"
-                                      zIndex="1"
-                                      type="button"
-                                      onClick={() => {
-                                        remove(index);
-                                        handleDelete(index);
-                                      }}
-                                    >
-                                      Delete
-                                    </Text>
-                                  )}
+                                  <Text
+                                    cursor={
+                                      index === 0 ? "not-allowed" : "pointer"
+                                    }
+                                    color={
+                                      index === 0 ? "gray.500" : "blue.500"
+                                    }
+                                    fontWeight="700"
+                                    fontSize="16px"
+                                    position="absolute"
+                                    right="24px"
+                                    top="28px"
+                                    zIndex="1"
+                                    onClick={() => {
+                                      if (index !== 0) {
+                                        forms.remove(index);
+                                      }
+                                    }}
+                                  >
+                                    Delete
+                                  </Text>
+                                  <DragHandleIcon
+                                    position="absolute"
+                                    left="24px"
+                                    top="54px"
+                                    color="gray.500"
+                                    fontSize="16px"
+                                  />
+                                  {/* Sub-lesson name field */}
                                   <Field
                                     name={`sub_lessons.${index}.sub_lesson_name`}
+                                    validate={validateSubLessonName}
                                   >
                                     {({ field, form }) => {
+                                      let isFormInValid = false;
+                                      if (
+                                        form.errors.sub_lessons &&
+                                        form.touched.sub_lessons
+                                      ) {
+                                        if (
+                                          form.errors.sub_lessons[index] &&
+                                          form.touched.sub_lessons[index]
+                                        ) {
+                                          isFormInValid =
+                                            form.errors.sub_lessons[index]
+                                              .sub_lesson_name &&
+                                            form.touched.sub_lessons[index]
+                                              .sub_lesson_name;
+                                        }
+                                      }
                                       return (
-                                        <FormControl
-                                          isInvalid={
-                                            form.errors.sub_lesson_name &&
-                                            form.touched.sub_lesson_name
-                                          }
-                                          isRequired
-                                        >
+                                        <FormControl isInvalid={isFormInValid}>
                                           <FormLabel
-                                            //htmlFor={`sub_lessons.${index}.sub_lesson_name`}
-                                            fontSize="16px"
-                                            fontWeight="400"
-                                            mt="24px"
+                                            variant="body2"
+                                            color="black"
                                           >
-                                            Sub-lesson name
+                                            Sub-lesson name{" "}
+                                            <Text
+                                              variant="body2"
+                                              as="span"
+                                              color="red"
+                                            >
+                                              *
+                                            </Text>
                                           </FormLabel>
-                                          {/* //!Allow to Drag drop start here */}
-
-                                          <DragHandleIcon
-                                            left="-45px"
-                                            top="60px"
-                                            position="absolute"
-                                            color="gray.500"
-                                            fontSize="16px"
-                                          />
                                           <Input
                                             type="text"
                                             w="530px"
                                             h="48px"
                                             {...field}
+                                            placeholder="Enter sub-lesson name"
                                           />
+                                          <FormErrorMessage>
+                                            {isFormInValid
+                                              ? form.errors.sub_lessons[index]
+                                                  .sub_lesson_name
+                                              : null}
+                                          </FormErrorMessage>
                                         </FormControl>
                                       );
                                     }}
                                   </Field>
-                                  <Text
-                                    fontSize="16px"
-                                    fontWeight="400"
-                                    mt="24px"
-                                    mb="8px"
+                                  {/* Sub-lesson video upload field */}
+                                  <Field
+                                    name={`sub_lessons.${index}.video`}
+                                    validate={validateVideo}
                                   >
-                                    Video
-                                    <Text as="span" color="#E53E3E">
-                                      &nbsp;*
-                                    </Text>
-                                  </Text>
-                                  {Boolean(video[index]) ? (
-                                    <Flex
-                                      w="100%"
-                                      h="100%"
-                                      position="relative"
-                                      mb="24px"
-                                    >
-                                      <iframe
-                                        w="100%"
-                                        src={video[index]}
-                                        fit="contain"
-                                      />
-                                      <Flex
-                                        w="32px"
-                                        h="32px"
-                                        borderRadius="full"
-                                        position="absolute"
-                                        top="5%"
-                                        right="65.5%"
-                                        bg="purple"
-                                        justify="center"
-                                        align="center"
-                                        sx={{
-                                          "&:hover": {
-                                            opacity: 0.5,
-                                          },
-                                        }}
-                                        cursor="pointer"
-                                        onClick={() => {
-                                          handleRemoveVideo(index);
-                                          action = "delete";
-                                        }}
-                                      >
-                                        <Image
-                                          src="/assets/misc/close-button.svg"
-                                          alt="close button"
-                                          w="11px"
-                                          h="11px"
-                                        />
-                                      </Flex>
-                                    </Flex>
-                                  ) : (
-                                    <label>
-                                      <Input
-                                        type="file"
-                                        hidden
-                                        onChange={(event) => {
-                                          handleVideoChange(event, index);
-                                        }}
-                                      />
-                                      <Flex
-                                        w="160px"
-                                        h="160px"
-                                        direction="column"
-                                        justify="center"
-                                        align="center"
-                                        color="blue.400"
-                                        cursor="pointer"
-                                        bgColor="gray.200"
-                                        borderRadius="8px"
-                                      >
-                                        <Text fontSize="36px" fontWeight="200">
-                                          +
-                                        </Text>
-                                        <Text fontSize="14px" fontWeight="500">
-                                          Upload Video
-                                        </Text>
-                                      </Flex>
-                                    </label>
-                                  )}
+                                    {({ field, form }) => {
+                                      let isFormInValid = false;
+                                      if (
+                                        form.errors.sub_lessons &&
+                                        form.touched.sub_lessons
+                                      ) {
+                                        if (
+                                          form.errors.sub_lessons[index] &&
+                                          form.touched.sub_lessons[index]
+                                        ) {
+                                          isFormInValid =
+                                            form.errors.sub_lessons[index]
+                                              .video &&
+                                            form.touched.sub_lessons[index]
+                                              .video;
+                                        }
+                                      }
+                                      return (
+                                        <Flex direction="column" gap="8px">
+                                          <Text
+                                            fontSize="16px"
+                                            fontWeight="400"
+                                            color="black"
+                                          >
+                                            Video{" "}
+                                            <Text as="span" color="red">
+                                              *
+                                            </Text>
+                                          </Text>
+                                          <Flex
+                                            w="160px"
+                                            h="160px"
+                                            direction="column"
+                                            justify="center"
+                                            align="center"
+                                            color="blue.400"
+                                            bg="gray.100"
+                                            borderRadius="8px"
+                                          >
+                                            {field.value ? (
+                                              <Flex
+                                                w="100%"
+                                                h="100%"
+                                                position="relative"
+                                                bg="gray.200"
+                                                borderRadius="8px"
+                                              >
+                                                <video
+                                                  controls
+                                                  w="100%"
+                                                  h="100%"
+                                                >
+                                                  <source src={field.value} />
+                                                </video>
+                                                <Flex
+                                                  w="32px"
+                                                  h="32px"
+                                                  borderRadius="full"
+                                                  position="absolute"
+                                                  top="-18px"
+                                                  right="-18px"
+                                                  bg="purple"
+                                                  justify="center"
+                                                  align="center"
+                                                  sx={{
+                                                    "&:hover": {
+                                                      opacity: 0.5,
+                                                    },
+                                                  }}
+                                                  cursor="pointer"
+                                                  onClick={() => {
+                                                    form.setFieldValue(
+                                                      `sub_lessons.${index}.video`,
+                                                      null
+                                                    );
+                                                  }}
+                                                >
+                                                  <Image
+                                                    src="/assets/misc/close-button.svg"
+                                                    alt="close button"
+                                                    w="11px"
+                                                    h="11px"
+                                                  />
+                                                </Flex>
+                                              </Flex>
+                                            ) : (
+                                              <FormControl
+                                                isInvalid={isFormInValid}
+                                                w="100%"
+                                                h="100%"
+                                              >
+                                                <label>
+                                                  <Input
+                                                    type="file"
+                                                    hidden
+                                                    onChange={(event) => {
+                                                      handleVideoChange(
+                                                        event.currentTarget
+                                                          .files[0],
+                                                        index,
+                                                        form.setFieldValue
+                                                      );
+                                                    }}
+                                                  />
+                                                  <Flex
+                                                    w="100%"
+                                                    h="100%"
+                                                    direction="column"
+                                                    justify="center"
+                                                    align="center"
+                                                    color="blue.400"
+                                                    cursor="pointer"
+                                                    bg="gray.200"
+                                                    borderRadius="8px"
+                                                  >
+                                                    <Text
+                                                      fontSize="36px"
+                                                      fontWeight="200"
+                                                    >
+                                                      +
+                                                    </Text>
+                                                    <Text
+                                                      fontSize="14px"
+                                                      fontWeight="500"
+                                                    >
+                                                      Upload Video
+                                                    </Text>
+                                                  </Flex>
+                                                </label>
+                                                <FormErrorMessage w="max-content">
+                                                  {isFormInValid
+                                                    ? form.errors.sub_lessons[
+                                                        index
+                                                      ].video
+                                                    : null}
+                                                </FormErrorMessage>
+                                              </FormControl>
+                                            )}
+                                          </Flex>
+                                        </Flex>
+                                      );
+                                    }}
+                                  </Field>
                                 </Flex>
-                                //               </div>
-                                //            )}
-                                //          </Draggable>
-                                //         {provided.placeholder}
-                                //         </div>
-                                //      )}
-                                //    </Droppable>
-                                // </DragDropContext>
                               );
                             })}
-                          {/* ! --------------- Add Form END----------------  */}
-                          <Button
-                            mt="24px"
-                            mb="60px"
-                            w="208px"
-                            h="60px"
-                            variant="secondary"
-                            shadow="shadow1"
-                            type="button"
-                            onClick={() => {
-                              handleAddSubLesson();
-                              push({
-                                sub_lesson_name: "",
-                              });
-                            }}
-                          >
-                            + Add Sub-lesson
-                          </Button>
-                        </>
-                      )}
+                            {/* ! --------------- Add Form END----------------  */}
+                            <Button
+                              w="208px"
+                              h="60px"
+                              variant="secondary"
+                              onClick={() => {
+                                forms.push({
+                                  sub_lesson_name: "",
+                                  video: null,
+                                });
+                              }}
+                            >
+                              + Add Sub-lesson
+                            </Button>
+                          </>
+                        );
+                      }}
                     </FieldArray>
                   </Flex>
                 </Flex>
-              </Form>
-            )}
-          </Formik>
-        </Flex>
-      </Flex>
-    </>
+              </Flex>
+            </Flex>
+          </Flex>
+        </Form>
+      )}
+    </Formik>
   );
 }
 
