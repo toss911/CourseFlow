@@ -80,7 +80,6 @@ function AuthProvider(props) {
       );
       if (result.data.token) {
         const adminToken = result.data.token;
-        console.log("adminToken: ", adminToken);
         localStorage.setItem("adminToken", adminToken);
         const userDataFromToken = jwtDecode(adminToken);
         setContextAdminState({ ...contextAdminState, user: userDataFromToken });
