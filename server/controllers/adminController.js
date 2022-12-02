@@ -999,6 +999,9 @@ export const deleteLesson = async (req, res) => {
   const lessonId = req.params.lessonId;
   const courseId = req.query.courseId;
   const admin_id = req.query.byAdmin;
+  console.log(admin_id);
+  console.log(courseId);
+  console.log(lessonId);
 
   /* Validate whether this admin owned the course or not */
   let doesAdminOwnThisCourse = await pool.query(
@@ -1036,18 +1039,19 @@ export const deleteLesson = async (req, res) => {
   
     let public_id = JSON.parse(video.video_directory).public_id;
     await cloudinaryUpload(public_id, "delete" );
+    console.log(public_id);
     
   }
 
   // Step2 here
-  // await pool.query(
-  //   `
-  //   DELETE 
-  //   FROM lessons
-  //   WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
-  // `,
-  //   [lessonId, courseId]
-  // );
+  await pool.query(
+    `
+    DELETE 
+    FROM lessons
+    WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
+  `,
+    [lessonId, courseId]
+  );
 
   return res.json({
     message: "Lesson deleted successfully",

@@ -25,11 +25,14 @@ import { DragHandleIcon } from "@chakra-ui/icons";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useAdmin } from "../contexts/admin.js";
 import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 let lessonDeleteIndex;
 export let changeLessonSeq = false;
 
-const LessonTable = ({ currentCourseData, innerRef }) => {
+const LessonTable = ({ currentCourseData, innerRef, adminId}) => {
   const { addLesson, setAddLesson, setAddCourseFields } = useAdmin();
+  const [lessonId, setLessonId] = useState();
   const navigate = useNavigate();
   const { courseId } = useParams();
   const {
@@ -63,6 +66,11 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
     setAddLesson(items);
     changeLessonSeq = true;
   };
+
+  const handleDeleteLesson = async (lessonId, courseId, adminId) => {
+    const result = await axios.delete(`http://localhost:4000/admin/delete-lesson/${lessonId}?courseId=${courseId}&byAdmin=${adminId}`);
+    console.log(result.data.message);
+  }
 
 
   return (
@@ -144,6 +152,8 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
                                     onClick={() => {
                                       if (courseId) {
                                         // Delete lesson from edit course page
+                                        onConfirmModalOpen();
+                                        setLessonId(row.lesson_id);
                                       } else {
                                         // Delete lesson from add course page
                                         lessonDeleteIndex = index;
@@ -161,6 +171,7 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
                                     onClick={() => {
                                       if (courseId) {
                                         // Edit lesson from edit course page
+                                        // navigate("/admin");
                                       } else {
                                         // Edit lesson from add course page
                                         navigate(`./edit-lesson/${index + 1}`);
@@ -215,6 +226,9 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
                   newLessonsList.splice(lessonDeleteIndex, 1);
                   setAddLesson(newLessonsList);
                   onConfirmModalClose();
+                  if (courseId) {
+                    handleDeleteLesson(lessonId, courseId, 1)
+                  }
 
                 }}
               >

@@ -987,7 +987,7 @@ function AdminEditCourses() {
                       </Flex>
                     </Flex>
                     {/* Lessons Table */}
-                    <LessonTable />
+                    <LessonTable adminId={adminId}/>
                     <Flex w="100%" mb="87px" justifyContent="flex-end">
                       <Button variant="ghost" mr="40px" onClick={() => {
                                 // courseId = course.course_id;

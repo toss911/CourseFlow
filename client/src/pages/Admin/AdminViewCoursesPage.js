@@ -74,11 +74,11 @@ function AdminViewCourses() {
   const handleDeleteCourse = async (courseId) => {
     setIsDeleting(true);
     const result = await axios.delete(
-      `http://localhost:4000/admin/courses/${courseId}?byAdmin=${adminId}`
+      `http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`
     );
     console.log("result: ", result.data.message);
     setIsDeleting(false);
-    if (/successfully/i.test(result.data.message)) {
+    if (/deleted/i.test(result.data.message)) {
       onConfirmModalClose();
       getAdminCourses(searchParams.get("search"));
     }
