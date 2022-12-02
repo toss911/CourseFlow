@@ -60,7 +60,7 @@ function AdminEditLesson() {
   const { courseId, lessonId } = useParams();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
-  const [filesObj, setFilesObj] = useState([]);
+  const [fileVideo, setFileVideo] = useState([]);
   const [videoKey, setVideoKey] = useState(0);
   // this state is for forcing video elements to be re-render after dragged and dropped
 
@@ -93,23 +93,32 @@ function AdminEditLesson() {
   };
 
   const convertToFileObj = async (url, fileName) => {
-    let fileVideo = "";
+    let convertFileVideo = "";
     await fetch(url).then(async (response) => {
       const blob = await response.blob();
       const file = new File([blob], fileName, {
         type: blob.type,
       });
-      fileVideo = file;
+      convertFileVideo = file;
     });
-    //console.log("fileVideo: ", fileVideo);
-    return fileVideo;
+    // const dataVideo = [];
+    // dataVideo[index] = convertFileVideo;
+    // setFileVideo([...dataVideo]);
+    //console.log(fileVideo);
+    return convertFileVideo;
   };
 
   let includeSubLesson = [];
   if (Boolean(subLessonData)) {
     for (let i = 0; i < subLessonData.length; i++) {
       const url = JSON.parse(subLessonData[i].video_directory).url;
-      const fileVideo = convertToFileObj(url, `video-sub-lesson${i}`);
+
+      // const convertFileVideo = convertToFileObj(
+      //   JSON.parse(subLessonData[i].video_directory),
+      //   `video-sub-lesson${i}`
+      // );
+      // console.log("convertFileVideo: ", convertFileVideo);
+
       includeSubLesson[i] = {
         sub_lesson_name: subLessonData[i].sub_lesson_name,
         sub_lesson_id: subLessonData[i].sub_lesson_id,
@@ -123,6 +132,10 @@ function AdminEditLesson() {
   const handleVideoChange = (currentFile, index, setFieldValue) => {
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
+        const dataVideo = [...fileVideo];
+        dataVideo[index] = currentFile;
+        setFileVideo([...dataVideo]);
+
         setFieldValue(
           `sub_lessons.${index}.video`,
           URL.createObjectURL(currentFile)
@@ -147,8 +160,7 @@ function AdminEditLesson() {
         lesson_name: value.lesson_name,
         sub_lesson_name: value.sub_lessons[i].sub_lesson_name,
         sub_lesson_id: Number(value.sub_lessons[i].sub_lesson_id),
-        video: `{ "url" :"https://res.cloudinary.com/dfsomhrhl/video/private/s--FQcRZGby--/v1669824296/courseflow/course_video_trailers/klejw1frqb2azseup6ih.mp4",
-        "public_id" :"courseflow/course_video_trailers/klejw1frqb2azseup6ih" }`,
+        video: fileVideo[i],
       };
       const result = await axios.put(
         `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
@@ -158,9 +170,9 @@ function AdminEditLesson() {
         setModalMsg("edited");
         onSuccessModalOpen();
         if (Boolean(courseId)) {
-          navigate(`admin/edit-course/${courseId}`);
+          navigate(`admin/edit-course/${courseId}`, { replace: true });
         } else {
-          navigate(`admin/add-course`);
+          navigate(`admin/add-course`, { replace: true });
         }
       }
     }
@@ -278,9 +290,11 @@ function AdminEditLesson() {
                       _hover={{ opacity: 0.5 }}
                       onClick={() => {
                         if (Boolean(courseId)) {
-                          navigate(`/admin/edit-course/${courseId}`);
+                          navigate(`/admin/edit-course/${courseId}`, {
+                            replace: true,
+                          });
                         } else {
-                          navigate(`/admin/add-course`);
+                          navigate(`/admin/add-course`, { replace: true });
                         }
                       }}
                     />
@@ -763,9 +777,11 @@ function AdminEditLesson() {
               onCloseComplete={async () => {
                 if (/deleted/i.test(modalMsg)) {
                   if (Boolean(courseId)) {
-                    navigate(`admin/edit-course/${courseId}`);
+                    navigate(`admin/edit-course/${courseId}`, {
+                      replace: true,
+                    });
                   } else {
-                    navigate(`admin/add-course`);
+                    navigate(`admin/add-course`, { replace: true });
                   }
                 } else if (/edited/i.test(modalMsg)) {
                   setIsLoading(true);
