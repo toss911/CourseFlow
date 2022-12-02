@@ -130,7 +130,8 @@ export const addCourse = async (req, res) => {
 // GET course
 
 export const getCourse = async (req, res) => {
-  const courseId = req.params.courseId;
+  try {
+    const courseId = req.params.courseId;
   const adminId = req.query.adminId;
 
   const courseData = await pool.query(
@@ -191,37 +192,43 @@ export const getCourse = async (req, res) => {
       ...arrOfFilesDirectory,
     ], // create a file object out of these media urls.
   });
+ 
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+  
 };
 
 // PUT course
 
 export const updateCourse = async (req, res) => {
-  const courseId = req.params.courseId;
-  const adminId = req.query.adminId;
-  const mediaFiles = req.files;
-  console.log(mediaFiles);
-  console.log(req.body.lesson_id);
-  console.log(req.body.sequence);
+  try {
+    const courseId = req.params.courseId;
+    const adminId = req.query.adminId;
+    const mediaFiles = req.files;
+    console.log(mediaFiles);
+    console.log(req.body.lesson_id);
+    console.log(req.body.sequence);
 
-  const updatedCourse = {
-    courseName: req.body.course_name,
-    price: req.body.price,
-    learningTime: req.body.learning_time,
-    courseSummary: req.body.course_summary,
-    detail: req.body.course_detail,
-    category: req.body.category,
-    courseAttachFiles: [],
-  };
+    const updatedCourse = {
+      courseName: req.body.course_name,
+      price: req.body.price,
+      learningTime: req.body.learning_time,
+      courseSummary: req.body.course_summary,
+      detail: req.body.course_detail,
+      category: req.body.category,
+      courseAttachFiles: [],
+    };
 
-  const updatedLesson = {
-    lessonId: req.body.lesson_id,
-    sequence: req.body.sequence,
-  };
+    const updatedLesson = {
+      lessonId: req.body.lesson_id,
+      sequence: req.body.sequence,
+    };
 
-  if (Object.keys(mediaFiles).length === 0) {
-    // if admin did not change any media
-    await pool.query(
-      `
+    if (Object.keys(mediaFiles).length === 0) {
+      // if admin did not change any media
+      await pool.query(
+        `
       with course_update as (
         UPDATE courses
          SET course_name = $1, summary = $2,
@@ -235,79 +242,79 @@ export const updateCourse = async (req, res) => {
       FROM (SELECT UNNEST($10::int[]) as lesson_id, UNNEST($11::int[]) as sequence) AS l2
       WHERE l.lesson_id = l2.lesson_id
       `,
-      [
-        updatedCourse.courseName,
-        updatedCourse.courseSummary,
-        updatedCourse.detail,
-        updatedCourse.price,
-        updatedCourse.learningTime,
-        new Date(),
-        updatedCourse.category,
-        courseId,
-        adminId,
-        updatedLesson.lessonId,
-        updatedLesson.sequence,
-      ]
-    );
-    return res.json({
-      message: "updated successfully 1",
-    });
-  } else {
-    const courseMediaFiles = await pool.query(
-      `
+        [
+          updatedCourse.courseName,
+          updatedCourse.courseSummary,
+          updatedCourse.detail,
+          updatedCourse.price,
+          updatedCourse.learningTime,
+          new Date(),
+          updatedCourse.category,
+          courseId,
+          adminId,
+          updatedLesson.lessonId,
+          updatedLesson.sequence,
+        ]
+      );
+      return res.json({
+        message: "updated successfully",
+      });
+    } else {
+      const courseMediaFiles = await pool.query(
+        `
     SELECT courses.cover_image_directory, courses.video_trailer_directory
     FROM courses
     WHERE courses.course_id = $1 AND admin_id = $2
     `,
-      [courseId, adminId]
-    );
+        [courseId, adminId]
+      );
 
-    let filesPublicIdForDelete = [];
+      let filesPublicIdForDelete = [];
 
-    const courseAttachedFiles = await pool.query(
-      `
+      const courseAttachedFiles = await pool.query(
+        `
       SELECT * from files where course_id = $1
       `,
-      [courseId]
-    );
+        [courseId]
+      );
 
-    for (let file of courseAttachedFiles.rows) {
-      filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
-    }
-    // }
+      for (let file of courseAttachedFiles.rows) {
+        filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
+      }
+      // }
 
-    for (let publicId of Object.values(courseMediaFiles.rows[0])) {
-      // console.log(JSON.parse(publicId).public_id);
-      filesPublicIdForDelete.push(JSON.parse(publicId).public_id);
-    }
+      for (let publicId of Object.values(courseMediaFiles.rows[0])) {
+        // console.log(JSON.parse(publicId).public_id);
+        filesPublicIdForDelete.push(JSON.parse(publicId).public_id);
+      }
 
-    for (let filePublicId of filesPublicIdForDelete) {
-      await cloudinaryUpload(filePublicId, "delete");
-    }
+      for (let filePublicId of filesPublicIdForDelete) {
+        await cloudinaryUpload(filePublicId, "delete");
+      }
 
-    await pool.query(
-      `
+      await pool.query(
+        `
     DELETE from files WHERE course_id = $1
     `,
-      [courseId]
-    );
+        [courseId]
+      );
 
-    // upload everything to cloudinary again
-    updatedCourse.courseCoverImage = await cloudinaryUpload(
-      ...req.files.course_cover_images,
-      "upload",
-      "course_cover_images"
-    );
+      // upload everything to cloudinary again
+      updatedCourse.courseCoverImage = await cloudinaryUpload(
+        ...req.files.course_cover_images,
+        "upload",
+        "course_cover_images"
+      );
 
-    updatedCourse.courseVideoTrailer = await cloudinaryUpload(
-      ...req.files.course_video_trailers,
-      "upload",
-      "course_video_trailers"
-    );
+      updatedCourse.courseVideoTrailer = await cloudinaryUpload(
+        ...req.files.course_video_trailers,
+        "upload",
+        "course_video_trailers"
+      );
 
-    // update the files' directory except for attached files
-    await pool.query(
-      `
+      // update the files' directory except for attached files
+      await pool.query(
+        `
 with course_update as (
   UPDATE courses
    SET course_name = $1, summary = $2,
@@ -323,75 +330,79 @@ FROM (SELECT UNNEST($12::int[]) as lesson_id, UNNEST($13::int[]) as sequence) AS
 WHERE l.lesson_id = l2.lesson_id
 
 `,
-      [
-        updatedCourse.courseName,
-        updatedCourse.courseSummary,
-        updatedCourse.detail,
-        updatedCourse.price,
-        updatedCourse.learningTime,
-        updatedCourse.courseCoverImage,
-        updatedCourse.courseVideoTrailer,
-        new Date(),
-        updatedCourse.category,
-        courseId,
-        adminId,
-        updatedLesson.lessonId,
-        updatedLesson.sequence,
-      ]
-    );
+        [
+          updatedCourse.courseName,
+          updatedCourse.courseSummary,
+          updatedCourse.detail,
+          updatedCourse.price,
+          updatedCourse.learningTime,
+          updatedCourse.courseCoverImage,
+          updatedCourse.courseVideoTrailer,
+          new Date(),
+          updatedCourse.category,
+          courseId,
+          adminId,
+          updatedLesson.lessonId,
+          updatedLesson.sequence,
+        ]
+      );
 
-    let fileName = [];
-    let fileType = [];
-    let fileSize = [];
+      let fileName = [];
+      let fileType = [];
+      let fileSize = [];
 
-    if (req.files.course_attached_files != undefined) {
-      for (let file of req.files.course_attached_files) {
-        updatedCourse.courseAttachFiles.push(
-          JSON.stringify(
-            await cloudinaryUpload(file, "upload", "course_attached_files")
-          )
-        );
+      if (req.files.course_attached_files != undefined) {
+        for (let file of req.files.course_attached_files) {
+          updatedCourse.courseAttachFiles.push(
+            JSON.stringify(
+              await cloudinaryUpload(file, "upload", "course_attached_files")
+            )
+          );
 
-        fileName.push(file.originalname);
-        fileType.push(file.mimetype);
-        fileSize.push(file.size);
-      }
+          fileName.push(file.originalname);
+          fileType.push(file.mimetype);
+          fileSize.push(file.size);
+        }
 
-      await pool.query(
-        `
+        await pool.query(
+          `
       INSERT INTO files (course_id, file_name, type, size, directory)
       VALUES ( $1, unnest($2::text[]), unnest($3::text[]), unnest($4::int[]), unnest($5::text[]));
       `,
-        [
-          courseId,
-          fileName,
-          fileType,
-          fileSize,
-          updatedCourse.courseAttachFiles,
-        ]
-      );
-    }
+          [
+            courseId,
+            fileName,
+            fileType,
+            fileSize,
+            updatedCourse.courseAttachFiles,
+          ]
+        );
+      }
 
-    return res.json({
-      message: "updated successfully",
-    });
+      return res.json({
+        message: "updated successfully",
+      });
+    }
+  } catch (error) {
+    return res.sendStatus(500);
   }
 };
 
 // DELETE course
 
 export const deleteCourse = async (req, res) => {
-  const courseId = req.params.courseId;
-  const adminId = req.query.adminId;
-  console.log(adminId);
-  console.log(courseId);
+  try {
+    const courseId = req.params.courseId;
+    const adminId = req.query.adminId;
+    console.log(adminId);
+    console.log(courseId);
 
-  // check if there are media files in the database
+    // check if there are media files in the database
 
-  // Step1: Delete all media related to that course from cloudinary
+    // Step1: Delete all media related to that course from cloudinary
 
-  const courseMediaFiles = await pool.query(
-    `
+    const courseMediaFiles = await pool.query(
+      `
   SELECT courses.cover_image_directory, courses.video_trailer_directory, sub_lessons.video_directory
   FROM courses
   INNER join lessons
@@ -400,54 +411,55 @@ export const deleteCourse = async (req, res) => {
   ON sub_lessons.lesson_id = lessons.lesson_id
   WHERE courses.course_id = $1 AND courses.admin_id = $2
   `,
-    [courseId, adminId]
-  );
+      [courseId, adminId]
+    );
 
-
-  const courseAttachedFiles = await pool.query(
-    `
+    const courseAttachedFiles = await pool.query(
+      `
   SELECT * from files where course_id = $1
   `,
-    [courseId]
-  );
+      [courseId]
+    );
 
-  let filesPublicIdForDelete = [];
+    let filesPublicIdForDelete = [];
 
-  for (let file of courseAttachedFiles.rows) {
-    filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
-  }
-
-  for (let publicId of Object.values(courseMediaFiles.rows[0])) {
-    console.log(JSON.parse(publicId).public_id);
-    filesPublicIdForDelete.push(JSON.parse(publicId).public_id);
-  }
-
-  console.log(filesPublicIdForDelete);
-  console.log(courseAttachedFiles.rows);
-  
-  const filesType = [];
-  for (let i of courseAttachedFiles.rows) {
-    filesType.push(i.type);
-  }
-  
-
-  for (let filePublicId of filesPublicIdForDelete) {
-    for (let fileType of filesType) {
-      await cloudinaryUpload(filePublicId, "delete", "any folder", fileType );
+    for (let file of courseAttachedFiles.rows) {
+      filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
     }
-  }
 
-  // Step2: Delete course from database
+    for (let publicId of Object.values(courseMediaFiles.rows[0])) {
+      console.log(JSON.parse(publicId).public_id);
+      filesPublicIdForDelete.push(JSON.parse(publicId).public_id);
+    }
 
-  await pool.query(
-    `
+    console.log(filesPublicIdForDelete);
+    console.log(courseAttachedFiles.rows);
+
+    const filesType = [];
+    for (let i of courseAttachedFiles.rows) {
+      filesType.push(i.type);
+    }
+
+    for (let filePublicId of filesPublicIdForDelete) {
+      for (let fileType of filesType) {
+        await cloudinaryUpload(filePublicId, "delete", "any folder", fileType);
+      }
+    }
+
+    // Step2: Delete course from database
+
+    await pool.query(
+      `
   DELETE from courses WHERE course_id = $1 AND admin_id = $2`,
-    [courseId, adminId]
-  );
+      [courseId, adminId]
+    );
 
-  return res.json({
-    message: "course deleted",
-  });
+    return res.json({
+      message: "course deleted",
+    });
+  } catch (eror) {
+    return res.sendStatus(500);
+  }
 };
 
 export const getAdminCourses = async (req, res) => {
@@ -994,18 +1006,17 @@ export const editLesson = async (req, res) => {
 // DELETE Lesson
 
 export const deleteLesson = async (req, res) => {
-  // Step2: Get all cloudinary public_id of sub-lesson videos of that lesson and delete it from cloudinary
-  // Step3: Delete that lesson
-  const lessonId = req.params.lessonId;
-  const courseId = req.query.courseId;
-  const admin_id = req.query.byAdmin;
-  console.log(admin_id);
-  console.log(courseId);
-  console.log(lessonId);
+  try {
+    const lessonId = req.params.lessonId;
+    const courseId = req.query.courseId;
+    const admin_id = req.query.byAdmin;
+    console.log(admin_id);
+    console.log(courseId);
+    console.log(lessonId);
 
-  /* Validate whether this admin owned the course or not */
-  let doesAdminOwnThisCourse = await pool.query(
-    `
+    /* Validate whether this admin owned the course or not */
+    let doesAdminOwnThisCourse = await pool.query(
+      `
   SELECT EXISTS 
   (SELECT *
     FROM courses
@@ -1015,45 +1026,46 @@ export const deleteLesson = async (req, res) => {
   ON lessons.lesson_id = sub_lessons.lesson_id
   WHERE courses.admin_id = $1 AND courses.course_id = $2)
   `,
-    [admin_id, courseId]
-  );
-  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
-  if (!doesAdminOwnThisCourse) {
-    return res
-      .status(403)
-      .json({ message: "You have no permission to delete this assignment" });
-  }
+      [admin_id, courseId]
+    );
+    doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+    if (!doesAdminOwnThisCourse) {
+      return res
+        .status(403)
+        .json({ message: "You have no permission to delete this assignment" });
+    }
 
-  // Step1 here
-  const result = await pool.query(
-    `
+    // Step1 here
+    const result = await pool.query(
+      `
   SELECT video_directory from sub_lessons 
   WHERE lesson_id = $1
 `,
-    [lessonId]
-  );
+      [lessonId]
+    );
 
-  const videoMetaDataFromCloudinary = result.rows;
+    const videoMetaDataFromCloudinary = result.rows;
 
-  for (let video of videoMetaDataFromCloudinary) {
-  
-    let public_id = JSON.parse(video.video_directory).public_id;
-    await cloudinaryUpload(public_id, "delete" );
-    console.log(public_id);
-    
-  }
+    for (let video of videoMetaDataFromCloudinary) {
+      let public_id = JSON.parse(video.video_directory).public_id;
+      await cloudinaryUpload(public_id, "delete");
+      console.log(public_id);
+    }
 
-  // Step2 here
-  await pool.query(
-    `
+    // Step2 here
+    await pool.query(
+      `
     DELETE 
     FROM lessons
     WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
   `,
-    [lessonId, courseId]
-  );
+      [lessonId, courseId]
+    );
 
-  return res.json({
-    message: "Lesson deleted successfully",
-  });
+    return res.json({
+      message: "Lesson deleted successfully",
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
