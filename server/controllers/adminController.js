@@ -4,167 +4,127 @@ import { cloudinaryUpload } from "../utils/upload.js";
 // POST course
 
 export const addCourse = async (req, res) => {
-  const adminId = req.query.adminId;
-  const createdDate = new Date();
+  try {
+    const adminId = req.query.byAdmin;
 
-  const newCourse = {
-    courseName: req.body.course_name,
-    price: req.body.price,
-    learningTime: req.body.learning_time,
-    courseSummary: req.body.course_summary,
-    detail: req.body.course_detail,
-    category: req.body.category,
-    courseAttachFiles: [],
-  };
-
-  newCourse.courseCoverImage = await cloudinaryUpload(
-    ...req.files.course_cover_images,
-    "upload",
-    "course_cover_images"
-  );
-  newCourse.courseVideoTrailer = await cloudinaryUpload(
-    ...req.files.course_video_trailers,
-    "upload",
-    "course_video_trailers"
-  );
-
-  const newLesson = { lessonNames: [], lessonSequence: [] };
-
-  for (let lesson of req.body.lesson_name) {
-    newLesson.lessonNames.push(lesson);
-  }
-
-  for (let lesson of req.body.lesson_sequence) {
-    newLesson.lessonSequence.push(lesson);
-  }
-
-  const newSubLesson = {
-    subLessonNames: [],
-    subLessonSequence: [],
-    subLessonVideos: [],
-  };
-
-  for (let subLesson of req.body.sub_lesson_name) {
-    newSubLesson.subLessonNames.push(subLesson);
-  }
-
-  for (let subLesson of req.body.sub_lesson_sequence) {
-    newSubLesson.subLessonSequence.push(subLesson);
-  }
-
-  for (let video of req.files.sub_lesson_videos) {
-    newSubLesson.subLessonVideos.push(
-      JSON.stringify(
-        await cloudinaryUpload(video, "upload", "sub_lesson_videos")
-      )
+    const newCourse = {
+      courseName: req.body.course_name,
+      price: req.body.price,
+      learningTime: req.body.learning_time,
+      summary: req.body.course_summary,
+      detail: req.body.course_detail,
+      category: req.body.category,
+    };
+    newCourse.coverImageDir = await cloudinaryUpload(
+      ...req.files.cover_image,
+      "upload",
+      "image"
     );
-  }
+    newCourse.videoTrailerDir = await cloudinaryUpload(
+      ...req.files.video_trailer,
+      "upload",
+      "video"
+    );
 
-  // If there are attached files
-  if (req.files.course_attached_files != undefined) {
-    let fileName = [];
-    let fileType = [];
-    let fileSize = [];
+    // Insert course data into courses table
+    let courseId = await pool.query(
+      `
+    INSERT INTO courses (admin_id, course_name, summary, detail, price, learning_time, cover_image_directory, video_trailer_directory, created_date, updated_date, category)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    RETURNING course_id
+    `,
+      [
+        adminId,
+        newCourse.courseName,
+        newCourse.summary,
+        newCourse.detail,
+        newCourse.price,
+        newCourse.learningTime,
+        newCourse.coverImageDir,
+        newCourse.videoTrailerDir,
+        new Date(),
+        new Date(),
+        newCourse.category,
+      ]
+    );
+    courseId = courseId.rows[0].course_id;
 
-    for (let file of req.files.course_attached_files) {
-      fileName.push(file.originalname);
-      fileType.push(file.mimetype);
-      fileSize.push(file.size);
-      newCourse.courseAttachFiles.push(
-        JSON.stringify(
-          await cloudinaryUpload(file, "upload", "course_attached_files")
-        )
-      );
+    // Insert lessons data into lessons table
+    const lessons = JSON.parse(req.body.lessons);
+    const lessonName = [];
+    const lessonSequence = [];
+
+    for (let i = 0; i < lessons.length; i++) {
+      lessonName.push(lessons[i].lesson_name);
+      lessonSequence.push(i + 1);
+    }
+
+    let lessonId = await pool.query(
+      `
+    INSERT INTO lessons (course_id, lesson_name, sequence)
+    VALUES ($1, UNNEST($2::text[]), UNNEST($3::int[]))
+    RETURNING lesson_id
+    `,
+      [courseId, lessonName, lessonSequence]
+    );
+    lessonId = lessonId.rows.map((item) => {
+      return item.lesson_id;
+    });
+
+    // Insert sub-lessons data into sub_lessons table
+    const lessonIdSequence = [];
+    const subLessonName = [];
+    const subLessonSequence = [];
+    const subLessonVideoDir = [];
+
+    for (let i = 0; i < lessons.length; i++) {
+      for (let j = 0; j < lessons[i].sub_lessons.length; j++) {
+        lessonIdSequence.push(lessonId[i]);
+        subLessonName.push(lessons[i].sub_lessons[j].sub_lesson_name);
+        subLessonSequence.push(j + 1);
+      }
+    }
+
+    for (let file of req.files.sub_lesson_videos) {
+      const fileUploadMeta = await cloudinaryUpload(file, "upload", "video");
+      subLessonVideoDir.push(fileUploadMeta);
     }
 
     await pool.query(
       `
-      with first_insert as (
-          INSERT INTO courses(admin_id, course_name, summary, detail, price, learning_time, cover_image_directory, video_trailer_directory, created_date, category) 
-          VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
-          RETURNING course_id
-       ), 
-       second_insert as (
-         INSERT INTO lessons( course_id, lesson_name, sequence) 
-         VALUES
-         ( (select course_id from first_insert), unnest($11::text[]), unnest($12::int[]))
-         RETURNING lesson_id
-       ),
-       third_insert as (
-          INSERT INTO sub_lessons ( lesson_id , sub_lesson_name, video_directory, sequence) 
-       VALUES 
-       ( unnest((select array_agg(lesson_id) from second_insert)), unnest($13::text[]), unnest($14::text[]), unnest($15::int[]) )
-          
-       )
-       insert into files (course_id, file_name, type, size, directory)
-       VALUES ( (select course_id from first_insert), unnest($16::text[]), unnest($17::text[]), unnest($18::int[]), unnest($19::text[]));
-       
-  
-       `,
-      [
-        adminId,
-        newCourse.courseName,
-        newCourse.courseSummary,
-        newCourse.detail,
-        newCourse.price,
-        newCourse.learningTime,
-        newCourse.courseCoverImage,
-        newCourse.courseVideoTrailer,
-        createdDate,
-        newCourse.category,
-        newLesson.lessonNames,
-        newLesson.lessonSequence,
-        newSubLesson.subLessonNames,
-        newSubLesson.subLessonVideos,
-        newSubLesson.subLessonSequence,
-        fileName,
-        fileType,
-        fileSize,
-        newCourse.courseAttachFiles,
-      ]
+    INSERT INTO sub_lessons (lesson_id, sub_lesson_name, video_directory, sequence, duration)
+    VALUES (UNNEST($1::int[]), UNNEST($2::text[]), UNNEST($3::text[]), UNNEST($4::int[]), $5)
+    `,
+      [lessonIdSequence, subLessonName, subLessonVideoDir, subLessonSequence, 0]
     );
-  } else {
-    await pool.query(
-      `
-      with first_insert as (
-        INSERT INTO courses(admin_id, course_name, summary, detail, price, learning_time, cover_image_directory, video_trailer_directory, created_date, category) 
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
-        RETURNING course_id
-     ), 
-     second_insert as (
-       INSERT INTO lessons( course_id, lesson_name, sequence) 
-       VALUES
-       ( (select course_id from first_insert), unnest($11::text[]), unnest($12::int[]))
-       RETURNING lesson_id
-     )
-      INSERT INTO sub_lessons ( lesson_id , sub_lesson_name, video_directory, sequence) 
-     VALUES 
-     ( unnest((select array_agg(lesson_id) from second_insert)), unnest($13::text[]), unnest($14::text[]), unnest($15::int[]) )
-        
-       `,
-      [
-        adminId,
-        newCourse.courseName,
-        newCourse.courseSummary,
-        newCourse.detail,
-        newCourse.price,
-        newCourse.learningTime,
-        newCourse.courseCoverImage,
-        newCourse.courseVideoTrailer,
-        createdDate,
-        newCourse.category,
-        newLesson.lessonNames,
-        newLesson.lessonSequence,
-        newSubLesson.subLessonNames,
-        newSubLesson.subLessonVideos,
-        newSubLesson.subLessonSequence,
-      ]
-    );
-  }
 
-  return res.json({
-    message: "Course created successfully",
-  });
+    // Upload attached files into cloudinary and insert those data into the files table
+    if (req.files.files) {
+      const fileName = [];
+      const fileType = [];
+      const fileSize = [];
+      const fileDir = [];
+      for (let file of req.files.files) {
+        const fileUploadMeta = await cloudinaryUpload(file, "upload", "file");
+        fileName.push(file.originalname);
+        fileType.push(file.mimetype);
+        fileSize.push(file.size);
+        fileDir.push(fileUploadMeta);
+      }
+      await pool.query(
+        `
+      INSERT INTO files (course_id, file_name, type, size, directory)
+      VALUES ($1, UNNEST($2::text[]), UNNEST($3::text[]), UNNEST($4::int[]), UNNEST($5::text[]))
+      `,
+        [courseId, fileName, fileType, fileSize, fileDir]
+      );
+    }
+    return res.json({
+      message: "Course has been created successfully",
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
 
 // GET course

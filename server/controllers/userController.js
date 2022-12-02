@@ -218,8 +218,8 @@ export const subscribedCourses = async (req, res) => {
       INNER JOIN subscriptions
       ON courses.course_id = subscriptions.course_id
       WHERE subscriptions.user_id = $1
-      GROUP BY courses.course_id 
-      ORDER BY courses.course_id ASC`,
+      GROUP BY courses.course_id, subscriptions.created_date
+      ORDER BY subscriptions.created_date DESC`,
       [userId]
     );
     for (let course of subscribedCourses.rows) {

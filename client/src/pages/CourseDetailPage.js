@@ -13,6 +13,7 @@ import {
   UnorderedList,
   ListItem,
   Skeleton,
+  AspectRatio,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Navbar } from "../components/Navbar";
@@ -64,12 +65,13 @@ function CourseDetail() {
 
         <Box w="100vw" pt="15px" pl="160px" display="flex" flexDirection="row">
           <Box className="left-section" display="flex" flexDirection="column">
-            <Image
-              src="/assets/course-detail-page/Course1.svg"
-              alt="Course picture"
-              h="460px"
-              w="739px"
-            />
+            <AspectRatio w="739px" ratio={16 / 9}>
+              <iframe
+                title={`${course.course_name} Trailer`}
+                src={course.video_trailer_directory}
+                allowFullScreen
+              />
+            </AspectRatio>
             <Box display="flex" flexDirection="column" w="548px" gap="24px">
               <Heading variant="headline2" color="black" mt="100px">
                 Course Detail
@@ -161,7 +163,7 @@ function CourseDetail() {
                                     {file.file_name}
                                   </Text>
                                   <Text variant="body4" color="blue.500">
-                                    {file.size.toLocaleString("en")} mb
+                                    {(file.size * 1e-6).toLocaleString("en")} mb
                                   </Text>
                                 </Flex>
                               </Link>

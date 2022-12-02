@@ -13,7 +13,14 @@ const courseUpload = multerUpload.fields([
   { name: "sub_lesson_videos", maxCount: 200 },
 ]);
 
-adminRouter.post("/add-course", courseUpload, admin_controller.addCourse);
+const newCourseUpload = multerUpload.fields([
+  { name: "cover_image", maxCount: 1 },
+  { name: "video_trailer", maxCount: 1 },
+  { name: "files", maxCount: 20 },
+  { name: "sub_lesson_videos", maxCount: 200 },
+]);
+
+adminRouter.post("/add-course", newCourseUpload, admin_controller.addCourse);
 adminRouter.get("/get-course/:courseId", admin_controller.getCourse);
 adminRouter.get(
   "/edit-course/:courseId/edit-lesson",

@@ -60,6 +60,9 @@ export const getById = async (req, res) => {
       [courseId]
     );
     course_data = course_data.rows[0];
+    course_data.video_trailer_directory = JSON.parse(
+      course_data.video_trailer_directory
+    ).url;
 
     const lessons = await pool.query(
       `
@@ -110,6 +113,7 @@ export const getById = async (req, res) => {
     );
     course_data.files = [];
     files.rows.map((file) => {
+      file.directory = JSON.parse(file.directory).url;
       course_data.files.push(file);
     });
 
@@ -549,7 +553,7 @@ export const getSubLesson = async (req, res) => {
     const subLessonData = {
       sub_lesson_id: subLessonId,
       sub_lesson_name: querySubLesson[0].sub_lesson_name,
-      video_directory: querySubLesson[0].video_directory,
+      video_directory: JSON.parse(querySubLesson[0].video_directory).url,
       duration: querySubLesson[0].duration,
       assignments: {},
     };

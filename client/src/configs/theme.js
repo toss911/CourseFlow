@@ -292,6 +292,33 @@ const components = {
           opacity: 1,
         },
       },
+      error: {
+        bg: "#E53E3E",
+        color: "white",
+        boxShadow: "shadow1",
+        borderRadius: "12px",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          bg: "#fd4545",
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.400",
+            opacity: 1,
+          },
+        },
+        _active: {
+          bg: "#b63535",
+        },
+        _disabled: {
+          color: "gray.600",
+          bg: "gray.400",
+          opacity: 1,
+        },
+      },
     },
     defaultProps: {
       variant: "primary",

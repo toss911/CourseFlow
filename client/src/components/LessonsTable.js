@@ -28,8 +28,8 @@ import { useNavigate, useParams } from "react-router-dom";
 let lessonDeleteIndex;
 export let changeLessonSeq = false;
 
-const LessonTable = () => {
-  const { addLesson, setAddLesson } = useAdmin();
+const LessonTable = ({ currentCourseData, innerRef }) => {
+  const { addLesson, setAddLesson, setAddCourseFields } = useAdmin();
   const navigate = useNavigate();
   const { courseId } = useParams();
   const {
@@ -73,8 +73,10 @@ const LessonTable = () => {
           Lesson
         </Heading>
         <Button
+          ref={innerRef}
           variant="primary"
           onClick={() => {
+            setAddCourseFields(currentCourseData);
             navigate("./add-lesson");
           }}
         >
