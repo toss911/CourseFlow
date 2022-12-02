@@ -22,7 +22,7 @@ const cloudinaryUpload = async (file, action, nameFolder, fileType) => {
           resource_type: "video",
         });
       } else if (/file/i.test(file)) {
-        if (/image/i.test(fileType)) {
+        if (/image|pdf/i.test(fileType)) {
           await cloudinary.uploader.destroy(file, {
             type: "private",
           });

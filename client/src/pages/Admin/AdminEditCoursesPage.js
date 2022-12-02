@@ -13,6 +13,14 @@ import {
   Button,
   Heading,
   FormHelperText,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Divider
 } from "@chakra-ui/react";
 import { useAdmin } from "../../contexts/admin.js";
 import { Field, Form, Formik } from "formik";
@@ -35,10 +43,16 @@ function AdminEditCourses() {
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
+  const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const courseId = params.courseId;
   const { addLesson, setAddLesson } = useAdmin();
   const navigate = useNavigate();
+  const {
+    isOpen: isConfirmModalOpen,
+    onOpen: onConfirmModalOpen,
+    onClose: onConfirmModalClose,
+  } = useDisclosure();
 
   const getCourseData = async () => {
     const result = await axios.get(
@@ -174,10 +188,13 @@ function AdminEditCourses() {
   };
 
   const handleDeleteCourse = async () => {
-
+    setIsDeleting(true);
     const result = await axios.delete(`http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`)
     console.log(result.data.message);
-
+    if (/deleted/i.test(result.data.message)) {
+      onConfirmModalClose();
+    }
+    setIsDeleting(false);
   }
 
   // *- input validation -* //
@@ -972,13 +989,55 @@ function AdminEditCourses() {
                     {/* Lessons Table */}
                     <LessonTable />
                     <Flex w="100%" mb="87px" justifyContent="flex-end">
-                      <Button variant="ghost" mr="40px" onClick={handleDeleteCourse}>
+                      <Button variant="ghost" mr="40px" onClick={() => {
+                                // courseId = course.course_id;
+                                onConfirmModalOpen();
+                              }}>
                         Delete this course
                       </Button>
                     </Flex>
                   </Box>
                 </Flex>
               </Flex>
+              <Modal
+        isCentered
+        isOpen={isConfirmModalOpen}
+        onClose={onConfirmModalClose}
+        closeOnOverlayClick={false}
+        preserveScrollBarGap
+        onCloseComplete={()=> navigate("/admin")}
+      >
+        <ModalOverlay />
+        <ModalContent borderRadius="24px">
+          <ModalHeader borderRadius="24px 24px 0px 0px">
+            <Text variant="body1" color="black">
+              Confirmation
+            </Text>
+          </ModalHeader>
+          <Divider sx={{ borderColor: "gray.300" }} />
+          <ModalCloseButton color="gray.500" />
+          <ModalBody p="24px 50px 24px 24px" color="black">
+            <Text variant="body2" color="gray.700" as="span">
+              Do you want to delete this course?
+            </Text>
+            <Flex mt="24px" width="600px">
+              <Button variant="secondary" onClick={onConfirmModalClose}>
+                No, I don't
+              </Button>
+              <Button
+                ml="16px"
+                isLoading={isDeleting}
+                variant="primary"
+                onClick={() => {
+                  handleDeleteCourse(courseId);
+                }}
+              >
+                Yes, I want to delete
+              </Button>
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
             </Form>
           );
         }}
