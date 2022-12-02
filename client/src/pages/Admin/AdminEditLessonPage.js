@@ -43,9 +43,9 @@ function AdminEditLesson() {
   } = useDisclosure();
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [courseData, setCourseData] = useState();
+  const [courseData, setCourseData] = useState([]);
   const { addLesson, setAddLesson } = useAdmin();
-  const [subLessonData, setSubLessonData] = useState();
+  const [subLessonData, setSubLessonData] = useState([]);
   const [modalMsg, setModalMsg] = useState();
   const toast = useToast();
   const navigate = useNavigate();
@@ -53,6 +53,8 @@ function AdminEditLesson() {
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
   const [fileVideo, setFileVideo] = useState([]);
+  const [convertFile, setConvertFile] = useState(); //เอาไว้เก็บค่าหลังแปลงเป็น ObjFile เนื่องจากค่าไม่ถูกส่งออกมาจาก Function
+
   const [videoKey, setVideoKey] = useState(0);
   // this state is for forcing video elements to be re-render after dragged and dropped
 
@@ -97,7 +99,7 @@ function AdminEditLesson() {
     setSubLessonData(result.data.data);
   };
 
-  const convertToFileObj = async (url, fileName) => {
+  const convertToFileObj = async (url, fileName, index) => {
     let convertFileVideo = "";
     await fetch(url).then(async (response) => {
       const blob = await response.blob();
@@ -106,24 +108,22 @@ function AdminEditLesson() {
       });
       convertFileVideo = file;
     });
-    // const dataVideo = [];
-    // dataVideo[index] = convertFileVideo;
-    // setFileVideo([...dataVideo]);
-    //console.log(fileVideo);
-    return convertFileVideo;
+    const dataVideo = [...fileVideo];
+    dataVideo[index] = convertFileVideo;
+    setFileVideo([...dataVideo]);
+    setConvertFile(convertFileVideo);
+    return;
   };
-
   let includeSubLesson = [];
-  if (Boolean(subLessonData)) {
+
+  if (Boolean(subLessonData.length > 0)) {
     for (let i = 0; i < subLessonData.length; i++) {
       const url = JSON.parse(subLessonData[i].video_directory).url;
-
-      // const convertFileVideo = convertToFileObj(
-      //   JSON.parse(subLessonData[i].video_directory),
-      //   `video-sub-lesson${i}`
-      // );
-      // console.log("convertFileVideo: ", convertFileVideo);
-
+      const convertFileVideo = convertToFileObj(
+        JSON.parse(subLessonData[i].video_directory),
+        `video-sub-lesson${i}`,
+        i
+      );
       includeSubLesson[i] = {
         sub_lesson_name: subLessonData[i].sub_lesson_name,
         sub_lesson_id: subLessonData[i].sub_lesson_id,
@@ -131,8 +131,6 @@ function AdminEditLesson() {
         sequence: i + 1,
       };
     }
-    //console.log(subLessonData);
-    //console.log("includeSubLesson ", includeSubLesson);
   }
 
   const handleVideoChange = (currentFile, index, setFieldValue) => {
@@ -141,7 +139,6 @@ function AdminEditLesson() {
         const dataVideo = [...fileVideo];
         dataVideo[index] = currentFile;
         setFileVideo([...dataVideo]);
-
         setFieldValue(
           `sub_lessons.${index}.video`,
           URL.createObjectURL(currentFile)
@@ -157,18 +154,25 @@ function AdminEditLesson() {
   };
 
   const handleSubmit = async (value) => {
-    console.log("value: ", value);
+    //console.log("value: ", fileVideo);
     const newLesson = [...addLesson];
     newLesson[lessonId - 1] = value;
     setAddLesson(newLesson);
+    console.log(value);
+    // url สำหรับ mock video
+    // `{ "url" :"https://res.cloudinary.com/dfsomhrhl/video/private/s--FQcRZGby--/v1669824296/courseflow/course_video_trailers/klejw1frqb2azseup6ih.mp4",
+    //     "public_id" :"courseflow/course_video_trailers/klejw1frqb2azseup6ih" }`
     for (let i = 0; i < value.sub_lessons.length; i++) {
+      console.log(fileVideo);
+      const formData = new FormData();
+      formData.append("video", fileVideo[i]);
       const body = {
         lesson_name: value.lesson_name,
         sub_lesson_name: value.sub_lessons[i].sub_lesson_name,
         sub_lesson_id: Number(value.sub_lessons[i].sub_lesson_id),
-        video: fileVideo[i],
         sequence: i + 1,
       };
+      // ต้องส่ง formData ไปด้วย
       const result = await axios.put(
         `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
         body
@@ -250,10 +254,8 @@ function AdminEditLesson() {
       initialValues={
         courseId
           ? {
-              lesson_name: Boolean(subLessonData)
-                ? courseData[subLessonData[0].course_id].lessons[
-                    subLessonData[0].lesson_id
-                  ].lesson_name
+              lesson_name: Boolean(subLessonData.length > 0)
+                ? courseData[courseId].lessons[lessonId].lesson_name
                 : "",
               sub_lessons: includeSubLesson,
             }
@@ -306,7 +308,8 @@ function AdminEditLesson() {
                       }}
                     />
                     <Flex direction="column">
-                      {Boolean(courseId) && Boolean(subLessonData) ? (
+                      {Boolean(courseId) &&
+                      Boolean(subLessonData.length > 0) ? (
                         <>
                           <Flex gap="8px">
                             <Text variant="body3" color="gray.600">
@@ -763,28 +766,14 @@ function AdminEditLesson() {
                       </Droppable>
                     </DragDropContext>
                   </Flex>
-                  <Link alignSelf="end" onClick={() => onConfirmModalOpen()}>
+                  <Link
+                    alignSelf="end"
+                    onClick={() => {
+                      onConfirmModalOpen();
+                    }}
+                  >
                     Delete lesson
                   </Link>
-                </Flex>
-                <Flex
-                  bgColor="gray.100"
-                  direction="column"
-                  align="end"
-                  justify="center"
-                >
-                  <Text
-                    cursor="pointer"
-                    color="blue.500"
-                    fontWeight="700"
-                    fontSize="16px"
-                    mt="83px"
-                    mr="40px"
-                    mb="112px"
-                    onClick={() => onConfirmModalOpen()}
-                  >
-                    Delete Lesson
-                  </Text>
                 </Flex>
               </Flex>
             </Flex>
@@ -861,10 +850,15 @@ function AdminEditLesson() {
                       // isLoading={isDeleting}
                       variant="primary"
                       onClick={() => {
+                        handleDeleteLesson();
                         if (Boolean(courseId)) {
-                          navigate(`/admin/edit-course/${courseId}`);
+                          navigate(`/admin/edit-course/${courseId}`, {
+                            replace: true,
+                          });
                         } else {
-                          navigate(`/admin/add-course`);
+                          navigate(`/admin/add-course`, {
+                            replace: true,
+                          });
                         }
                         const newLessonsList = [...addLesson];
                         newLessonsList.splice(lessonId - 1, 1);
