@@ -403,6 +403,7 @@ export const deleteCourse = async (req, res) => {
     [courseId, adminId]
   );
 
+
   const courseAttachedFiles = await pool.query(
     `
   SELECT * from files where course_id = $1
@@ -422,18 +423,27 @@ export const deleteCourse = async (req, res) => {
   }
 
   console.log(filesPublicIdForDelete);
+  console.log(courseAttachedFiles.rows);
+  
+  const filesType = [];
+  for (let i of courseAttachedFiles.rows) {
+    filesType.push(i.type);
+  }
+  
 
   for (let filePublicId of filesPublicIdForDelete) {
-    await cloudinaryUpload(filePublicId, "delete");
+    for (let fileType of filesType) {
+      await cloudinaryUpload(filePublicId, "delete", "any folder", fileType );
+    }
   }
 
   // Step2: Delete course from database
 
-  // await pool.query(
-  //   `
-  // DELETE from courses WHERE course_id = $1 AND admin_id = $2`,
-  //   [courseId, adminId]
-  // );
+  await pool.query(
+    `
+  DELETE from courses WHERE course_id = $1 AND admin_id = $2`,
+    [courseId, adminId]
+  );
 
   return res.json({
     message: "course deleted",
@@ -918,10 +928,32 @@ export const getCourseLesson = async (req, res) => {
 // DELETE Lesson
 
 export const deleteLesson = async (req, res) => {
-  // Step1: Get all cloudinary public_id of sub-lesson videos of that lesson and delete it from cloudinary
-  // Step2: Delete that lesson
+  // Step2: Get all cloudinary public_id of sub-lesson videos of that lesson and delete it from cloudinary
+  // Step3: Delete that lesson
   const lessonId = req.params.lessonId;
   const courseId = req.query.courseId;
+  const admin_id = req.query.byAdmin;
+
+  /* Validate whether this admin owned the course or not */
+  let doesAdminOwnThisCourse = await pool.query(
+    `
+  SELECT EXISTS 
+  (SELECT *
+    FROM courses
+  INNER JOIN lessons
+  ON courses.course_id = lessons.course_id
+  INNER JOIN sub_lessons
+  ON lessons.lesson_id = sub_lessons.lesson_id
+  WHERE courses.admin_id = $1 AND courses.course_id = $2)
+  `,
+    [admin_id, courseId]
+  );
+  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+  if (!doesAdminOwnThisCourse) {
+    return res
+      .status(403)
+      .json({ message: "You have no permission to delete this assignment" });
+  }
 
   // Step1 here
   const result = await pool.query(
@@ -935,19 +967,21 @@ export const deleteLesson = async (req, res) => {
   const videoMetaDataFromCloudinary = result.rows;
 
   for (let video of videoMetaDataFromCloudinary) {
+  
     let public_id = JSON.parse(video.video_directory).public_id;
-    await cloudinaryUpload(public_id, "delete");
+    await cloudinaryUpload(public_id, "delete" );
+    
   }
 
   // Step2 here
-  await pool.query(
-    `
-    DELETE 
-    FROM lessons
-    WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
-  `,
-    [lessonId, courseId]
-  );
+  // await pool.query(
+  //   `
+  //   DELETE 
+  //   FROM lessons
+  //   WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
+  // `,
+  //   [lessonId, courseId]
+  // );
 
   return res.json({
     message: "Lesson deleted successfully",
