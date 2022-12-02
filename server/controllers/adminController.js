@@ -403,7 +403,6 @@ export const deleteCourse = async (req, res) => {
     [courseId, adminId]
   );
 
-
   const courseAttachedFiles = await pool.query(
     `
   SELECT * from files where course_id = $1
@@ -424,16 +423,15 @@ export const deleteCourse = async (req, res) => {
 
   console.log(filesPublicIdForDelete);
   console.log(courseAttachedFiles.rows);
-  
+
   const filesType = [];
   for (let i of courseAttachedFiles.rows) {
     filesType.push(i.type);
   }
-  
 
   for (let filePublicId of filesPublicIdForDelete) {
     for (let fileType of filesType) {
-      await cloudinaryUpload(filePublicId, "delete", "any folder", fileType );
+      await cloudinaryUpload(filePublicId, "delete", "any folder", fileType);
     }
   }
 
@@ -653,16 +651,48 @@ export const postNewAssignment = async (req, res) => {
     );
 
     /* Insert new assignment into "assignments" table */
-    await pool.query(
+    let assignmentId = await pool.query(
       `
       INSERT INTO assignments(sub_lesson_id, detail, created_date, updated_date)
       VALUES ($1, $2, $3, $4)
+      RETURNING assignment_id
       `,
       [sub_lesson_id, detail, new Date(), new Date()]
+    );
+    assignmentId = assignmentId.rows[0].assignment_id;
+
+    /* Checking whether there is any user that already accepted assignment(s) in this sub-lesson
+    If so, insert this new assignment into users_assignments */
+    let acceptedDateOfUsers = await pool.query(
+      `
+      SELECT users_assignments.user_id, users_assignments.accepted_date 
+      FROM users_assignments
+      INNER JOIN assignments
+      ON users_assignments.assignment_id = assignments.assignment_id
+      WHERE assignments.sub_lesson_id = $1
+      GROUP BY users_assignments.user_id, users_assignments.accepted_date
+      `,
+      [sub_lesson_id]
+    );
+    acceptedDateOfUsers = acceptedDateOfUsers.rows;
+    const arrayOfUserId = [];
+    const arrayOfAcceptedDate = [];
+    for (let acceptedDateOfEachUser of acceptedDateOfUsers) {
+      arrayOfUserId.push(acceptedDateOfEachUser.user_id);
+      arrayOfAcceptedDate.push(acceptedDateOfEachUser.accepted_date);
+    }
+
+    await pool.query(
+      `
+      INSERT INTO users_assignments (user_id, assignment_id, accepted_date, updated_date, status)
+      VALUES (UNNEST($1::int[]), $2, UNNEST($3::timestamp with time zone[]), UNNEST($3::timestamp with time zone[]), $4)
+      `,
+      [arrayOfUserId, assignmentId, arrayOfAcceptedDate, "pending"]
     );
 
     return res.json({ message: "Assignment has been successfully added" });
   } catch (error) {
+    console.log("error: ", error);
     return res.sendStatus(500);
   }
 };
@@ -751,7 +781,7 @@ export const getAssignmentById = async (req, res) => {
   if (!doesAdminOwnThisCourse) {
     return res
       .status(403)
-      .json({ message: "You have no permission to delete this assignment" });
+      .json({ message: "You have no permission to see this assignment" });
   }
 
   let data = await pool.query(
@@ -862,6 +892,39 @@ export const deleteAssignment = async (req, res) => {
       return res
         .status(403)
         .json({ message: "You have no permission to delete this assignment" });
+    }
+
+    /* Checking whether this assignment is the last assignment of a sub-lesson or not
+    If so, restart a duration of sub-lesson to be 0 */
+    let assignmentCount = await pool.query(
+      `
+      WITH get_sub_lesson_id AS (
+        SELECT sub_lesson_id
+        FROM assignments
+        WHERE assignment_id = $1
+      ) 
+      SELECT COUNT(assignment_id)
+      FROM assignments
+      WHERE sub_lesson_id in (SELECT sub_lesson_id FROM get_sub_lesson_id)
+      `,
+      [assignment_id]
+    );
+    assignmentCount = assignmentCount.rows[0].count;
+
+    if (Number(assignmentCount) === 1) {
+      await pool.query(
+        `
+        WITH get_sub_lesson_id AS (
+          SELECT sub_lesson_id
+          FROM assignments
+          WHERE assignment_id = $1
+        ) 
+        UPDATE sub_lessons
+        SET duration = 0
+        WHERE sub_lesson_id in (SELECT sub_lesson_id FROM get_sub_lesson_id)
+        `,
+        [assignment_id]
+      );
     }
 
     /* Delete an assignment from "assignments" table */
@@ -1033,18 +1096,16 @@ export const deleteLesson = async (req, res) => {
   const videoMetaDataFromCloudinary = result.rows;
 
   for (let video of videoMetaDataFromCloudinary) {
-  
     let public_id = JSON.parse(video.video_directory).public_id;
-    await cloudinaryUpload(public_id, "delete" );
-    
+    await cloudinaryUpload(public_id, "delete");
   }
 
   // Step2 here
   // await pool.query(
   //   `
-  //   DELETE 
+  //   DELETE
   //   FROM lessons
-  //   WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
+  //   WHERE lessons.lesson_id = $1 AND lessons.course_id = $2
   // `,
   //   [lessonId, courseId]
   // );

@@ -1,10 +1,9 @@
 import axios from "axios";
 
 export default function jwtInterceptor() {
-  const hasToken = Boolean(window.localStorage.getItem("token"));
-  const hasAdminToken = Boolean(window.localStorage.getItem("adminToken"));
-
   axios.interceptors.request.use((req) => {
+    const hasToken = Boolean(window.localStorage.getItem("token"));
+    const hasAdminToken = Boolean(window.localStorage.getItem("adminToken"));
     if (/admin/i.test(req.url) && hasAdminToken) {
       req.headers = {
         ...req.headers,
@@ -24,6 +23,8 @@ export default function jwtInterceptor() {
       return res;
     },
     (error) => {
+      const hasToken = Boolean(window.localStorage.getItem("token"));
+      const hasAdminToken = Boolean(window.localStorage.getItem("adminToken"));
       if (
         error.response.status === 401 &&
         error.response.statusText === "Unauthorized"
