@@ -915,13 +915,79 @@ export const getCourseLesson = async (req, res) => {
   return res.json({ data });
 };
 
+export const editLesson = async (req, res) => {
+  // try {
+  const admin_id = req.query.byAdmin;
+  const lesson_id = req.params.lessonId;
+  const lesson_name = req.body.lesson_name;
+  const sub_lesson_name = req.body.sub_lesson_name;
+  const sub_lesson_id = req.body.sub_lesson_id;
+  const sequence = req.body.sequence;
+  const video = req.body.video;
+  /* Validate whether this admin owned the course or not */
+  let doesAdminOwnThisCourse = await pool.query(
+    `
+    SELECT EXISTS 
+    (SELECT *
+      FROM courses
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    WHERE courses.admin_id = $1 AND lessons.lesson_id = $2)
+    `,
+    [admin_id, lesson_id]
+  );
+  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+  if (!doesAdminOwnThisCourse) {
+    return res
+      .status(403)
+      .json({ message: "You have no permission to edit this lesson" });
+  }
+
+  /* Update lesson_name in "lessons" table */
+  await pool.query(
+    `
+  UPDATE lessons
+  SET lesson_name = $1
+  WHERE lesson_id = $2
+  `,
+    [lesson_name, lesson_id]
+  );
+
+  /* Update sub_lesson_name and video in "sub_lessons" table */
+  await pool.query(
+    `
+    UPDATE sub_lessons
+    SET sub_lesson_name = $1,
+      video_directory = $2
+    WHERE sub_lesson_id = $3 AND lesson_id = $4
+    
+    `,
+    [sub_lesson_name, video, sub_lesson_id, lesson_id]
+  );
+
+  await pool.query(
+    `
+    UPDATE lessons as l
+    SET sequence = l2.sequence
+    FROM (SELECT UNNEST($1::int[]) as lesson_id, UNNEST($2::int[]) as sequence) AS l2
+    WHERE l.lesson_id = l2.lesson_id
+    `,
+    [lesson_id, sequence]
+  );
+
+  return res.json({ message: "Lesson has been successfully edited" });
+  // } catch (error) {
+  //   return res.sendStatus(500);
+  // }
+};
+
 // DELETE Lesson
 
 export const deleteLesson = async (req, res) => {
   // Step1: Get all cloudinary public_id of sub-lesson videos of that lesson and delete it from cloudinary
   // Step2: Delete that lesson
   const lessonId = req.params.lessonId;
-  const courseId = req.query.courseId;
+  const courseId = req.params.courseId;
 
   // Step1 here
   const result = await pool.query(

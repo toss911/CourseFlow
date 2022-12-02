@@ -2,10 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import {
   Flex,
-  Text,
-  Image,
-  Heading,
-  Button,
   FormControl,
   FormLabel,
   FormErrorMessage,
@@ -18,9 +14,14 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Divider,
   Link,
+  Divider,
+  Image,
+  Heading,
+  Text,
+  Button,
 } from "@chakra-ui/react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 import { DragHandleIcon, WarningIcon } from "@chakra-ui/icons";
 import { useAuth } from "../../contexts/authentication.js";
 import axios from "axios";
@@ -35,6 +36,13 @@ function AdminEditLesson() {
     onOpen: onSuccessModalOpen,
     onClose: onSuccessModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isConfirmModalOpen,
+    onOpen: onConfirmModalOpen,
+    onClose: onConfirmModalClose,
+  } = useDisclosure();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [courseData, setCourseData] = useState();
   const { addLesson, setAddLesson } = useAdmin();
   const [subLessonData, setSubLessonData] = useState();
@@ -42,12 +50,11 @@ function AdminEditLesson() {
   const toast = useToast();
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
-  const [videoKey, setVideoKey] = useState(0); // this state is for forcing video elements to be re-render after dragged and dropped
-  const {
-    isOpen: isConfirmModalOpen,
-    onOpen: onConfirmModalOpen,
-    onClose: onConfirmModalClose,
-  } = useDisclosure();
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
+  const [fileVideo, setFileVideo] = useState([]);
+  const [videoKey, setVideoKey] = useState(0);
+  // this state is for forcing video elements to be re-render after dragged and dropped
 
   useEffect(() => {
     /* Prompt a pop-up message to warn the users if they are trying to refresh to web page */
@@ -59,16 +66,21 @@ function AdminEditLesson() {
     return () => window.removeEventListener("beforeunload", unloadCallback);
   }, []);
 
-  const forceUpdateVideo = () => {
-    setVideoKey(videoKey + 1);
-  };
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       await getCourseData();
       await getSubLessonData();
+      setIsLoading(false);
     }
     fetchData();
   }, []);
+
+  // this state is for forcing video elements to be re-render after dragged and dropped
+
+  const forceUpdateVideo = () => {
+    setVideoKey(videoKey + 1);
+  };
 
   // Querying a course data
   const getCourseData = async () => {
@@ -86,26 +98,37 @@ function AdminEditLesson() {
   };
 
   const convertToFileObj = async (url, fileName) => {
-    let fileVideo = "";
+    let convertFileVideo = "";
     await fetch(url).then(async (response) => {
       const blob = await response.blob();
       const file = new File([blob], fileName, {
         type: blob.type,
       });
-      fileVideo = file;
+      convertFileVideo = file;
     });
-    //console.log("fileVideo: ", fileVideo);
-    return fileVideo;
+    // const dataVideo = [];
+    // dataVideo[index] = convertFileVideo;
+    // setFileVideo([...dataVideo]);
+    //console.log(fileVideo);
+    return convertFileVideo;
   };
 
   let includeSubLesson = [];
   if (Boolean(subLessonData)) {
     for (let i = 0; i < subLessonData.length; i++) {
       const url = JSON.parse(subLessonData[i].video_directory).url;
-      const fileVideo = convertToFileObj(url, `video-sub-lesson${i}`);
+
+      // const convertFileVideo = convertToFileObj(
+      //   JSON.parse(subLessonData[i].video_directory),
+      //   `video-sub-lesson${i}`
+      // );
+      // console.log("convertFileVideo: ", convertFileVideo);
+
       includeSubLesson[i] = {
         sub_lesson_name: subLessonData[i].sub_lesson_name,
+        sub_lesson_id: subLessonData[i].sub_lesson_id,
         video: url,
+        sequence: i + 1,
       };
     }
     //console.log(subLessonData);
@@ -115,6 +138,10 @@ function AdminEditLesson() {
   const handleVideoChange = (currentFile, index, setFieldValue) => {
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
+        const dataVideo = [...fileVideo];
+        dataVideo[index] = currentFile;
+        setFileVideo([...dataVideo]);
+
         setFieldValue(
           `sub_lessons.${index}.video`,
           URL.createObjectURL(currentFile)
@@ -130,24 +157,44 @@ function AdminEditLesson() {
   };
 
   const handleSubmit = async (value) => {
+    console.log("value: ", value);
     const newLesson = [...addLesson];
     newLesson[lessonId - 1] = value;
     setAddLesson(newLesson);
-    const body = {
-      sub_lesson_name: value.sub_lesson_name,
-      video: value.video,
-    };
-    const result = await axios.put(
-      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
-      body
+    for (let i = 0; i < value.sub_lessons.length; i++) {
+      const body = {
+        lesson_name: value.lesson_name,
+        sub_lesson_name: value.sub_lessons[i].sub_lesson_name,
+        sub_lesson_id: Number(value.sub_lessons[i].sub_lesson_id),
+        video: fileVideo[i],
+        sequence: i + 1,
+      };
+      const result = await axios.put(
+        `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
+        body
+      );
+      if (/successfully/i.test(result.data.message)) {
+        setModalMsg("edited");
+        onSuccessModalOpen();
+        if (Boolean(courseId)) {
+          navigate(`admin/edit-course/${courseId}`, { replace: true });
+        } else {
+          navigate(`admin/add-course`, { replace: true });
+        }
+      }
+    }
+  };
+
+  const handleDeleteLesson = async () => {
+    setIsDeleting(true);
+    const result = await axios.delete(
+      `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`
     );
+    setIsDeleting(false);
     if (/successfully/i.test(result.data.message)) {
-      setModalMsg("edited");
+      onConfirmModalClose();
+      setModalMsg("deleted");
       onSuccessModalOpen();
-    } else if (Boolean(courseId)) {
-      navigate(`/admin/edit-course/${courseId}`);
-    } else {
-      navigate(`/admin/add-course`);
     }
   };
 
@@ -250,9 +297,11 @@ function AdminEditLesson() {
                       _hover={{ opacity: 0.5 }}
                       onClick={() => {
                         if (Boolean(courseId)) {
-                          navigate(`/admin/edit-course/${courseId}`);
+                          navigate(`/admin/edit-course/${courseId}`, {
+                            replace: true,
+                          });
                         } else {
-                          navigate(`/admin/add-course`);
+                          navigate(`/admin/add-course`, { replace: true });
                         }
                       }}
                     />
@@ -297,7 +346,7 @@ function AdminEditLesson() {
                       Cancel
                     </Button>
                     <Button type="submit" isLoading={isSubmitting}>
-                      Save
+                      Edit
                     </Button>
                   </Flex>
                 </Flex>
@@ -718,8 +767,71 @@ function AdminEditLesson() {
                     Delete lesson
                   </Link>
                 </Flex>
+                <Flex
+                  bgColor="gray.100"
+                  direction="column"
+                  align="end"
+                  justify="center"
+                >
+                  <Text
+                    cursor="pointer"
+                    color="blue.500"
+                    fontWeight="700"
+                    fontSize="16px"
+                    mt="83px"
+                    mr="40px"
+                    mb="112px"
+                    onClick={() => onConfirmModalOpen()}
+                  >
+                    Delete Lesson
+                  </Text>
+                </Flex>
               </Flex>
             </Flex>
+            <Modal
+              isCentered
+              isOpen={isSuccessModalOpen}
+              onClose={onSuccessModalClose}
+              onCloseComplete={async () => {
+                if (/deleted/i.test(modalMsg)) {
+                  if (Boolean(courseId)) {
+                    navigate(`admin/edit-course/${courseId}`, {
+                      replace: true,
+                    });
+                  } else {
+                    navigate(`admin/add-course`, { replace: true });
+                  }
+                } else if (/edited/i.test(modalMsg)) {
+                  setIsLoading(true);
+                  await getCourseData();
+                  await getSubLessonData();
+                  setIsLoading(false);
+                }
+              }}
+              preserveScrollBarGap
+            >
+              <ModalOverlay />
+              <ModalContent borderRadius="24px">
+                <ModalHeader
+                  bg="blue.500"
+                  color="white"
+                  textAlign="center"
+                  borderRadius="24px 24px 0px 0px"
+                  fontSize="1.5rem"
+                >
+                  <CheckCircleIcon mr="0.5em" />
+                  Success
+                </ModalHeader>
+                <ModalBody
+                  textAlign="center"
+                  my="2em"
+                  color="black"
+                  fontSize="1rem"
+                >
+                  Lesson has been successfully {modalMsg}.
+                </ModalBody>
+              </ModalContent>
+            </Modal>
             <Modal
               isCentered
               isOpen={isConfirmModalOpen}
