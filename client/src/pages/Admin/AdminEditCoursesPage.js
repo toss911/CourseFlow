@@ -20,7 +20,7 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Divider
+  Divider,
 } from "@chakra-ui/react";
 import { useAdmin } from "../../contexts/admin.js";
 import { Field, Form, Formik } from "formik";
@@ -36,7 +36,6 @@ import { changeLessonSeq } from "../../components/LessonsTable";
 let action = "no files";
 
 function AdminEditCourses() {
-  const [courseData, setCourseData] = useState({});
   const [coverImageFile, setCoverImageFile] = useState();
   const [videoFile, setVideoFile] = useState();
   const [files, setFiles] = useState([]);
@@ -46,7 +45,8 @@ function AdminEditCourses() {
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const courseId = params.courseId;
-  const { addLesson, setAddLesson } = useAdmin();
+  const { addLesson, setAddLesson, editCourseFields, setEditCourseFields } =
+    useAdmin();
   const navigate = useNavigate();
   const {
     isOpen: isConfirmModalOpen,
@@ -58,7 +58,7 @@ function AdminEditCourses() {
     const result = await axios.get(
       `http://localhost:4000/admin/get-course/${courseId}?adminId=${adminId}`
     );
-    setCourseData(result.data.data);
+    setEditCourseFields(result.data.data);
     const results = await convertToFileObj(
       result.data.filesMetaData,
       result.data.allMediaUrls
@@ -93,8 +93,6 @@ function AdminEditCourses() {
 
     return filesObjects;
   };
-
-  console.log(courseData);
 
   useEffect(() => {
     getCourseData();
@@ -189,13 +187,15 @@ function AdminEditCourses() {
 
   const handleDeleteCourse = async () => {
     setIsDeleting(true);
-    const result = await axios.delete(`http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`)
+    const result = await axios.delete(
+      `http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`
+    );
     console.log(result.data.message);
     if (/deleted/i.test(result.data.message)) {
       onConfirmModalClose();
     }
     setIsDeleting(false);
-  }
+  };
 
   // *- input validation -* //
   const validateCourseName = (value) => {
@@ -274,12 +274,12 @@ function AdminEditCourses() {
     <>
       <Formik
         initialValues={{
-          course_name: courseData.course_name || "",
-          price: courseData.price || "",
-          learning_time: courseData.learning_time || "",
-          course_summary: courseData.summary || "",
-          course_detail: courseData.detail || "",
-          category: courseData.category || "",
+          course_name: editCourseFields.course_name || "",
+          price: editCourseFields.price || "",
+          learning_time: editCourseFields.learning_time || "",
+          course_summary: editCourseFields.summary || "",
+          course_detail: editCourseFields.detail || "",
+          category: editCourseFields.category || "",
           cover_image: coverImageFile || null,
           video_trailer: videoFile || null,
           files: files || "",
@@ -323,7 +323,7 @@ function AdminEditCourses() {
                           Course
                         </Heading>
                         <Heading variant="headline3">
-                          {courseData.course_name}
+                          {editCourseFields.course_name}
                         </Heading>
                       </Flex>
                     </Flex>
@@ -989,10 +989,14 @@ function AdminEditCourses() {
                     {/* Lessons Table */}
                     <LessonTable />
                     <Flex w="100%" mb="87px" justifyContent="flex-end">
-                      <Button variant="ghost" mr="40px" onClick={() => {
-                                // courseId = course.course_id;
-                                onConfirmModalOpen();
-                              }}>
+                      <Button
+                        variant="ghost"
+                        mr="40px"
+                        onClick={() => {
+                          // courseId = course.course_id;
+                          onConfirmModalOpen();
+                        }}
+                      >
                         Delete this course
                       </Button>
                     </Flex>
@@ -1000,44 +1004,44 @@ function AdminEditCourses() {
                 </Flex>
               </Flex>
               <Modal
-        isCentered
-        isOpen={isConfirmModalOpen}
-        onClose={onConfirmModalClose}
-        closeOnOverlayClick={false}
-        preserveScrollBarGap
-        onCloseComplete={()=> navigate("/admin")}
-      >
-        <ModalOverlay />
-        <ModalContent borderRadius="24px">
-          <ModalHeader borderRadius="24px 24px 0px 0px">
-            <Text variant="body1" color="black">
-              Confirmation
-            </Text>
-          </ModalHeader>
-          <Divider sx={{ borderColor: "gray.300" }} />
-          <ModalCloseButton color="gray.500" />
-          <ModalBody p="24px 50px 24px 24px" color="black">
-            <Text variant="body2" color="gray.700" as="span">
-              Do you want to delete this course?
-            </Text>
-            <Flex mt="24px" width="600px">
-              <Button variant="secondary" onClick={onConfirmModalClose}>
-                No, I don't
-              </Button>
-              <Button
-                ml="16px"
-                isLoading={isDeleting}
-                variant="primary"
-                onClick={() => {
-                  handleDeleteCourse(courseId);
-                }}
+                isCentered
+                isOpen={isConfirmModalOpen}
+                onClose={onConfirmModalClose}
+                closeOnOverlayClick={false}
+                preserveScrollBarGap
+                onCloseComplete={() => navigate("/admin")}
               >
-                Yes, I want to delete
-              </Button>
-            </Flex>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+                <ModalOverlay />
+                <ModalContent borderRadius="24px">
+                  <ModalHeader borderRadius="24px 24px 0px 0px">
+                    <Text variant="body1" color="black">
+                      Confirmation
+                    </Text>
+                  </ModalHeader>
+                  <Divider sx={{ borderColor: "gray.300" }} />
+                  <ModalCloseButton color="gray.500" />
+                  <ModalBody p="24px 50px 24px 24px" color="black">
+                    <Text variant="body2" color="gray.700" as="span">
+                      Do you want to delete this course?
+                    </Text>
+                    <Flex mt="24px" width="600px">
+                      <Button variant="secondary" onClick={onConfirmModalClose}>
+                        No, I don't
+                      </Button>
+                      <Button
+                        ml="16px"
+                        isLoading={isDeleting}
+                        variant="primary"
+                        onClick={() => {
+                          handleDeleteCourse(courseId);
+                        }}
+                      >
+                        Yes, I want to delete
+                      </Button>
+                    </Flex>
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
             </Form>
           );
         }}

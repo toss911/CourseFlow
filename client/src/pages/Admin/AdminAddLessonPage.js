@@ -15,11 +15,15 @@ import {
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
+import { useAuth } from "../../contexts/authentication.js";
 import { useNavigate, useParams } from "react-router-dom";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import axios from "axios";
 
 function AdminAddLesson() {
-  const { addLesson, setAddLesson } = useAdmin();
+  const { addLesson, setAddLesson, editCourseFields } = useAdmin();
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
   const toast = useToast();
   const navigate = useNavigate();
   const { courseId } = useParams();
@@ -53,11 +57,28 @@ function AdminAddLesson() {
     }
   };
 
-  const handleSubmit = (values) => {
-    setAddLesson([...addLesson, values]);
+  const handleSubmit = async (values) => {
     if (Boolean(courseId)) {
-      navigate(`/admin/edit-course/${courseId}`);
+      const formData = new FormData();
+      formData.append("lesson_name", values.lesson_name);
+      for (let sub_lesson of values.sub_lessons) {
+        formData.append("sub_lesson_names", sub_lesson.sub_lesson_name);
+        formData.append("sub_lesson_videos", sub_lesson.video);
+      }
+      const result = await axios.post(
+        `http://localhost:4000/admin/courses/${courseId}/lesson?byAdmin=${adminId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      if (/success/i.test(result.data.message)) {
+        navigate(`/admin/edit-course/${courseId}`);
+      } else {
+        alert(`ERROR: Please try again later`);
+      }
     } else {
+      setAddLesson([...addLesson, values]);
       navigate(`/admin/add-course`);
     }
   };
@@ -167,7 +188,7 @@ function AdminAddLesson() {
                             Course
                           </Text>
                           <Text variant="body3" color="black">
-                            'Service Design Essentials'
+                            {`'${editCourseFields.course_name}'`}
                           </Text>
                         </Flex>
                       ) : null}

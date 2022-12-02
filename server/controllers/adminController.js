@@ -692,7 +692,6 @@ export const postNewAssignment = async (req, res) => {
 
     return res.json({ message: "Assignment has been successfully added" });
   } catch (error) {
-    console.log("error: ", error);
     return res.sendStatus(500);
   }
 };
@@ -986,6 +985,66 @@ export const getCourseLesson = async (req, res) => {
   data = data.rows;
 
   return res.json({ data });
+};
+
+export const postNewLesson = async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+    const lessonName = req.body.lesson_name;
+    const arrayOfSubLessonName = req.body.sub_lesson_names;
+    const arrayOfSubLessonVideo = req.files.sub_lesson_videos;
+    const arrayOfSubLessonVideoDir = [];
+    const arrayOfSubLessonSequence = [];
+
+    // Upload files to cloudinary
+    for (let video of arrayOfSubLessonVideo) {
+      const metaData = await cloudinaryUpload(video, "upload", "video");
+      arrayOfSubLessonVideoDir.push(metaData);
+    }
+
+    // Get a sequence of sub-lessons
+    for (let i = 0; i < arrayOfSubLessonName.length; i++) {
+      arrayOfSubLessonSequence.push(i);
+    }
+
+    // Query the lesson last sequence number first so that we could append it
+    let lessonId = await pool.query(
+      `
+      WITH get_last_sequence AS (
+        SELECT sequence
+        FROM lessons
+        WHERE course_id = $1
+        ORDER BY sequence DESC
+        LIMIT 1
+      ) 
+      INSERT INTO lessons (course_id, lesson_name, sequence)
+      SELECT $1, $2, sequence + 1
+      FROM get_last_sequence
+      RETURNING lesson_id
+      `,
+      [courseId, lessonName]
+    );
+    lessonId = lessonId.rows[0].lesson_id;
+
+    await pool.query(
+      `
+      INSERT INTO sub_lessons (lesson_id, sub_lesson_name, video_directory, sequence, duration)
+      VALUES ($1, UNNEST($2::text[]), UNNEST($3::text[]), UNNEST($4::int[]), 0)
+      `,
+      [
+        lessonId,
+        arrayOfSubLessonName,
+        arrayOfSubLessonVideoDir,
+        arrayOfSubLessonSequence,
+      ]
+    );
+
+    return res.json({
+      message: "Lesson has been successfully created",
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
 
 export const editLesson = async (req, res) => {
