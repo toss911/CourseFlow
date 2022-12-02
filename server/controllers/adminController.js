@@ -959,6 +959,7 @@ export const editLesson = async (req, res) => {
   const lesson_name = req.body.lesson_name;
   const sub_lesson_name = req.body.sub_lesson_name;
   const sub_lesson_id = req.body.sub_lesson_id;
+  const sequence = req.body.sequence;
   const video = req.body.video;
   /* Validate whether this admin owned the course or not */
   let doesAdminOwnThisCourse = await pool.query(
@@ -996,8 +997,19 @@ export const editLesson = async (req, res) => {
     SET sub_lesson_name = $1,
       video_directory = $2
     WHERE sub_lesson_id = $3 AND lesson_id = $4
+    
     `,
     [sub_lesson_name, video, sub_lesson_id, lesson_id]
+  );
+
+  await pool.query(
+    `
+    UPDATE lessons as l
+    SET sequence = l2.sequence
+    FROM (SELECT UNNEST($1::int[]) as lesson_id, UNNEST($2::int[]) as sequence) AS l2
+    WHERE l.lesson_id = l2.lesson_id
+    `,
+    [lesson_id, sequence]
   );
 
   return res.json({ message: "Lesson has been successfully edited" });

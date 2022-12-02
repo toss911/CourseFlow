@@ -123,6 +123,7 @@ function AdminEditLesson() {
         sub_lesson_name: subLessonData[i].sub_lesson_name,
         sub_lesson_id: subLessonData[i].sub_lesson_id,
         video: url,
+        sequence: i + 1,
       };
     }
     //console.log(subLessonData);
@@ -161,6 +162,7 @@ function AdminEditLesson() {
         sub_lesson_name: value.sub_lessons[i].sub_lesson_name,
         sub_lesson_id: Number(value.sub_lessons[i].sub_lesson_id),
         video: fileVideo[i],
+        sequence: i + 1,
       };
       const result = await axios.put(
         `http://localhost:4000/admin/edit-course/${courseId}/edit-lesson/${lessonId}?byAdmin=${adminId}`,
