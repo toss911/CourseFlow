@@ -72,7 +72,8 @@ export const getById = async (req, res) => {
         ON courses.course_id = lessons.course_id
         INNER JOIN sub_lessons 
         ON lessons.lesson_id = sub_lessons.lesson_id
-        WHERE courses.course_id=$1`,
+        WHERE courses.course_id=$1
+        ORDER BY lessons.sequence ASC, sub_lessons.sequence ASC`,
       [courseId]
     );
 
