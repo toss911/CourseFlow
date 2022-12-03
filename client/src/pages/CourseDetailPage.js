@@ -76,7 +76,7 @@ function CourseDetail() {
               <Heading variant="headline2" color="black" mt="100px">
                 Course Detail
               </Heading>
-              <Text variant="body2" w="739px" mt="10px">
+              <Text variant="body2" w="739px" mt="10px" whiteSpace="pre-wrap">
                 {course.detail}
               </Text>
             </Box>
