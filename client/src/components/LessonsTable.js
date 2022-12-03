@@ -28,7 +28,7 @@ import { useNavigate, useParams } from "react-router-dom";
 let lessonDeleteIndex;
 export let changeLessonSeq = false;
 
-const LessonTable = ({ currentCourseData, innerRef }) => {
+const LessonTable = ({ currentCourseData, innerRef, lessons, setLessons }) => {
   const { addLesson, setAddLesson, setAddCourseFields } = useAdmin();
   const navigate = useNavigate();
   const { courseId } = useParams();
@@ -56,14 +56,18 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
       return;
     }
     const items = reorder(
-      addLesson,
+      courseId ? lessons : addLesson,
       result.source.index,
       result.destination.index
     );
-    setAddLesson(items);
-    changeLessonSeq = true;
-  };
 
+    if (courseId) {
+      setLessons(items);
+      changeLessonSeq = true;
+    } else {
+      setAddLesson(items);
+    }
+  };
 
   return (
     <Flex direction="column" mx="40px" my="50px">
@@ -101,7 +105,7 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
                   </Thead>
 
                   <Tbody>
-                    {addLesson.map((row, index) => {
+                    {(courseId ? lessons : addLesson).map((row, index) => {
                       return (
                         <Draggable
                           key={index}
@@ -130,7 +134,11 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
                                 {row.lesson_name}
                               </Td>
                               <Td w="40%" color="black">
-                                {courseId ? row.count : row.sub_lessons.length}
+                                {courseId
+                                  ? row.count
+                                  : row.sub_lessons
+                                  ? row.sub_lessons.length
+                                  : null}
                               </Td>
                               <Td w="10%">
                                 <Flex gap="20%">
@@ -142,13 +150,8 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
                                     cursor="pointer"
                                     _hover={{ opacity: 0.5 }}
                                     onClick={() => {
-                                      if (courseId) {
-                                        // Delete lesson from edit course page
-                                      } else {
-                                        // Delete lesson from add course page
-                                        lessonDeleteIndex = index;
-                                        onConfirmModalOpen();
-                                      }
+                                      lessonDeleteIndex = index;
+                                      onConfirmModalOpen();
                                     }}
                                   />
                                   <Image
@@ -211,11 +214,17 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
                 // isLoading={isDeleting}
                 variant="primary"
                 onClick={() => {
-                  const newLessonsList = [...addLesson];
-                  newLessonsList.splice(lessonDeleteIndex, 1);
-                  setAddLesson(newLessonsList);
+                  if (courseId) {
+                    /* รอใส่ API ของอาย */
+                    const newLessonsList = [...lessons];
+                    newLessonsList.splice(lessonDeleteIndex, 1);
+                    setLessons(newLessonsList);
+                  } else {
+                    const newLessonsList = [...addLesson];
+                    newLessonsList.splice(lessonDeleteIndex, 1);
+                    setAddLesson(newLessonsList);
+                  }
                   onConfirmModalClose();
-
                 }}
               >
                 Yes, I want to delete

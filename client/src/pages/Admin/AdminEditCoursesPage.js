@@ -21,13 +21,15 @@ import {
   ModalCloseButton,
   useDisclosure,
   Divider,
+  Link,
 } from "@chakra-ui/react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 import { useAdmin } from "../../contexts/admin.js";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import axios from "axios";
 import { useParams } from "react-router";
 import { useAuth } from "../../contexts/authentication";
@@ -36,23 +38,31 @@ import { changeLessonSeq } from "../../components/LessonsTable";
 let action = "no files";
 
 function AdminEditCourses() {
+  const { editCourseFields, setEditCourseFields } = useAdmin();
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
+
+  const navigate = useNavigate();
+  const params = useParams();
+  const courseId = params.courseId;
+
   const [coverImageFile, setCoverImageFile] = useState();
   const [videoFile, setVideoFile] = useState();
   const [files, setFiles] = useState([]);
-  const toast = useToast();
-  const { contextAdminState } = useAuth();
-  const adminId = contextAdminState.user.admin_id;
   const [isDeleting, setIsDeleting] = useState(false);
-  const params = useParams();
-  const courseId = params.courseId;
-  const { addLesson, setAddLesson, editCourseFields, setEditCourseFields } =
-    useAdmin();
-  const navigate = useNavigate();
+  const [lessons, setLessons] = useState([]);
+
   const {
     isOpen: isConfirmModalOpen,
     onOpen: onConfirmModalOpen,
     onClose: onConfirmModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isSuccessModalOpen,
+    onOpen: onSuccessModalOpen,
+    onClose: onSuccessModalClose,
+  } = useDisclosure();
+  const toast = useToast();
 
   const getCourseData = async () => {
     const result = await axios.get(
@@ -65,14 +75,11 @@ function AdminEditCourses() {
     );
 
     // setFilesObj(results); // this is an array of all file objects
-    // console.log(results);
     setCoverImageFile(results[0]);
     setVideoFile(results[1]);
     setFiles(results.slice(2));
-    setAddLesson(result.data.lessonsAndSubCount);
+    setLessons(result.data.lessonsAndSubCount);
   };
-  console.log(addLesson);
-  console.log(changeLessonSeq);
 
   // Convert media urls into file objects:
   const convertToFileObj = async (filesMetaData, allMediaUrls) => {
@@ -81,7 +88,6 @@ function AdminEditCourses() {
 
     for (let i = 0; i < allMediaUrls.length; i++) {
       filesMetaDataFromCloudinary.push(JSON.parse(allMediaUrls[i]));
-      console.log(filesMetaDataFromCloudinary[i]);
       await fetch(filesMetaDataFromCloudinary[i].url).then(async (response) => {
         const blob = await response.blob();
         const file = new File([blob], filesMetaData[i].file_name, {
@@ -99,7 +105,6 @@ function AdminEditCourses() {
   }, []);
 
   const handleSubmit = async (values) => {
-    console.log(action);
     const formData = new FormData();
     formData.append("course_name", values.course_name);
     formData.append("price", values.price);
@@ -109,10 +114,10 @@ function AdminEditCourses() {
     formData.append("category", values.category);
     // if the user changes lessons' sequence:
     if (changeLessonSeq) {
-      for (let lesson of addLesson) {
-        lesson.sequence = addLesson.indexOf(lesson) + 1;
+      for (let lesson of lessons) {
+        lesson.sequence = lessons.indexOf(lesson) + 1;
       }
-      addLesson.forEach((lesson) => {
+      lessons.forEach((lesson) => {
         formData.append("lesson_id", lesson.lesson_id);
         formData.append("sequence", lesson.sequence);
       });
@@ -125,9 +130,6 @@ function AdminEditCourses() {
         formData.append("course_attached_files", file);
       });
     }
-    for (let i of formData) {
-      console.log(i);
-    }
     const result = await axios.put(
       `http://localhost:4000/admin/edit-course/${courseId}?adminId=${adminId}`,
       formData,
@@ -135,18 +137,21 @@ function AdminEditCourses() {
         headers: { "Content-Type": "multipart/form-data" },
       }
     );
+    if (/success/i.test(result.data.message)) {
+      onSuccessModalOpen();
+    }
   };
 
   const handleVideoChange = (currentFile, setFieldValue) => {
     action = "change";
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
-        if (currentFile.size <= 1.2e9) {
+        if (currentFile.size < 1e8) {
           setFieldValue("video_trailer", currentFile);
           setVideoFile(currentFile);
         } else {
           return toast({
-            title: "Video size must be less than 1.2GB!",
+            title: "Video size must be less than 100MB!",
             status: "error",
             isClosable: true,
           });
@@ -190,9 +195,9 @@ function AdminEditCourses() {
     const result = await axios.delete(
       `http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`
     );
-    console.log(result.data.message);
     if (/deleted/i.test(result.data.message)) {
       onConfirmModalClose();
+      navigate("/admin");
     }
     setIsDeleting(false);
   };
@@ -888,7 +893,6 @@ function AdminEditCourses() {
                                                   ...field.value,
                                                 ];
                                                 newFieldValue.splice(key, 1);
-                                                console.log(newFieldValue);
                                                 setFiles(newFieldValue);
                                                 form.setFieldValue(
                                                   "files",
@@ -987,18 +991,11 @@ function AdminEditCourses() {
                       </Flex>
                     </Flex>
                     {/* Lessons Table */}
-                    <LessonTable />
+                    <LessonTable lessons={lessons} setLessons={setLessons} />
                     <Flex w="100%" mb="87px" justifyContent="flex-end">
-                      <Button
-                        variant="ghost"
-                        mr="40px"
-                        onClick={() => {
-                          // courseId = course.course_id;
-                          onConfirmModalOpen();
-                        }}
-                      >
-                        Delete this course
-                      </Button>
+                      <Link onClick={() => onConfirmModalOpen()}>
+                        Delete Assignment
+                      </Link>
                     </Flex>
                   </Box>
                 </Flex>
@@ -1009,7 +1006,6 @@ function AdminEditCourses() {
                 onClose={onConfirmModalClose}
                 closeOnOverlayClick={false}
                 preserveScrollBarGap
-                onCloseComplete={() => navigate("/admin")}
               >
                 <ModalOverlay />
                 <ModalContent borderRadius="24px">
@@ -1039,6 +1035,34 @@ function AdminEditCourses() {
                         Yes, I want to delete
                       </Button>
                     </Flex>
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
+              <Modal
+                isCentered
+                isOpen={isSuccessModalOpen}
+                onClose={onSuccessModalClose}
+                preserveScrollBarGap
+              >
+                <ModalOverlay />
+                <ModalContent borderRadius="24px">
+                  <ModalHeader
+                    bg="blue.500"
+                    color="white"
+                    textAlign="center"
+                    borderRadius="24px 24px 0px 0px"
+                    fontSize="1.5rem"
+                  >
+                    <CheckCircleIcon mr="0.5em" />
+                    Success
+                  </ModalHeader>
+                  <ModalBody
+                    textAlign="center"
+                    my="2em"
+                    color="black"
+                    fontSize="1rem"
+                  >
+                    Course has been successfully edited.
                   </ModalBody>
                 </ModalContent>
               </Modal>
