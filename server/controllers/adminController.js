@@ -132,17 +132,17 @@ export const addCourse = async (req, res) => {
 export const getCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
-  const adminId = req.query.adminId;
+    const adminId = req.query.adminId;
 
-  const courseData = await pool.query(
-    `
+    const courseData = await pool.query(
+      `
   SELECT * from courses
   WHERE course_id = $1 AND admin_id = $2`,
-    [courseId, adminId]
-  );
+      [courseId, adminId]
+    );
 
-  const lessonsAndSubCount = await pool.query(
-    `
+    const lessonsAndSubCount = await pool.query(
+      `
     SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
     FROM courses
     INNER JOIN lessons
@@ -153,50 +153,48 @@ export const getCourse = async (req, res) => {
     GROUP BY lessons.lesson_id
     ORDER BY lessons.sequence asc
     `,
-    [courseId]
-  );
+      [courseId]
+    );
 
-  const courseAttachedFiles = await pool.query(
-    `
+    const courseAttachedFiles = await pool.query(
+      `
   SELECT * from files where course_id = $1
   `,
-    [courseId]
-  );
+      [courseId]
+    );
 
-  let arrOfFilesDirectory = [];
-  for (let file of courseAttachedFiles.rows) {
-    arrOfFilesDirectory.push(file.directory);
-  }
-
-  const filesMetaData = courseAttachedFiles.rows;
-  filesMetaData.unshift(
-    {
-      file_name: "cover image",
-      cover_image_directory: courseData.rows[0].cover_image_directory,
-    },
-    {
-      file_name: "video trailer",
-      video_directory: courseData.rows[0].video_trailer_directory,
+    let arrOfFilesDirectory = [];
+    for (let file of courseAttachedFiles.rows) {
+      arrOfFilesDirectory.push(file.directory);
     }
-  );
-  // console.log(filesMetaData);
 
-  return res.json({
-    data: courseData.rows[0],
-    lessonsAndSubCount: lessonsAndSubCount.rows,
-    filesMetaData: filesMetaData,
-    allMediaUrls: [
-      courseData.rows[0].cover_image_directory,
-      courseData.rows[0].video_trailer_directory,
-      // courseData.rows[0].video_directory, // sub-lesson video directory
-      ...arrOfFilesDirectory,
-    ], // create a file object out of these media urls.
-  });
- 
+    const filesMetaData = courseAttachedFiles.rows;
+    filesMetaData.unshift(
+      {
+        file_name: "cover image",
+        cover_image_directory: courseData.rows[0].cover_image_directory,
+      },
+      {
+        file_name: "video trailer",
+        video_directory: courseData.rows[0].video_trailer_directory,
+      }
+    );
+    // console.log(filesMetaData);
+
+    return res.json({
+      data: courseData.rows[0],
+      lessonsAndSubCount: lessonsAndSubCount.rows,
+      filesMetaData: filesMetaData,
+      allMediaUrls: [
+        courseData.rows[0].cover_image_directory,
+        courseData.rows[0].video_trailer_directory,
+        // courseData.rows[0].video_directory, // sub-lesson video directory
+        ...arrOfFilesDirectory,
+      ], // create a file object out of these media urls.
+    });
   } catch (error) {
     return res.sendStatus(500);
   }
-  
 };
 
 // PUT course
@@ -665,12 +663,43 @@ export const postNewAssignment = async (req, res) => {
     );
 
     /* Insert new assignment into "assignments" table */
-    await pool.query(
+    let assignmentId = await pool.query(
       `
       INSERT INTO assignments(sub_lesson_id, detail, created_date, updated_date)
       VALUES ($1, $2, $3, $4)
+      RETURNING assignment_id
       `,
       [sub_lesson_id, detail, new Date(), new Date()]
+    );
+    assignmentId = assignmentId.rows[0].assignment_id;
+
+    /* Checking whether there is any user that already accepted assignment(s) in this sub-lesson
+    If so, insert this new assignment into users_assignments */
+    let acceptedDateOfUsers = await pool.query(
+      `
+      SELECT users_assignments.user_id, users_assignments.accepted_date 
+      FROM users_assignments
+      INNER JOIN assignments
+      ON users_assignments.assignment_id = assignments.assignment_id
+      WHERE assignments.sub_lesson_id = $1
+      GROUP BY users_assignments.user_id, users_assignments.accepted_date
+      `,
+      [sub_lesson_id]
+    );
+    acceptedDateOfUsers = acceptedDateOfUsers.rows;
+    const arrayOfUserId = [];
+    const arrayOfAcceptedDate = [];
+    for (let acceptedDateOfEachUser of acceptedDateOfUsers) {
+      arrayOfUserId.push(acceptedDateOfEachUser.user_id);
+      arrayOfAcceptedDate.push(acceptedDateOfEachUser.accepted_date);
+    }
+
+    await pool.query(
+      `
+      INSERT INTO users_assignments (user_id, assignment_id, accepted_date, updated_date, status)
+      VALUES (UNNEST($1::int[]), $2, UNNEST($3::timestamp with time zone[]), UNNEST($3::timestamp with time zone[]), $4)
+      `,
+      [arrayOfUserId, assignmentId, arrayOfAcceptedDate, "pending"]
     );
 
     return res.json({ message: "Assignment has been successfully added" });
@@ -763,7 +792,7 @@ export const getAssignmentById = async (req, res) => {
   if (!doesAdminOwnThisCourse) {
     return res
       .status(403)
-      .json({ message: "You have no permission to delete this assignment" });
+      .json({ message: "You have no permission to see this assignment" });
   }
 
   let data = await pool.query(
@@ -876,6 +905,39 @@ export const deleteAssignment = async (req, res) => {
         .json({ message: "You have no permission to delete this assignment" });
     }
 
+    /* Checking whether this assignment is the last assignment of a sub-lesson or not
+    If so, restart a duration of sub-lesson to be 0 */
+    let assignmentCount = await pool.query(
+      `
+      WITH get_sub_lesson_id AS (
+        SELECT sub_lesson_id
+        FROM assignments
+        WHERE assignment_id = $1
+      ) 
+      SELECT COUNT(assignment_id)
+      FROM assignments
+      WHERE sub_lesson_id in (SELECT sub_lesson_id FROM get_sub_lesson_id)
+      `,
+      [assignment_id]
+    );
+    assignmentCount = assignmentCount.rows[0].count;
+
+    if (Number(assignmentCount) === 1) {
+      await pool.query(
+        `
+        WITH get_sub_lesson_id AS (
+          SELECT sub_lesson_id
+          FROM assignments
+          WHERE assignment_id = $1
+        ) 
+        UPDATE sub_lessons
+        SET duration = 0
+        WHERE sub_lesson_id in (SELECT sub_lesson_id FROM get_sub_lesson_id)
+        `,
+        [assignment_id]
+      );
+    }
+
     /* Delete an assignment from "assignments" table */
     await pool.query(
       `
@@ -935,6 +997,66 @@ export const getCourseLesson = async (req, res) => {
   data = data.rows;
 
   return res.json({ data });
+};
+
+export const postNewLesson = async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+    const lessonName = req.body.lesson_name;
+    const arrayOfSubLessonName = req.body.sub_lesson_names;
+    const arrayOfSubLessonVideo = req.files.sub_lesson_videos;
+    const arrayOfSubLessonVideoDir = [];
+    const arrayOfSubLessonSequence = [];
+
+    // Upload files to cloudinary
+    for (let video of arrayOfSubLessonVideo) {
+      const metaData = await cloudinaryUpload(video, "upload", "video");
+      arrayOfSubLessonVideoDir.push(metaData);
+    }
+
+    // Get a sequence of sub-lessons
+    for (let i = 0; i < arrayOfSubLessonName.length; i++) {
+      arrayOfSubLessonSequence.push(i);
+    }
+
+    // Query the lesson last sequence number first so that we could append it
+    let lessonId = await pool.query(
+      `
+      WITH get_last_sequence AS (
+        SELECT sequence
+        FROM lessons
+        WHERE course_id = $1
+        ORDER BY sequence DESC
+        LIMIT 1
+      ) 
+      INSERT INTO lessons (course_id, lesson_name, sequence)
+      SELECT $1, $2, sequence + 1
+      FROM get_last_sequence
+      RETURNING lesson_id
+      `,
+      [courseId, lessonName]
+    );
+    lessonId = lessonId.rows[0].lesson_id;
+
+    await pool.query(
+      `
+      INSERT INTO sub_lessons (lesson_id, sub_lesson_name, video_directory, sequence, duration)
+      VALUES ($1, UNNEST($2::text[]), UNNEST($3::text[]), UNNEST($4::int[]), 0)
+      `,
+      [
+        lessonId,
+        arrayOfSubLessonName,
+        arrayOfSubLessonVideoDir,
+        arrayOfSubLessonSequence,
+      ]
+    );
+
+    return res.json({
+      message: "Lesson has been successfully created",
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
 
 export const editLesson = async (req, res) => {

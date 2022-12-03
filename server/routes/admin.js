@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import * as admin_controller from "../controllers/adminController.js";
 import { protect } from "../middlewares/protect.js";
+import { checkAdminPermission } from "../middlewares/checkAdminPermission.js";
 
 const adminRouter = Router();
 const multerUpload = multer({ dest: "uploads/" });
@@ -33,6 +34,13 @@ adminRouter.get(
   protect,
   admin_controller.getCourseLesson
 );
+adminRouter.post(
+  "/courses/:courseId/lesson",
+  protect,
+  checkAdminPermission,
+  courseUpload,
+  admin_controller.postNewLesson
+);
 adminRouter.put(
   "/edit-course/:courseId/edit-lesson/:lessonId",
   protect,
@@ -44,12 +52,23 @@ adminRouter.delete(
   admin_controller.deleteLesson
 );
 adminRouter.get("/courses", protect, admin_controller.getAdminCourses);
+adminRouter.put(
+  "/edit-course/:courseId",
+  courseUpload,
+  admin_controller.updateCourse
+);
 adminRouter.delete(
-  "/courses/:courseId",
-  protect,
+  "/delete-course/:courseId",
+  courseUpload,
   admin_controller.deleteCourse
 );
+adminRouter.delete(
+  "/delete-lesson/:lessonId",
+  courseUpload,
+  admin_controller.deleteLesson
+);
 
+/* assignments CRUD */
 adminRouter.get("/assignments", protect, admin_controller.getAllCoursesData);
 adminRouter.post("/assignments", protect, admin_controller.postNewAssignment);
 adminRouter.get(
@@ -72,17 +91,5 @@ adminRouter.delete(
   protect,
   admin_controller.deleteAssignment
 );
-
-adminRouter.put(
-  "/edit-course/:courseId",
-  courseUpload,
-  admin_controller.updateCourse
-);
-adminRouter.delete(
-  "/delete-course/:courseId",
-  courseUpload,
-  admin_controller.deleteCourse
-);
-adminRouter.delete("/delete-lesson/:lessonId", courseUpload, admin_controller.deleteLesson);
 
 export default adminRouter;
