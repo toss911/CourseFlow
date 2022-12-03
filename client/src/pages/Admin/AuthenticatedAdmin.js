@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import AdminViewCourses from "./AdminViewCoursesPage";
-import AdminAddAssignment from "./AdminAddAssignment";
-import AdminEditAssignment from "./AdminEditAssignment";
+import AdminAddAssignment from "./AdminAddAssignmentPage";
+import AdminEditAssignment from "./AdminEditAssignmentPage";
 import AdminAddCoursesPage from "./AdminAddCoursesPage";
 import AdminError from "./AdminErrorPage";
 import AdminAssignmentList from "./AdminAssignmentListPage";
