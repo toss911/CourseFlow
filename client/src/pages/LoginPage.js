@@ -16,7 +16,7 @@ import { useAuth } from "../contexts/authentication.js";
 import { Field, Form, Formik } from "formik";
 
 function LoginPage() {
-  const { login, contextState } = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (values, props) => {
     const result = await login(values);
