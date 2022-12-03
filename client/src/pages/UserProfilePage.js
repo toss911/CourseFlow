@@ -51,26 +51,24 @@ function UserProfile() {
 
   const handleFileChange = (event) => {
     const currentFile = event.target.files[0];
-    if (currentFile) {
-      if (/jpeg|png/gi.test(currentFile.type)) {
-        if (currentFile.size <= 2e6) {
-          action = "change";
-          setAvatarFile(currentFile);
-          setAvatar(URL.createObjectURL(currentFile));
-        } else {
-          return toast({
-            title: "File size must be less than 2MB!",
-            status: "error",
-            isClosable: true,
-          });
-        }
+    if (/jpeg|png/gi.test(currentFile.type)) {
+      if (currentFile.size < 2e6) {
+        action = "change";
+        setAvatarFile(currentFile);
+        setAvatar(URL.createObjectURL(currentFile));
       } else {
         return toast({
-          title: "File type must be JPG/PNG only!",
+          title: "File size must be less than 2MB!",
           status: "error",
           isClosable: true,
         });
       }
+    } else {
+      return toast({
+        title: "File type must be JPG/PNG only!",
+        status: "error",
+        isClosable: true,
+      });
     }
   };
 

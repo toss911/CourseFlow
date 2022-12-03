@@ -115,47 +115,71 @@ const AdminAddCourses = () => {
   };
 
   const handleVideoChange = (currentFile, setFieldValue) => {
-    if (currentFile) {
-      if (/video/gi.test(currentFile.type)) {
-        if (currentFile.size <= 1.2e9) {
-          setFieldValue("video_trailer", currentFile);
-        } else {
-          return toast({
-            title: "Video size must be less than 1.2GB!",
-            status: "error",
-            isClosable: true,
-          });
-        }
+    if (/video/gi.test(currentFile.type)) {
+      if (currentFile.size < 1e8) {
+        setFieldValue("video_trailer", currentFile);
       } else {
         return toast({
-          title: "File type must be video only!",
+          title: "Video size must be less than 100MB!",
           status: "error",
           isClosable: true,
         });
       }
+    } else {
+      return toast({
+        title: "File type must be video only!",
+        status: "error",
+        isClosable: true,
+      });
     }
   };
 
   const handleCoverImageChange = (currentFile, setFieldValue) => {
-    if (currentFile) {
-      if (/jpeg|png/gi.test(currentFile.type)) {
-        if (currentFile.size <= 2e6) {
-          setFieldValue("cover_image", currentFile);
+    if (/jpeg|png/gi.test(currentFile.type)) {
+      if (currentFile.size < 2e6) {
+        setFieldValue("cover_image", currentFile);
+      } else {
+        return toast({
+          title: "File size must be less than 2MB!",
+          status: "error",
+          isClosable: true,
+        });
+      }
+    } else {
+      return toast({
+        title: "File type must be JPG/PNG only!",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleFilesChange = (newFiles, setFieldValue, currentFiles) => {
+    const validFiles = [...currentFiles];
+    for (let newFile of newFiles) {
+      if (/video/gi.test(newFile.type)) {
+        if (newFile.size < 1e8) {
+          validFiles.push(newFile);
         } else {
           return toast({
-            title: "File size must be less than 2MB!",
+            title: "Video size must be less than 100MB!",
             status: "error",
             isClosable: true,
           });
         }
       } else {
-        return toast({
-          title: "File type must be JPG/PNG only!",
-          status: "error",
-          isClosable: true,
-        });
+        if (newFile.size < 1e7) {
+          validFiles.push(newFile);
+        } else {
+          return toast({
+            title: "File size must be less than 10MB!",
+            status: "error",
+            isClosable: true,
+          });
+        }
       }
     }
+    setFieldValue("files", validFiles);
   };
 
   // *- input validation -* //
@@ -853,15 +877,12 @@ const AdminAddCourses = () => {
                                         display="none"
                                         multiple
                                         onChange={(event) => {
-                                          const newFieldValue = [
-                                            ...field.value,
-                                            ...Object.values(
+                                          handleFilesChange(
+                                            Object.values(
                                               event.currentTarget.files
                                             ),
-                                          ];
-                                          form.setFieldValue(
-                                            "files",
-                                            newFieldValue
+                                            form.setFieldValue,
+                                            field.value
                                           );
                                         }}
                                       />
@@ -891,9 +912,12 @@ const AdminAddCourses = () => {
                                       display="none"
                                       multiple
                                       onChange={(event) => {
-                                        form.setFieldValue(
-                                          "files",
-                                          Object.values(event.target.files)
+                                        handleFilesChange(
+                                          Object.values(
+                                            event.currentTarget.files
+                                          ),
+                                          form.setFieldValue,
+                                          field.value
                                         );
                                       }}
                                     />

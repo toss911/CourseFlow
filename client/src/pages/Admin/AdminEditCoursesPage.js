@@ -190,6 +190,34 @@ function AdminEditCourses() {
     }
   };
 
+  const handleFilesChange = (newFiles, setFieldValue, currentFiles) => {
+    const validFiles = [...currentFiles];
+    for (let newFile of newFiles) {
+      if (/video/gi.test(newFile.type)) {
+        if (newFile.size < 1e8) {
+          validFiles.push(newFile);
+        } else {
+          return toast({
+            title: "Video size must be less than 100MB!",
+            status: "error",
+            isClosable: true,
+          });
+        }
+      } else {
+        if (newFile.size < 1e7) {
+          validFiles.push(newFile);
+        } else {
+          return toast({
+            title: "File size must be less than 10MB!",
+            status: "error",
+            isClosable: true,
+          });
+        }
+      }
+    }
+    setFieldValue("files", validFiles);
+  };
+
   const handleDeleteCourse = async () => {
     setIsDeleting(true);
     const result = await axios.delete(

@@ -46,7 +46,15 @@ function AdminAddLesson() {
   const handleVideoChange = (currentFile, index, setFieldValue) => {
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
-        setFieldValue(`sub_lessons.${index}.video`, currentFile);
+        if (currentFile.size < 1e8) {
+          setFieldValue(`sub_lessons.${index}.video`, currentFile);
+        } else {
+          return toast({
+            title: "Video size must be less than 100MB!",
+            status: "error",
+            isClosable: true,
+          });
+        }
       } else {
         return toast({
           title: "File type must be video only!",

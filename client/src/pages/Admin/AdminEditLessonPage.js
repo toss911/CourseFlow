@@ -138,14 +138,21 @@ function AdminEditLesson() {
   const handleVideoChange = (currentFile, index, setFieldValue) => {
     if (currentFile) {
       if (/video/gi.test(currentFile.type)) {
-        const dataVideo = [...fileVideo];
-        dataVideo[index] = currentFile;
-        setFileVideo([...dataVideo]);
-
-        setFieldValue(
-          `sub_lessons.${index}.video`,
-          URL.createObjectURL(currentFile)
-        );
+        if (currentFile.size < 1e8) {
+          const dataVideo = [...fileVideo];
+          dataVideo[index] = currentFile;
+          setFileVideo([...dataVideo]);
+          setFieldValue(
+            `sub_lessons.${index}.video`,
+            URL.createObjectURL(currentFile)
+          );
+        } else {
+          return toast({
+            title: "Video size must be less than 100MB!",
+            status: "error",
+            isClosable: true,
+          });
+        }
       } else {
         return toast({
           title: "File type must be video only!",
