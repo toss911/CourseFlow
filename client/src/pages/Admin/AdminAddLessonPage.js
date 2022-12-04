@@ -29,16 +29,6 @@ function AdminAddLesson() {
   const { courseId } = useParams();
   const [videoKey, setVideoKey] = useState(0); // this state is for forcing video elements to be re-render after dragged and dropped
 
-  useEffect(() => {
-    /* Prompt a pop-up message to warn the users if they are trying to refresh to web page */
-    const unloadCallback = (event) => {
-      event.preventDefault();
-      return (event.returnValue = "Changes you made may not be saved.");
-    };
-    window.addEventListener("beforeunload", unloadCallback);
-    return () => window.removeEventListener("beforeunload", unloadCallback);
-  }, []);
-
   const forceUpdateVideo = () => {
     setVideoKey(videoKey + 1);
   };
@@ -74,13 +64,14 @@ function AdminAddLesson() {
         formData.append("sub_lesson_videos", sub_lesson.video);
       }
       const result = await axios.post(
-        `http://localhost:4000/admin/courses/${courseId}/lesson?byAdmin=${adminId}`,
+        `http://localhost:4000/admin/courses/${courseId}/lessons?byAdmin=${adminId}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
       if (/success/i.test(result.data.message)) {
+        setAddLesson(result.data.data);
         navigate(`/admin/edit-course/${courseId}`);
       } else {
         alert(`ERROR: Please try again later`);

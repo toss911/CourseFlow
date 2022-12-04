@@ -8,20 +8,13 @@ const adminRouter = Router();
 const multerUpload = multer({ dest: "uploads/" });
 
 const courseUpload = multerUpload.fields([
-  { name: "course_cover_images", maxCount: 1 },
-  { name: "course_video_trailers", maxCount: 1 },
-  { name: "course_attached_files", maxCount: 20 },
-  { name: "sub_lesson_videos", maxCount: 200 },
-]);
-
-const newCourseUpload = multerUpload.fields([
   { name: "cover_image", maxCount: 1 },
   { name: "video_trailer", maxCount: 1 },
   { name: "files", maxCount: 20 },
   { name: "sub_lesson_videos", maxCount: 200 },
 ]);
 
-adminRouter.post("/add-course", newCourseUpload, admin_controller.addCourse);
+adminRouter.post("/add-course", courseUpload, admin_controller.addCourse);
 adminRouter.get("/get-course/:courseId", admin_controller.getCourse);
 adminRouter.get(
   "/edit-course/:courseId/edit-lesson",
@@ -29,28 +22,27 @@ adminRouter.get(
   admin_controller.getAllCoursesData
 );
 
-adminRouter.get(
-  "/edit-course/:courseId/edit-lesson/:lessonId",
-  protect,
-  admin_controller.getCourseLesson
-);
 adminRouter.post(
-  "/courses/:courseId/lesson",
+  "/courses/:courseId/lessons",
   protect,
   checkAdminPermission,
   courseUpload,
-  admin_controller.postNewLesson
+  admin_controller.addLesson
+);
+adminRouter.get(
+  "/courses/:courseId/lessons/:lessonId",
+  protect,
+  checkAdminPermission,
+  admin_controller.getLesson
 );
 adminRouter.put(
-  "/edit-course/:courseId/edit-lesson/:lessonId",
+  "/courses/:courseId/lessons/:lessonId",
   protect,
+  checkAdminPermission,
+  courseUpload,
   admin_controller.editLesson
 );
-adminRouter.delete(
-  "/edit-course/:courseId/edit-lesson/:lessonId",
-  protect,
-  admin_controller.deleteLesson
-);
+
 adminRouter.get("/courses", protect, admin_controller.getAdminCourses);
 adminRouter.put(
   "/edit-course/:courseId",

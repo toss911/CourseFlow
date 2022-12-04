@@ -4,6 +4,7 @@ import LoginPage from "./LoginPage.js";
 import RegisterPage from "./RegisterPage.js";
 import OurCourses from "./OurCoursesPage.js";
 import CourseDetail from "./CourseDetailPage.js";
+import ErrorPage from "./ErrorPage.js";
 
 function UnauthenticatedApp() {
   return (
@@ -13,6 +14,7 @@ function UnauthenticatedApp() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/courses" element={<OurCourses />} />
       <Route path="/courses/:courseId" element={<CourseDetail />} />
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
+import AppAdmin from "./AppAdmin.js";
 import reportWebVitals from "./reportWebVitals";
 import { ChakraProvider } from "@chakra-ui/react";
 import { AuthProvider } from "./contexts/authentication.js";
@@ -9,7 +10,6 @@ import { AdminProvider } from "./contexts/admin.js";
 import theme from "./configs/theme.js";
 import jwtInterceptor from "./utils/jwtInterceptors.js";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AppAdmin from "./AppAdmin.js";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 jwtInterceptor();

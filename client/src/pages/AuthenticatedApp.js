@@ -8,6 +8,7 @@ import MyCourses from "./MyCoursesPage.js";
 import LearningPage from "./LearningPage.js";
 import DesireCourse from "./DesireCoursePage.js";
 import LearningHome from "./LearningHomePage.js";
+import ErrorPage from "./ErrorPage.js";
 
 function AuthenticatedApp() {
   return (
@@ -24,6 +25,7 @@ function AuthenticatedApp() {
         path="/courses/:courseId/learning/:subLessonId"
         element={<LearningPage />}
       />
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 }

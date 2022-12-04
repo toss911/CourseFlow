@@ -76,7 +76,6 @@ function AdminViewCourses() {
     const result = await axios.delete(
       `http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`
     );
-    console.log("result: ", result.data.message);
     setIsDeleting(false);
     if (/deleted/i.test(result.data.message)) {
       onConfirmModalClose();

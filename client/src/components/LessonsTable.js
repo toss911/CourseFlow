@@ -24,26 +24,28 @@ import {
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useAdmin } from "../contexts/admin.js";
+import { useAuth } from "../contexts/authentication.js";
 import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 import axios from "axios";
 let lessonDeleteId;
-export let changeLessonSeq = false;
+let lessonDeleteIndex;
 
-const LessonTable = ({
-  currentCourseData,
-  innerRef,
-  lessons,
-  setLessons,
-  adminId,
-}) => {
-  const { addLesson, setAddLesson, setAddCourseFields } = useAdmin();
+const LessonTable = ({ currentCourseData, innerRef }) => {
+  const { addLesson, setAddLesson, setAddCourseFields, setEditCourseFields } =
+    useAdmin();
+  const { contextAdminState } = useAuth();
+  const adminId = contextAdminState.user.admin_id;
+
   const navigate = useNavigate();
   const { courseId } = useParams();
+
   const {
     isOpen: isConfirmModalOpen,
     onOpen: onConfirmModalOpen,
     onClose: onConfirmModalClose,
   } = useDisclosure();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -63,23 +65,26 @@ const LessonTable = ({
       return;
     }
     const items = reorder(
-      courseId ? lessons : addLesson,
+      addLesson,
       result.source.index,
       result.destination.index
     );
 
-    if (courseId) {
-      setLessons(items);
-      changeLessonSeq = true;
-    } else {
-      setAddLesson(items);
-    }
+    setAddLesson(items);
   };
 
   const handleDeleteLesson = async (lessonId, courseId, adminId) => {
+    setIsDeleting(true);
     const result = await axios.delete(
       `http://localhost:4000/admin/delete-lesson/${lessonId}?courseId=${courseId}&byAdmin=${adminId}`
     );
+    if (/success/.test(result.data.message)) {
+      setIsDeleting(false);
+      const newLessonsList = [...addLesson];
+      newLessonsList.splice(lessonDeleteIndex, 1);
+      setAddLesson(newLessonsList);
+    }
+    onConfirmModalClose();
   };
 
   return (
@@ -93,7 +98,11 @@ const LessonTable = ({
           ref={innerRef}
           variant="primary"
           onClick={() => {
-            setAddCourseFields(currentCourseData);
+            if (courseId) {
+              setEditCourseFields(currentCourseData);
+            } else {
+              setAddCourseFields(currentCourseData); // Preserved add course field values even page was navigated to another route
+            }
             navigate("./add-lesson");
           }}
         >
@@ -118,7 +127,7 @@ const LessonTable = ({
                   </Thead>
 
                   <Tbody>
-                    {(courseId ? lessons : addLesson).map((row, index) => {
+                    {addLesson.map((row, index) => {
                       return (
                         <Draggable
                           key={index}
@@ -155,24 +164,35 @@ const LessonTable = ({
                               </Td>
                               <Td w="10%">
                                 <Flex gap="20%">
-                                  <Image
-                                    src="../../../assets/admin-page/bin.svg"
-                                    alt="bin"
-                                    w="24px"
-                                    h="24px"
-                                    cursor="pointer"
-                                    _hover={{ opacity: 0.5 }}
-                                    onClick={() => {
-                                      if (courseId) {
-                                        // Delete lesson from edit course page
-                                        lessonDeleteId = row.lesson_id;
-                                      } else {
-                                        // Delete lesson from add course page
-                                        lessonDeleteId = index;
-                                      }
-                                      onConfirmModalOpen();
-                                    }}
-                                  />
+                                  {index === 0 ? (
+                                    <Image
+                                      src="../../../assets/admin-page/bin-disabled.svg"
+                                      alt="bin"
+                                      w="24px"
+                                      h="24px"
+                                      cursor="not-allowed"
+                                    />
+                                  ) : (
+                                    <Image
+                                      src="../../../assets/admin-page/bin.svg"
+                                      alt="bin"
+                                      w="24px"
+                                      h="24px"
+                                      cursor="pointer"
+                                      _hover={{ opacity: 0.5 }}
+                                      onClick={() => {
+                                        if (courseId) {
+                                          // Delete lesson from edit course page
+                                          lessonDeleteId = row.lesson_id;
+                                          lessonDeleteIndex = index;
+                                        } else {
+                                          // Delete lesson from add course page
+                                          lessonDeleteIndex = index;
+                                        }
+                                        onConfirmModalOpen();
+                                      }}
+                                    />
+                                  )}
                                   <Image
                                     src="../../../assets/admin-page/edit.svg"
                                     alt="edit"
@@ -183,9 +203,13 @@ const LessonTable = ({
                                     onClick={() => {
                                       if (courseId) {
                                         // Edit lesson from edit course page
-                                        // navigate("/admin");
+                                        setEditCourseFields(currentCourseData);
+                                        navigate(
+                                          `./edit-lesson/${row.lesson_id}`
+                                        );
                                       } else {
                                         // Edit lesson from add course page
+                                        setAddCourseFields(currentCourseData); // Preserved add course field values even page was navigated to another route
                                         navigate(`./edit-lesson/${index + 1}`);
                                       }
                                     }}
@@ -231,17 +255,17 @@ const LessonTable = ({
               </Button>
               <Button
                 ml="16px"
-                // isLoading={isDeleting}
+                isLoading={isDeleting}
                 variant="primary"
                 onClick={() => {
                   if (courseId) {
                     handleDeleteLesson(lessonDeleteId, courseId, adminId);
                   } else {
                     const newLessonsList = [...addLesson];
-                    newLessonsList.splice(lessonDeleteId, 1);
+                    newLessonsList.splice(lessonDeleteIndex, 1);
                     setAddLesson(newLessonsList);
+                    onConfirmModalClose();
                   }
-                  onConfirmModalClose();
                 }}
               >
                 Yes, I want to delete

@@ -1,12 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import LoginAdminPage from "./LoginAdminPage";
-import AdminError from "./AdminErrorPage";
+import ErrorPage from "../ErrorPage.js";
 
 function UnauthenticatedAdmin() {
   return (
     <Routes>
       <Route path="/" element={<LoginAdminPage />} />
-      <Route path="*" element={<AdminError />} />
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 }

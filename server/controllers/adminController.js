@@ -1,8 +1,6 @@
 import { pool } from "../utils/db.js";
 import { cloudinaryUpload } from "../utils/upload.js";
 
-// POST course
-
 export const addCourse = async (req, res) => {
   try {
     const adminId = req.query.byAdmin;
@@ -18,12 +16,12 @@ export const addCourse = async (req, res) => {
     newCourse.coverImageDir = await cloudinaryUpload(
       ...req.files.cover_image,
       "upload",
-      "image"
+      "course_cover_images"
     );
     newCourse.videoTrailerDir = await cloudinaryUpload(
       ...req.files.video_trailer,
       "upload",
-      "video"
+      "course_video_trailers"
     );
 
     // Insert course data into courses table
@@ -86,7 +84,11 @@ export const addCourse = async (req, res) => {
     }
 
     for (let file of req.files.sub_lesson_videos) {
-      const fileUploadMeta = await cloudinaryUpload(file, "upload", "video");
+      const fileUploadMeta = await cloudinaryUpload(
+        file,
+        "upload",
+        "course_sub_lesson_videos"
+      );
       subLessonVideoDir.push(fileUploadMeta);
     }
 
@@ -105,7 +107,11 @@ export const addCourse = async (req, res) => {
       const fileSize = [];
       const fileDir = [];
       for (let file of req.files.files) {
-        const fileUploadMeta = await cloudinaryUpload(file, "upload", "file");
+        const fileUploadMeta = await cloudinaryUpload(
+          file,
+          "upload",
+          "course_attached_files"
+        );
         fileName.push(file.originalname);
         fileType.push(file.mimetype);
         fileSize.push(file.size);
@@ -127,8 +133,6 @@ export const addCourse = async (req, res) => {
   }
 };
 
-// GET course
-
 export const getCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
@@ -136,30 +140,31 @@ export const getCourse = async (req, res) => {
 
     const courseData = await pool.query(
       `
-  SELECT * from courses
-  WHERE course_id = $1 AND admin_id = $2`,
+      SELECT *, detail AS course_detail, summary AS course_summary from courses
+      WHERE course_id = $1 AND admin_id = $2`,
       [courseId, adminId]
     );
 
     const lessonsAndSubCount = await pool.query(
       `
-    SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
-    FROM courses
-    INNER JOIN lessons
-    ON courses.course_id = lessons.course_id
-    INNER JOIN sub_lessons
-    ON lessons.lesson_id = sub_lessons.lesson_id
-    WHERE courses.course_id = $1
-    GROUP BY lessons.lesson_id
-    ORDER BY lessons.sequence asc
-    `,
+      SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
+      FROM courses
+      INNER JOIN lessons
+      ON courses.course_id = lessons.course_id
+      INNER JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      WHERE courses.course_id = $1
+      GROUP BY lessons.lesson_id
+      ORDER BY lessons.sequence asc
+      `,
       [courseId]
     );
 
     const courseAttachedFiles = await pool.query(
       `
-  SELECT * from files where course_id = $1
-  `,
+      SELECT * 
+      FROM files 
+      WHERE course_id = $1`,
       [courseId]
     );
 
@@ -179,7 +184,6 @@ export const getCourse = async (req, res) => {
         video_directory: courseData.rows[0].video_trailer_directory,
       }
     );
-    // console.log(filesMetaData);
 
     return res.json({
       data: courseData.rows[0],
@@ -188,202 +192,203 @@ export const getCourse = async (req, res) => {
       allMediaUrls: [
         courseData.rows[0].cover_image_directory,
         courseData.rows[0].video_trailer_directory,
-        // courseData.rows[0].video_directory, // sub-lesson video directory
         ...arrOfFilesDirectory,
-      ], // create a file object out of these media urls.
+      ],
     });
   } catch (error) {
     return res.sendStatus(500);
   }
 };
 
-// PUT course
-
 export const updateCourse = async (req, res) => {
-  try {
-    const courseId = req.params.courseId;
-    const adminId = req.query.adminId;
-    const mediaFiles = req.files;
-    console.log(mediaFiles);
-    console.log(req.body.lesson_id);
-    console.log(req.body.sequence);
+  // try {
+  const courseId = req.params.courseId;
+  const adminId = req.query.adminId;
+  const mediaFiles = req.files;
 
-    const updatedCourse = {
-      courseName: req.body.course_name,
-      price: req.body.price,
-      learningTime: req.body.learning_time,
-      courseSummary: req.body.course_summary,
-      detail: req.body.course_detail,
-      category: req.body.category,
-      courseAttachFiles: [],
-    };
+  const updatedCourse = {
+    courseName: req.body.course_name,
+    price: req.body.price,
+    learningTime: req.body.learning_time,
+    courseSummary: req.body.course_summary,
+    detail: req.body.course_detail,
+    category: req.body.category,
+    courseAttachFiles: [],
+  };
 
-    const updatedLesson = {
-      lessonId: req.body.lesson_id,
-      sequence: req.body.sequence,
-    };
+  const updatedLesson = {
+    lessonId: req.body.lesson_id,
+    sequence: req.body.sequence,
+  };
 
-    if (Object.keys(mediaFiles).length === 0) {
-      // if admin did not change any media
-      await pool.query(
-        `
-      with course_update as (
-        UPDATE courses
-         SET course_name = $1, summary = $2,
-        detail = $3, price = $4, learning_time = $5,
-        updated_date= $6, category = $7
-        WHERE course_id = $8 AND admin_id = $9
-        returning course_id
-      )
-      UPDATE lessons as l
-      SET sequence = l2.sequence
-      FROM (SELECT UNNEST($10::int[]) as lesson_id, UNNEST($11::int[]) as sequence) AS l2
-      WHERE l.lesson_id = l2.lesson_id
-      `,
-        [
-          updatedCourse.courseName,
-          updatedCourse.courseSummary,
-          updatedCourse.detail,
-          updatedCourse.price,
-          updatedCourse.learningTime,
-          new Date(),
-          updatedCourse.category,
-          courseId,
-          adminId,
-          updatedLesson.lessonId,
-          updatedLesson.sequence,
-        ]
-      );
-      return res.json({
-        message: "updated successfully",
-      });
-    } else {
-      const courseMediaFiles = await pool.query(
-        `
-    SELECT courses.cover_image_directory, courses.video_trailer_directory
-    FROM courses
-    WHERE courses.course_id = $1 AND admin_id = $2
-    `,
-        [courseId, adminId]
-      );
+  if (Object.keys(mediaFiles).length === 0) {
+    // if admin did not change any media
+    await pool.query(
+      `
+        WITH course_update as (
+          UPDATE courses
+          SET course_name = $1, summary = $2,
+          detail = $3, price = $4, learning_time = $5,
+          updated_date= $6, category = $7
+          WHERE course_id = $8 AND admin_id = $9
+          RETURNING course_id
+        )
+        UPDATE lessons AS l
+        SET sequence = l2.sequence
+        FROM (SELECT UNNEST($10::int[]) as lesson_id, UNNEST($11::int[]) AS sequence) AS l2
+        WHERE l.lesson_id = l2.lesson_id
+        `,
+      [
+        updatedCourse.courseName,
+        updatedCourse.courseSummary,
+        updatedCourse.detail,
+        updatedCourse.price,
+        updatedCourse.learningTime,
+        new Date(),
+        updatedCourse.category,
+        courseId,
+        adminId,
+        updatedLesson.lessonId,
+        updatedLesson.sequence,
+      ]
+    );
+    return res.json({
+      message: "updated successfully",
+    });
+  } else {
+    const courseMediaFiles = await pool.query(
+      `
+        SELECT courses.cover_image_directory, courses.video_trailer_directory
+        FROM courses
+        WHERE courses.course_id = $1 AND admin_id = $2
+        `,
+      [courseId, adminId]
+    );
 
-      let filesPublicIdForDelete = [];
+    let filesForDelete = [];
 
-      const courseAttachedFiles = await pool.query(
-        `
-      SELECT * from files where course_id = $1
-      `,
-        [courseId]
-      );
+    const courseAttachedFiles = await pool.query(
+      `
+        SELECT * from files where course_id = $1
+        `,
+      [courseId]
+    );
 
-      for (let file of courseAttachedFiles.rows) {
-        filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
-      }
-      // }
-
-      for (let publicId of Object.values(courseMediaFiles.rows[0])) {
-        // console.log(JSON.parse(publicId).public_id);
-        filesPublicIdForDelete.push(JSON.parse(publicId).public_id);
-      }
-
-      for (let filePublicId of filesPublicIdForDelete) {
-        await cloudinaryUpload(filePublicId, "delete");
-      }
-
-      await pool.query(
-        `
-    DELETE from files WHERE course_id = $1
-    `,
-        [courseId]
-      );
-
-      // upload everything to cloudinary again
-      updatedCourse.courseCoverImage = await cloudinaryUpload(
-        ...req.files.course_cover_images,
-        "upload",
-        "course_cover_images"
-      );
-
-      updatedCourse.courseVideoTrailer = await cloudinaryUpload(
-        ...req.files.course_video_trailers,
-        "upload",
-        "course_video_trailers"
-      );
-
-      // update the files' directory except for attached files
-      await pool.query(
-        `
-with course_update as (
-  UPDATE courses
-   SET course_name = $1, summary = $2,
-  detail = $3, price = $4, learning_time = $5,
-  cover_image_directory = $6, video_trailer_directory = $7,
-  updated_date= $8, category = $9
-  WHERE course_id = $10 AND admin_id = $11
-  returning course_id
-)
-UPDATE lessons as l
-SET sequence = l2.sequence
-FROM (SELECT UNNEST($12::int[]) as lesson_id, UNNEST($13::int[]) as sequence) AS l2
-WHERE l.lesson_id = l2.lesson_id
-
-`,
-        [
-          updatedCourse.courseName,
-          updatedCourse.courseSummary,
-          updatedCourse.detail,
-          updatedCourse.price,
-          updatedCourse.learningTime,
-          updatedCourse.courseCoverImage,
-          updatedCourse.courseVideoTrailer,
-          new Date(),
-          updatedCourse.category,
-          courseId,
-          adminId,
-          updatedLesson.lessonId,
-          updatedLesson.sequence,
-        ]
-      );
-
-      let fileName = [];
-      let fileType = [];
-      let fileSize = [];
-
-      if (req.files.course_attached_files != undefined) {
-        for (let file of req.files.course_attached_files) {
-          updatedCourse.courseAttachFiles.push(
-            JSON.stringify(
-              await cloudinaryUpload(file, "upload", "course_attached_files")
-            )
-          );
-
-          fileName.push(file.originalname);
-          fileType.push(file.mimetype);
-          fileSize.push(file.size);
-        }
-
-        await pool.query(
-          `
-      INSERT INTO files (course_id, file_name, type, size, directory)
-      VALUES ( $1, unnest($2::text[]), unnest($3::text[]), unnest($4::int[]), unnest($5::text[]));
-      `,
-          [
-            courseId,
-            fileName,
-            fileType,
-            fileSize,
-            updatedCourse.courseAttachFiles,
-          ]
-        );
-      }
-
-      return res.json({
-        message: "updated successfully",
+    for (let file of courseAttachedFiles.rows) {
+      filesForDelete.push({
+        public_id: JSON.parse(file.directory).public_id,
+        fileType: file.type,
       });
     }
-  } catch (error) {
-    return res.sendStatus(500);
+
+    for (let publicId of Object.values(courseMediaFiles.rows[0])) {
+      filesForDelete.push({
+        public_id: JSON.parse(publicId).public_id,
+      });
+    }
+
+    for (let file of filesForDelete) {
+      await cloudinaryUpload(
+        file.public_id,
+        "delete",
+        undefined,
+        file.fileType
+      );
+    }
+
+    await pool.query(
+      `
+        DELETE FROM files WHERE course_id = $1
+        `,
+      [courseId]
+    );
+
+    // upload everything to cloudinary again
+    updatedCourse.courseCoverImage = await cloudinaryUpload(
+      ...req.files.cover_image,
+      "upload",
+      "course_cover_images"
+    );
+
+    updatedCourse.courseVideoTrailer = await cloudinaryUpload(
+      ...req.files.video_trailer,
+      "upload",
+      "course_video_trailers"
+    );
+
+    // update the files' directory except for attached files
+    await pool.query(
+      `
+        WITH course_update AS (
+          UPDATE courses
+          SET course_name = $1, summary = $2,
+          detail = $3, price = $4, learning_time = $5,
+          cover_image_directory = $6, video_trailer_directory = $7,
+          updated_date= $8, category = $9
+          WHERE course_id = $10 AND admin_id = $11
+          RETURNING course_id
+        )
+        UPDATE lessons AS l
+        SET sequence = l2.sequence
+        FROM (SELECT UNNEST($12::int[]) AS lesson_id, UNNEST($13::int[]) AS sequence) AS l2
+        WHERE l.lesson_id = l2.lesson_id
+        `,
+      [
+        updatedCourse.courseName,
+        updatedCourse.courseSummary,
+        updatedCourse.detail,
+        updatedCourse.price,
+        updatedCourse.learningTime,
+        updatedCourse.courseCoverImage,
+        updatedCourse.courseVideoTrailer,
+        new Date(),
+        updatedCourse.category,
+        courseId,
+        adminId,
+        updatedLesson.lessonId,
+        updatedLesson.sequence,
+      ]
+    );
+
+    let fileName = [];
+    let fileType = [];
+    let fileSize = [];
+
+    if (req.files.files != undefined) {
+      for (let file of req.files.files) {
+        updatedCourse.courseAttachFiles.push(
+          JSON.stringify(
+            await cloudinaryUpload(file, "upload", "course_attached_files")
+          )
+        );
+
+        fileName.push(file.originalname);
+        fileType.push(file.mimetype);
+        fileSize.push(file.size);
+      }
+
+      await pool.query(
+        `
+          INSERT INTO files (course_id, file_name, type, size, directory)
+          VALUES ( $1, unnest($2::text[]), unnest($3::text[]), unnest($4::int[]), unnest($5::text[]));
+          `,
+        [
+          courseId,
+          fileName,
+          fileType,
+          fileSize,
+          updatedCourse.courseAttachFiles,
+        ]
+      );
+    }
+
+    return res.json({
+      message: "updated successfully",
+    });
   }
+  // } catch (error) {
+  //   return res.sendStatus(500);
+  // }
 };
 
 // DELETE course
@@ -392,63 +397,67 @@ export const deleteCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
     const adminId = req.query.adminId;
-    console.log(adminId);
-    console.log(courseId);
-
-    // check if there are media files in the database
 
     // Step1: Delete all media related to that course from cloudinary
-
     const courseMediaFiles = await pool.query(
       `
-  SELECT courses.cover_image_directory, courses.video_trailer_directory, sub_lessons.video_directory
-  FROM courses
-  INNER join lessons
-  ON lessons.course_id = courses.course_id
-  INNER JOIN sub_lessons
-  ON sub_lessons.lesson_id = lessons.lesson_id
-  WHERE courses.course_id = $1 AND courses.admin_id = $2
-  `,
+      SELECT cover_image_directory, video_trailer_directory
+      FROM courses
+      WHERE course_id = $1 AND admin_id = $2
+      `,
+      [courseId, adminId]
+    );
+
+    const subLessonMediaFiles = await pool.query(
+      `
+      SELECT sub_lessons.video_directory
+      FROM courses
+      INNER join lessons
+      ON lessons.course_id = courses.course_id
+      INNER JOIN sub_lessons
+      ON sub_lessons.lesson_id = lessons.lesson_id
+      WHERE courses.course_id = $1 AND courses.admin_id = $2
+      `,
       [courseId, adminId]
     );
 
     const courseAttachedFiles = await pool.query(
       `
-  SELECT * from files where course_id = $1
-  `,
+      SELECT * 
+      FROM files 
+      WHERE course_id = $1
+      `,
       [courseId]
     );
 
-    let filesPublicIdForDelete = [];
+    let filesForDelete = [];
+
+    for (let videoDir of Object.values(courseMediaFiles.rows[0])) {
+      filesForDelete.push({ public_id: JSON.parse(videoDir).public_id });
+    }
+
+    for (let lessonVideoDir of subLessonMediaFiles.rows) {
+      filesForDelete.push({
+        public_id: JSON.parse(Object.values(lessonVideoDir)[0]).public_id,
+      });
+    }
 
     for (let file of courseAttachedFiles.rows) {
-      filesPublicIdForDelete.push(JSON.parse(file.directory).public_id);
+      filesForDelete.push({
+        public_id: JSON.parse(file.directory).public_id,
+        type: file.type,
+      });
     }
 
-    for (let publicId of Object.values(courseMediaFiles.rows[0])) {
-      console.log(JSON.parse(publicId).public_id);
-      filesPublicIdForDelete.push(JSON.parse(publicId).public_id);
-    }
-
-    console.log(filesPublicIdForDelete);
-    console.log(courseAttachedFiles.rows);
-
-    const filesType = [];
-    for (let i of courseAttachedFiles.rows) {
-      filesType.push(i.type);
-    }
-
-    for (let filePublicId of filesPublicIdForDelete) {
-      for (let fileType of filesType) {
-        await cloudinaryUpload(filePublicId, "delete", "any folder", fileType);
-      }
+    for (let file of filesForDelete) {
+      await cloudinaryUpload(file.public_id, "delete", undefined, file.type);
     }
 
     // Step2: Delete course from database
-
     await pool.query(
       `
-  DELETE from courses WHERE course_id = $1 AND admin_id = $2`,
+      DELETE FROM courses 
+      WHERE course_id = $1 AND admin_id = $2`,
       [courseId, adminId]
     );
 
@@ -520,43 +529,6 @@ export const getAdminCourses = async (req, res) => {
     return res.sendStatus(500);
   }
 };
-
-// export const deleteCourse = async (req, res) => {
-//   try {
-//     const admin_id = req.query.byAdmin;
-//     const course_id = req.params.courseId;
-
-//     /* Validate whether this admin owned the course or not */
-//     let doesAdminOwnThisCourse = await pool.query(
-//       `
-//     SELECT EXISTS
-//     (SELECT *
-//       FROM courses
-//     WHERE admin_id = $1 AND course_id = $2)
-//     `,
-//       [admin_id, course_id]
-//     );
-//     doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
-//     if (!doesAdminOwnThisCourse) {
-//       return res
-//         .status(403)
-//         .json({ message: "You have no permission to delete this course" });
-//     }
-
-//     /* Delete an assignment from "assignments" table */
-//     await pool.query(
-//       `
-//     DELETE FROM courses
-//     WHERE course_id = $1
-//     `,
-//       [course_id]
-//     );
-
-//     return res.json({ message: "Course has been successfully deleted" });
-//   } catch (error) {
-//     return res.sendStatus(500);
-//   }
-// };
 
 export const getAllCoursesData = async (req, res) => {
   try {
@@ -953,64 +925,27 @@ export const deleteAssignment = async (req, res) => {
   }
 };
 
-// get course for edit-lesson-page
-export const getCourseLesson = async (req, res) => {
-  const course_id = req.params.courseId;
-  const lesson_id = req.params.lessonId;
-  const admin_id = req.query.byAdmin;
-
-  /* Validate whether this admin owned the course or not */
-  let doesAdminOwnThisCourse = await pool.query(
-    `
-  SELECT EXISTS 
-  (SELECT *
-    FROM courses
-  INNER JOIN lessons
-  ON courses.course_id = lessons.course_id
-  INNER JOIN sub_lessons
-  ON lessons.lesson_id = sub_lessons.lesson_id
-  WHERE courses.admin_id = $1 AND courses.course_id = $2)
-  `,
-    [admin_id, course_id]
-  );
-  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
-  if (!doesAdminOwnThisCourse) {
-    return res
-      .status(403)
-      .json({ message: "You have no permission to delete this assignment" });
-  }
-
-  let data = await pool.query(
-    `
-  SELECT courses.course_id,courses.course_name,
-   lessons.lesson_id, lessons.lesson_name, lessons.sequence,
-  sub_lessons.sub_lesson_id, sub_lessons.sub_lesson_name, sub_lessons.video_directory, sub_lessons.sequence, sub_lessons.duration
-  FROM courses
-  INNER JOIN lessons
-  ON lessons.course_id = courses.course_id
-  INNER JOIN sub_lessons
-  ON sub_lessons.lesson_id = lessons.lesson_id
-  WHERE courses.course_id = $1 AND courses.admin_id = $2 AND sub_lessons.lesson_id = $3`,
-    [course_id, admin_id, lesson_id]
-  );
-
-  data = data.rows;
-
-  return res.json({ data });
-};
-
-export const postNewLesson = async (req, res) => {
+export const addLesson = async (req, res) => {
   try {
     const courseId = req.params.courseId;
     const lessonName = req.body.lesson_name;
-    const arrayOfSubLessonName = req.body.sub_lesson_names;
+    let arrayOfSubLessonName;
+    if (!Array.isArray(req.body.sub_lesson_names)) {
+      arrayOfSubLessonName = [req.body.sub_lesson_names];
+    } else {
+      arrayOfSubLessonName = req.body.sub_lesson_names;
+    }
     const arrayOfSubLessonVideo = req.files.sub_lesson_videos;
     const arrayOfSubLessonVideoDir = [];
     const arrayOfSubLessonSequence = [];
 
     // Upload files to cloudinary
     for (let video of arrayOfSubLessonVideo) {
-      const metaData = await cloudinaryUpload(video, "upload", "video");
+      const metaData = await cloudinaryUpload(
+        video,
+        "upload",
+        "course_sub_lesson_videos"
+      );
       arrayOfSubLessonVideoDir.push(metaData);
     }
 
@@ -1051,78 +986,91 @@ export const postNewLesson = async (req, res) => {
       ]
     );
 
+    let resultAfterAdded = await pool.query(
+      `
+      SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
+      FROM lessons
+      INNER JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      WHERE lessons.course_id = $1
+      GROUP BY lessons.lesson_id
+      ORDER BY lessons.sequence ASC;
+      `,
+      [courseId]
+    );
+    resultAfterAdded = resultAfterAdded.rows;
+
     return res.json({
       message: "Lesson has been successfully created",
+      data: resultAfterAdded,
     });
   } catch (error) {
     return res.sendStatus(500);
   }
 };
 
-export const editLesson = async (req, res) => {
-  // try {
-  const admin_id = req.query.byAdmin;
-  const lesson_id = req.params.lessonId;
-  const lesson_name = req.body.lesson_name;
-  const sub_lesson_name = req.body.sub_lesson_name;
-  const sub_lesson_id = req.body.sub_lesson_id;
-  const sequence = req.body.sequence;
-  const video = req.body.video;
-  /* Validate whether this admin owned the course or not */
-  let doesAdminOwnThisCourse = await pool.query(
+export const getLesson = async (req, res) => {
+  const courseId = req.params.courseId;
+  const lessonId = req.params.lessonId;
+
+  const lessonData = await pool.query(
     `
-    SELECT EXISTS 
-    (SELECT *
-      FROM courses
-    INNER JOIN lessons
-    ON courses.course_id = lessons.course_id
-    WHERE courses.admin_id = $1 AND lessons.lesson_id = $2)
+    SELECT lesson_name, sequence
+    FROM lessons
+    WHERE course_id = $1 AND lesson_id =$2
     `,
-    [admin_id, lesson_id]
+    [courseId, lessonId]
   );
-  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
-  if (!doesAdminOwnThisCourse) {
-    return res
-      .status(403)
-      .json({ message: "You have no permission to edit this lesson" });
+  const lessonName = lessonData.rows[0].lesson_name;
+  const lessonSequence = lessonData.rows[0].sequence;
+
+  let subLessonData = await pool.query(
+    `
+    SELECT sub_lessons.sub_lesson_name AS name, sub_lessons.video_directory AS dir, sub_lessons.sub_lesson_id AS id
+    FROM lessons
+    INNER JOIN sub_lessons
+    ON lessons.lesson_id = sub_lessons.lesson_id
+    WHERE lessons.course_id = $1 AND lessons.lesson_id = $2
+    ORDER BY sub_lessons.sequence ASC
+    `,
+    [courseId, lessonId]
+  );
+  subLessonData = subLessonData.rows;
+  const subLessons = [];
+  for (let subLesson of subLessonData) {
+    subLessons.push({
+      sub_lesson_id: subLesson.id,
+      sub_lesson_name: subLesson.name,
+      video: JSON.parse(subLesson.dir).url,
+    });
   }
+  return res.json({
+    data: {
+      lesson_name: lessonName,
+      lesson_sequence: lessonSequence,
+      sub_lessons: subLessons,
+    },
+  });
+};
 
-  /* Update lesson_name in "lessons" table */
-  await pool.query(
-    `
-  UPDATE lessons
-  SET lesson_name = $1
-  WHERE lesson_id = $2
-  `,
-    [lesson_name, lesson_id]
-  );
+export const editLesson = async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+    const lessonName = req.body.lesson_name;
+    let arrayOfSubLessonName;
+    if (!Array.isArray(req.body.sub_lesson_names)) {
+      arrayOfSubLessonName = [req.body.sub_lesson_names];
+    } else {
+      arrayOfSubLessonName = req.body.sub_lesson_names;
+    }
+    const arrayOfSubLessonVideo = req.files.sub_lesson_videos;
+    const arrayOfSubLessonVideoDir = [];
+    const arrayOfSubLessonSequence = [];
 
-  /* Update sub_lesson_name and video in "sub_lessons" table */
-  await pool.query(
-    `
-    UPDATE sub_lessons
-    SET sub_lesson_name = $1,
-      video_directory = $2
-    WHERE sub_lesson_id = $3 AND lesson_id = $4
-    
-    `,
-    [sub_lesson_name, video, sub_lesson_id, lesson_id]
-  );
-
-  await pool.query(
-    `
-    UPDATE lessons as l
-    SET sequence = l2.sequence
-    FROM (SELECT UNNEST($1::int[]) as lesson_id, UNNEST($2::int[]) as sequence) AS l2
-    WHERE l.lesson_id = l2.lesson_id
-    `,
-    [lesson_id, sequence]
-  );
-
-  return res.json({ message: "Lesson has been successfully edited" });
-  // } catch (error) {
-  //   return res.sendStatus(500);
-  // }
+    // ยังบ่เสร็จเด้อ
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
 
 // DELETE Lesson
@@ -1131,24 +1079,21 @@ export const deleteLesson = async (req, res) => {
   try {
     const lessonId = req.params.lessonId;
     const courseId = req.query.courseId;
-    const admin_id = req.query.byAdmin;
-    console.log(admin_id);
-    console.log(courseId);
-    console.log(lessonId);
+    const adminId = req.query.byAdmin;
 
     /* Validate whether this admin owned the course or not */
     let doesAdminOwnThisCourse = await pool.query(
       `
-  SELECT EXISTS 
-  (SELECT *
-    FROM courses
-  INNER JOIN lessons
-  ON courses.course_id = lessons.course_id
-  INNER JOIN sub_lessons
-  ON lessons.lesson_id = sub_lessons.lesson_id
-  WHERE courses.admin_id = $1 AND courses.course_id = $2)
-  `,
-      [admin_id, courseId]
+      SELECT EXISTS 
+      (SELECT *
+        FROM courses
+      INNER JOIN lessons
+      ON courses.course_id = lessons.course_id
+      INNER JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      WHERE courses.admin_id = $1 AND courses.course_id = $2)
+      `,
+      [adminId, courseId]
     );
     doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
     if (!doesAdminOwnThisCourse) {
@@ -1160,32 +1105,74 @@ export const deleteLesson = async (req, res) => {
     // Step1 here
     const result = await pool.query(
       `
-  SELECT video_directory from sub_lessons 
-  WHERE lesson_id = $1
-`,
+      SELECT video_directory 
+      FROM sub_lessons 
+      WHERE lesson_id = $1
+      `,
       [lessonId]
     );
 
     const videoMetaDataFromCloudinary = result.rows;
-
     for (let video of videoMetaDataFromCloudinary) {
       let public_id = JSON.parse(video.video_directory).public_id;
       await cloudinaryUpload(public_id, "delete");
-      console.log(public_id);
     }
 
     // Step2 here
     await pool.query(
       `
-    DELETE 
-    FROM lessons
-    WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
-  `,
+      DELETE 
+      FROM lessons
+      WHERE lessons.lesson_id = $1 AND lessons.course_id = $2 
+      `,
       [lessonId, courseId]
     );
 
+    // Step3 reorder sequence after delete
+    let newLessonList = await pool.query(
+      `
+      SELECT lesson_id
+      FROM lessons
+      WHERE course_id = $1
+      ORDER BY sequence ASC
+      `,
+      [courseId]
+    );
+    newLessonList = newLessonList.rows;
+    const arrayOfNewLesson = [];
+    const arrayOfSequence = [];
+    for (let i = 0; i < newLessonList.length; i++) {
+      arrayOfNewLesson.push(newLessonList[i].lesson_id);
+      arrayOfSequence.push(i + 1);
+    }
+
+    await pool.query(
+      `
+      UPDATE lessons AS l
+      SET sequence = l2.sequence
+      FROM (SELECT UNNEST($1::int[]) as lesson_id, UNNEST($2::int[]) AS sequence) AS l2
+      WHERE l.lesson_id = l2.lesson_id
+      `,
+      [arrayOfNewLesson, arrayOfSequence]
+    );
+
+    let resultAfterAdded = await pool.query(
+      `
+      SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
+      FROM lessons
+      INNER JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      WHERE lessons.course_id = $1
+      GROUP BY lessons.lesson_id
+      ORDER BY lessons.sequence ASC;
+      `,
+      [courseId]
+    );
+    resultAfterAdded = resultAfterAdded.rows;
+
     return res.json({
       message: "Lesson deleted successfully",
+      data: resultAfterAdded,
     });
   } catch (error) {
     return res.sendStatus(500);

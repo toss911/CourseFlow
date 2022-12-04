@@ -9,6 +9,9 @@ function AdminProvider(props) {
   const [addCourseFields, setAddCourseFields] = useState({});
   // editCourseField is for storing edit course fields on edit course page
   const [editCourseFields, setEditCourseFields] = useState({});
+  // filesEditCourse is for storing files data on edit course page
+  const [filesEditCourse, setFilesEditCourse] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <AdminContext.Provider
@@ -19,6 +22,10 @@ function AdminProvider(props) {
         setAddCourseFields,
         editCourseFields,
         setEditCourseFields,
+        filesEditCourse,
+        setFilesEditCourse,
+        isLoading,
+        setIsLoading,
       }}
     >
       {props.children}

@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik } from "formik";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { Sidebar } from "../../components/SidebarAdmin";
 import LessonTable from "../../components/LessonsTable";
 import axios from "axios";
@@ -41,23 +41,12 @@ const AdminAddCourses = () => {
     onOpen: onSuccessModalOpen,
     onClose: onSuccessModalClose,
   } = useDisclosure();
-  const { addLesson, setAddLesson, addCourseFields, setAddCourseFields } =
-    useAdmin();
+  const { addLesson, addCourseFields } = useAdmin();
   const toast = useToast();
   const { contextAdminState } = useAuth();
   const adminId = contextAdminState.user.admin_id;
   const lessonTableRef = useRef();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    /* Prompt a pop-up message to warn the users if they are trying to refresh to web page */
-    const unloadCallback = (event) => {
-      event.preventDefault();
-      return (event.returnValue = "Changes you made may not be saved.");
-    };
-    window.addEventListener("beforeunload", unloadCallback);
-    return () => window.removeEventListener("beforeunload", unloadCallback);
-  }, []);
 
   // this function will be triggered after user clicks on 'create course' button
   const addCourse = async (courseData) => {
@@ -83,8 +72,6 @@ const AdminAddCourses = () => {
       );
 
       if (/success/i.test(result.data.message)) {
-        setAddLesson([]);
-        setAddCourseFields({});
         onSuccessModalOpen();
       }
     } catch (error) {
