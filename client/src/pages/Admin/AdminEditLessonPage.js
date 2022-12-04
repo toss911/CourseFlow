@@ -22,14 +22,13 @@ import {
   Link,
   Spinner,
 } from "@chakra-ui/react";
-import { DragHandleIcon, CheckCircleIcon } from "@chakra-ui/icons";
+import { DragHandleIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
 import { useAuth } from "../../contexts/authentication";
 import { useNavigate, useParams } from "react-router-dom";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import axios from "axios";
-let action;
 
 function AdminEditLesson() {
   const { addLesson, setAddLesson, editCourseFields } = useAdmin();
@@ -37,17 +36,11 @@ function AdminEditLesson() {
   const adminId = contextAdminState.user.admin_id;
 
   const {
-    isOpen: isSuccessModalOpen,
-    onOpen: onSuccessModalOpen,
-    onClose: onSuccessModalClose,
-  } = useDisclosure();
-  const {
     isOpen: isConfirmModalOpen,
     onOpen: onConfirmModalOpen,
     onClose: onConfirmModalClose,
   } = useDisclosure();
   const toast = useToast();
-  const [modalMsg, setModalMsg] = useState();
 
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
