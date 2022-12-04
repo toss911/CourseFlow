@@ -22,13 +22,14 @@ import {
   Link,
   Spinner,
 } from "@chakra-ui/react";
-import { DragHandleIcon } from "@chakra-ui/icons";
+import { DragHandleIcon, CheckCircleIcon } from "@chakra-ui/icons";
 import { Field, Form, Formik, FieldArray } from "formik";
 import { useAdmin } from "../../contexts/admin.js";
 import { useAuth } from "../../contexts/authentication";
 import { useNavigate, useParams } from "react-router-dom";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import axios from "axios";
+let action;
 
 function AdminEditLesson() {
   const { addLesson, setAddLesson, editCourseFields } = useAdmin();
@@ -36,11 +37,17 @@ function AdminEditLesson() {
   const adminId = contextAdminState.user.admin_id;
 
   const {
+    isOpen: isSuccessModalOpen,
+    onOpen: onSuccessModalOpen,
+    onClose: onSuccessModalClose,
+  } = useDisclosure();
+  const {
     isOpen: isConfirmModalOpen,
     onOpen: onConfirmModalOpen,
     onClose: onConfirmModalClose,
   } = useDisclosure();
   const toast = useToast();
+  const [modalMsg, setModalMsg] = useState();
 
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
@@ -76,7 +83,7 @@ function AdminEditLesson() {
     for (let subLesson of lesson.sub_lessons) {
       await fetch(subLesson.video).then(async (res) => {
         const blob = await res.blob();
-        const file = new File([blob], `sub_lesson_video_${i}`, {
+        const file = new File([blob], `sub_lesson_video_${i + 1}`, {
           type: blob.type,
         });
         subLesson.video = file;
@@ -108,11 +115,26 @@ function AdminEditLesson() {
     }
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     if (Boolean(courseId)) {
-      console.log(values);
-      return false;
-      navigate(`/admin/edit-course/${courseId}`);
+      const formData = new FormData();
+      formData.append("lesson_name", values.lesson_name);
+      for (let subLesson of values.sub_lessons) {
+        formData.append("sub_lesson_id", subLesson.sub_lesson_id);
+        formData.append("sub_lesson_names", subLesson.sub_lesson_name);
+        formData.append("sub_lesson_videos", subLesson.video);
+      }
+      const result = await axios.put(
+        `http://localhost:4000/admin/courses/${courseId}/lessons/${lessonId}?byAdmin=${adminId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      if (/success/i.test(result.data.message)) {
+        setAddLesson(result.data.data);
+        navigate(`/admin/edit-course/${courseId}`);
+      }
     } else {
       const newLesson = [...addLesson];
       newLesson[lessonId - 1] = values;
@@ -150,10 +172,12 @@ function AdminEditLesson() {
     );
     if (/success/.test(result.data.message)) {
       setIsDeleting(false);
+      onConfirmModalClose();
       setAddLesson(result.data.data);
+      navigate(`/admin/edit-course/${courseId}`);
+    } else {
+      onConfirmModalClose();
     }
-    navigate(`/admin/edit-course/${courseId}`);
-    onConfirmModalClose();
   };
 
   /* Input Validation */
@@ -701,6 +725,7 @@ function AdminEditLesson() {
                                             variant="secondary"
                                             onClick={() => {
                                               forms.push({
+                                                sub_lesson_id: undefined,
                                                 sub_lesson_name: "",
                                                 video: null,
                                               });
@@ -772,10 +797,10 @@ function AdminEditLesson() {
                         if (Boolean(courseId)) {
                           handleDeleteLesson(lessonId, courseId, adminId);
                         } else {
-                          navigate(`/admin/add-course`);
                           const newLessonsList = [...addLesson];
                           newLessonsList.splice(lessonId - 1, 1);
                           setAddLesson(newLessonsList);
+                          navigate(`/admin/add-course`);
                         }
                       }}
                     >

@@ -201,30 +201,30 @@ export const getCourse = async (req, res) => {
 };
 
 export const updateCourse = async (req, res) => {
-  // try {
-  const courseId = req.params.courseId;
-  const adminId = req.query.adminId;
-  const mediaFiles = req.files;
+  try {
+    const courseId = req.params.courseId;
+    const adminId = req.query.adminId;
+    const mediaFiles = req.files;
 
-  const updatedCourse = {
-    courseName: req.body.course_name,
-    price: req.body.price,
-    learningTime: req.body.learning_time,
-    courseSummary: req.body.course_summary,
-    detail: req.body.course_detail,
-    category: req.body.category,
-    courseAttachFiles: [],
-  };
+    const updatedCourse = {
+      courseName: req.body.course_name,
+      price: req.body.price,
+      learningTime: req.body.learning_time,
+      courseSummary: req.body.course_summary,
+      detail: req.body.course_detail,
+      category: req.body.category,
+      courseAttachFiles: [],
+    };
 
-  const updatedLesson = {
-    lessonId: req.body.lesson_id,
-    sequence: req.body.sequence,
-  };
+    const updatedLesson = {
+      lessonId: req.body.lesson_id,
+      sequence: req.body.sequence,
+    };
 
-  if (Object.keys(mediaFiles).length === 0) {
-    // if admin did not change any media
-    await pool.query(
-      `
+    if (Object.keys(mediaFiles).length === 0) {
+      // if admin did not change any media
+      await pool.query(
+        `
         WITH course_update as (
           UPDATE courses
           SET course_name = $1, summary = $2,
@@ -238,87 +238,87 @@ export const updateCourse = async (req, res) => {
         FROM (SELECT UNNEST($10::int[]) as lesson_id, UNNEST($11::int[]) AS sequence) AS l2
         WHERE l.lesson_id = l2.lesson_id
         `,
-      [
-        updatedCourse.courseName,
-        updatedCourse.courseSummary,
-        updatedCourse.detail,
-        updatedCourse.price,
-        updatedCourse.learningTime,
-        new Date(),
-        updatedCourse.category,
-        courseId,
-        adminId,
-        updatedLesson.lessonId,
-        updatedLesson.sequence,
-      ]
-    );
-    return res.json({
-      message: "updated successfully",
-    });
-  } else {
-    const courseMediaFiles = await pool.query(
-      `
+        [
+          updatedCourse.courseName,
+          updatedCourse.courseSummary,
+          updatedCourse.detail,
+          updatedCourse.price,
+          updatedCourse.learningTime,
+          new Date(),
+          updatedCourse.category,
+          courseId,
+          adminId,
+          updatedLesson.lessonId,
+          updatedLesson.sequence,
+        ]
+      );
+      return res.json({
+        message: "updated successfully",
+      });
+    } else {
+      const courseMediaFiles = await pool.query(
+        `
         SELECT courses.cover_image_directory, courses.video_trailer_directory
         FROM courses
         WHERE courses.course_id = $1 AND admin_id = $2
         `,
-      [courseId, adminId]
-    );
+        [courseId, adminId]
+      );
 
-    let filesForDelete = [];
+      let filesForDelete = [];
 
-    const courseAttachedFiles = await pool.query(
-      `
+      const courseAttachedFiles = await pool.query(
+        `
         SELECT * from files where course_id = $1
         `,
-      [courseId]
-    );
-
-    for (let file of courseAttachedFiles.rows) {
-      filesForDelete.push({
-        public_id: JSON.parse(file.directory).public_id,
-        fileType: file.type,
-      });
-    }
-
-    for (let publicId of Object.values(courseMediaFiles.rows[0])) {
-      filesForDelete.push({
-        public_id: JSON.parse(publicId).public_id,
-      });
-    }
-
-    for (let file of filesForDelete) {
-      await cloudinaryUpload(
-        file.public_id,
-        "delete",
-        undefined,
-        file.fileType
+        [courseId]
       );
-    }
 
-    await pool.query(
-      `
+      for (let file of courseAttachedFiles.rows) {
+        filesForDelete.push({
+          public_id: JSON.parse(file.directory).public_id,
+          fileType: file.type,
+        });
+      }
+
+      for (let publicId of Object.values(courseMediaFiles.rows[0])) {
+        filesForDelete.push({
+          public_id: JSON.parse(publicId).public_id,
+        });
+      }
+
+      for (let file of filesForDelete) {
+        await cloudinaryUpload(
+          file.public_id,
+          "delete",
+          undefined,
+          file.fileType
+        );
+      }
+
+      await pool.query(
+        `
         DELETE FROM files WHERE course_id = $1
         `,
-      [courseId]
-    );
+        [courseId]
+      );
 
-    // upload everything to cloudinary again
-    updatedCourse.courseCoverImage = await cloudinaryUpload(
-      ...req.files.cover_image,
-      "upload",
-      "course_cover_images"
-    );
+      // upload everything to cloudinary again
+      updatedCourse.courseCoverImage = await cloudinaryUpload(
+        ...req.files.cover_image,
+        "upload",
+        "course_cover_images"
+      );
 
-    updatedCourse.courseVideoTrailer = await cloudinaryUpload(
-      ...req.files.video_trailer,
-      "upload",
-      "course_video_trailers"
-    );
+      updatedCourse.courseVideoTrailer = await cloudinaryUpload(
+        ...req.files.video_trailer,
+        "upload",
+        "course_video_trailers"
+      );
 
-    // update the files' directory except for attached files
-    await pool.query(
-      `
+      // update the files' directory except for attached files
+      await pool.query(
+        `
         WITH course_update AS (
           UPDATE courses
           SET course_name = $1, summary = $2,
@@ -333,62 +333,62 @@ export const updateCourse = async (req, res) => {
         FROM (SELECT UNNEST($12::int[]) AS lesson_id, UNNEST($13::int[]) AS sequence) AS l2
         WHERE l.lesson_id = l2.lesson_id
         `,
-      [
-        updatedCourse.courseName,
-        updatedCourse.courseSummary,
-        updatedCourse.detail,
-        updatedCourse.price,
-        updatedCourse.learningTime,
-        updatedCourse.courseCoverImage,
-        updatedCourse.courseVideoTrailer,
-        new Date(),
-        updatedCourse.category,
-        courseId,
-        adminId,
-        updatedLesson.lessonId,
-        updatedLesson.sequence,
-      ]
-    );
+        [
+          updatedCourse.courseName,
+          updatedCourse.courseSummary,
+          updatedCourse.detail,
+          updatedCourse.price,
+          updatedCourse.learningTime,
+          updatedCourse.courseCoverImage,
+          updatedCourse.courseVideoTrailer,
+          new Date(),
+          updatedCourse.category,
+          courseId,
+          adminId,
+          updatedLesson.lessonId,
+          updatedLesson.sequence,
+        ]
+      );
 
-    let fileName = [];
-    let fileType = [];
-    let fileSize = [];
+      let fileName = [];
+      let fileType = [];
+      let fileSize = [];
 
-    if (req.files.files != undefined) {
-      for (let file of req.files.files) {
-        updatedCourse.courseAttachFiles.push(
-          JSON.stringify(
-            await cloudinaryUpload(file, "upload", "course_attached_files")
-          )
-        );
+      if (req.files.files != undefined) {
+        for (let file of req.files.files) {
+          updatedCourse.courseAttachFiles.push(
+            JSON.stringify(
+              await cloudinaryUpload(file, "upload", "course_attached_files")
+            )
+          );
 
-        fileName.push(file.originalname);
-        fileType.push(file.mimetype);
-        fileSize.push(file.size);
-      }
+          fileName.push(file.originalname);
+          fileType.push(file.mimetype);
+          fileSize.push(file.size);
+        }
 
-      await pool.query(
-        `
+        await pool.query(
+          `
           INSERT INTO files (course_id, file_name, type, size, directory)
           VALUES ( $1, unnest($2::text[]), unnest($3::text[]), unnest($4::int[]), unnest($5::text[]));
           `,
-        [
-          courseId,
-          fileName,
-          fileType,
-          fileSize,
-          updatedCourse.courseAttachFiles,
-        ]
-      );
-    }
+          [
+            courseId,
+            fileName,
+            fileType,
+            fileSize,
+            updatedCourse.courseAttachFiles,
+          ]
+        );
+      }
 
-    return res.json({
-      message: "updated successfully",
-    });
+      return res.json({
+        message: "updated successfully",
+      });
+    }
+  } catch (error) {
+    return res.sendStatus(500);
   }
-  // } catch (error) {
-  //   return res.sendStatus(500);
-  // }
 };
 
 // DELETE course
@@ -1055,7 +1055,23 @@ export const getLesson = async (req, res) => {
 
 export const editLesson = async (req, res) => {
   try {
+    /* 
+    --- Step ---
+    0. Initialize a variable
+    1. Delete all of the sub-lesson videos
+    2. Upload new videos
+    3. DELETE a sub-lesson that users deleted
+    4. Categorize between sub-lesson that already have a data in database (has sub_lesson_id) and one that doesn't (sub_lesson_id is undefined)
+    5. Insert sub-lesson that are undefined into the database, then stored its sub_lesson_id in the variable
+    6. Substitute an undefined with sub_lesson_id that previously stored
+    7. Using UPDATE statement to update all of the sub-lessons
+    8. UPDATE lesson_name in lessons table
+    9. Return a new data of lesson/sub-lesson to update state in FE
+    */
+
+    // 0. Initialize a variable
     const courseId = req.params.courseId;
+    const lessonId = req.params.lessonId;
     const lessonName = req.body.lesson_name;
     let arrayOfSubLessonName;
     if (!Array.isArray(req.body.sub_lesson_names)) {
@@ -1063,17 +1079,163 @@ export const editLesson = async (req, res) => {
     } else {
       arrayOfSubLessonName = req.body.sub_lesson_names;
     }
+    let arrayOfSubLessonId;
+    if (!Array.isArray(req.body.sub_lesson_id)) {
+      arrayOfSubLessonId = [req.body.sub_lesson_id];
+    } else {
+      arrayOfSubLessonId = req.body.sub_lesson_id;
+    }
     const arrayOfSubLessonVideo = req.files.sub_lesson_videos;
     const arrayOfSubLessonVideoDir = [];
     const arrayOfSubLessonSequence = [];
 
-    // ยังบ่เสร็จเด้อ
+    for (let i = 0; i < arrayOfSubLessonVideo.length; i++) {
+      arrayOfSubLessonSequence.push(i + 1);
+    }
+
+    // 1. Delete all of the sub-lesson videos
+    let oldSubLessonVideo = await pool.query(
+      `
+      SELECT video_directory AS dir
+      FROM sub_lessons
+      INNER JOIN lessons
+      ON sub_lessons.lesson_id = lessons.lesson_id
+      WHERE lessons.course_id = $1 AND sub_lessons.lesson_id = $2
+      `,
+      [courseId, lessonId]
+    );
+    oldSubLessonVideo = oldSubLessonVideo.rows;
+    for (let i = 0; i < oldSubLessonVideo.length; i++) {
+      oldSubLessonVideo[i] = JSON.parse(oldSubLessonVideo[i].dir).public_id;
+      await cloudinaryUpload(oldSubLessonVideo[i], "delete");
+    }
+
+    // 2. Upload new videos
+    for (let subLessonVideo of arrayOfSubLessonVideo) {
+      arrayOfSubLessonVideoDir.push(
+        JSON.stringify(
+          await cloudinaryUpload(
+            subLessonVideo,
+            "upload",
+            "course_sub_lesson_videos"
+          )
+        )
+      );
+    }
+
+    // 3. DELETE a sub-lesson that users deleted
+    const deletedSubLesson = [];
+    let allCurrentSubLessonId = await pool.query(
+      `
+      SELECT sub_lesson_id AS id
+      FROM sub_lessons
+      WHERE lesson_id = $1
+      `,
+      [lessonId]
+    );
+    allCurrentSubLessonId = allCurrentSubLessonId.rows;
+    for (let i = 0; i < allCurrentSubLessonId.length; i++) {
+      allCurrentSubLessonId[i] = allCurrentSubLessonId[i].id;
+      if (!arrayOfSubLessonId.includes(String(allCurrentSubLessonId[i]))) {
+        deletedSubLesson.push(allCurrentSubLessonId[i]);
+      }
+    }
+    await pool.query(
+      `
+      DELETE FROM sub_lessons
+      WHERE sub_lesson_id IN (SELECT * FROM UNNEST($1::int[]))
+      `,
+      [deletedSubLesson]
+    );
+
+    // 4. Categorize between sub-lesson that already have a data in database (has sub_lesson_id) and one that doesn't (sub_lesson_id is undefined)
+    const indexOfUndefined = [];
+    for (let i = 0; i < arrayOfSubLessonId.length; i++) {
+      if (arrayOfSubLessonId[i] === "undefined") {
+        indexOfUndefined.push(i);
+      }
+    }
+    const arrayOfSubLessonNameUndefined = [];
+    for (let i = 0; i < indexOfUndefined.length; i++) {
+      arrayOfSubLessonNameUndefined.push(
+        arrayOfSubLessonName[indexOfUndefined[i]]
+      );
+    }
+
+    // 5. Insert sub-lesson that are undefined into the database, then stored its sub_lesson_id in the variable
+    let newSubLessonId = await pool.query(
+      `
+      INSERT INTO sub_lessons (lesson_id, sub_lesson_name, duration)
+      VALUES ($1, UNNEST($2::text[]), 0)
+      RETURNING sub_lesson_id
+      `,
+      [lessonId, arrayOfSubLessonNameUndefined]
+    );
+    newSubLessonId = newSubLessonId.rows;
+    for (let i = 0; i < newSubLessonId.length; i++) {
+      newSubLessonId[i] = newSubLessonId[i].sub_lesson_id;
+    }
+
+    // 6. Substitute an undefined with sub_lesson_id that previously stored
+    let j = 0;
+    for (let i = 0; i < arrayOfSubLessonId.length; i++) {
+      if (arrayOfSubLessonId[i] === "undefined") {
+        arrayOfSubLessonId[i] = newSubLessonId[j];
+        j++;
+      }
+    }
+
+    // 7. Using UPDATE statement to update all of the sub-lessons
+    await pool.query(
+      `
+      UPDATE sub_lessons AS l
+      SET sequence = l2.sequence,
+          sub_lesson_name = l2.sub_lesson_name,
+          video_directory = l2.video_directory
+      FROM (SELECT UNNEST($1::int[]) as sub_lesson_id, UNNEST($2::int[]) AS sequence, UNNEST($3::text[]) AS sub_lesson_name, UNNEST($4::text[]) AS video_directory) AS l2
+      WHERE l.sub_lesson_id = l2.sub_lesson_id
+      `,
+      [
+        arrayOfSubLessonId,
+        arrayOfSubLessonSequence,
+        arrayOfSubLessonName,
+        arrayOfSubLessonVideoDir,
+      ]
+    );
+
+    // 8. UPDATE lesson_name in lessons table
+    await pool.query(
+      `
+      UPDATE lessons
+      SET lesson_name = $1
+      WHERE lesson_id = $2
+      `,
+      [lessonName, lessonId]
+    );
+
+    // 9. Return a new data of lesson/sub-lesson to update state in FE
+    let resultAfterAdded = await pool.query(
+      `
+      SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
+      FROM lessons
+      INNER JOIN sub_lessons
+      ON lessons.lesson_id = sub_lessons.lesson_id
+      WHERE lessons.course_id = $1
+      GROUP BY lessons.lesson_id
+      ORDER BY lessons.sequence ASC;
+      `,
+      [courseId]
+    );
+    resultAfterAdded = resultAfterAdded.rows;
+
+    return res.json({
+      message: "Lesson has been editied successfully",
+      data: resultAfterAdded,
+    });
   } catch (error) {
     return res.sendStatus(500);
   }
 };
-
-// DELETE Lesson
 
 export const deleteLesson = async (req, res) => {
   try {
