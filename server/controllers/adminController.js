@@ -216,9 +216,22 @@ export const updateCourse = async (req, res) => {
       courseAttachFiles: [],
     };
 
+    let lessonId;
+    let sequence;
+    if (!Array.isArray(req.body.lesson_id)) {
+      lessonId = [req.body.lesson_id];
+    } else {
+      lessonId = req.body.lesson_id;
+    }
+    if (!Array.isArray(req.body.sequence)) {
+      sequence = [req.body.sequence];
+    } else {
+      sequence = req.body.sequence;
+    }
+
     const updatedLesson = {
-      lessonId: req.body.lesson_id,
-      sequence: req.body.sequence,
+      lessonId,
+      sequence,
     };
 
     if (Object.keys(mediaFiles).length === 0) {
