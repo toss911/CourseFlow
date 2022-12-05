@@ -135,7 +135,7 @@ function AdminEditCourse() {
     }
 
     const result = await axios.put(
-      `http://localhost:4000/admin/edit-course/${courseId}?adminId=${adminId}`,
+      `http://localhost:4000/admin/courses/${courseId}?byAdmin=${adminId}`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -225,7 +225,7 @@ function AdminEditCourse() {
   const handleDeleteCourse = async () => {
     setIsDeleting(true);
     const result = await axios.delete(
-      `http://localhost:4000/admin/delete-course/${courseId}?adminId=${adminId}`
+      `http://localhost:4000/admin/courses/${courseId}?byAdmin=${adminId}`
     );
     if (/deleted/i.test(result.data.message)) {
       onConfirmModalClose();

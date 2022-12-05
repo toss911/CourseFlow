@@ -14,14 +14,23 @@ const courseUpload = multerUpload.fields([
   { name: "sub_lesson_videos", maxCount: 200 },
 ]);
 
-adminRouter.post("/add-course", courseUpload, admin_controller.addCourse);
-adminRouter.get("/get-course/:courseId", admin_controller.getCourse);
-adminRouter.get(
-  "/edit-course/:courseId/edit-lesson",
+/* course CRUD */
+adminRouter.get("/courses", protect, admin_controller.getAdminCourses);
+adminRouter.post("/courses", protect, courseUpload, admin_controller.addCourse);
+adminRouter.get("/courses/:courseId", protect, admin_controller.getCourse);
+adminRouter.put(
+  "/courses/:courseId",
   protect,
-  admin_controller.getAllCoursesData
+  courseUpload,
+  admin_controller.updateCourse
+);
+adminRouter.delete(
+  "/courses/:courseId",
+  courseUpload,
+  admin_controller.deleteCourse
 );
 
+/* lesson or sub-lesson CRUD */
 adminRouter.post(
   "/courses/:courseId/lessons",
   protect,
@@ -42,20 +51,8 @@ adminRouter.put(
   courseUpload,
   admin_controller.editLesson
 );
-
-adminRouter.get("/courses", protect, admin_controller.getAdminCourses);
-adminRouter.put(
-  "/edit-course/:courseId",
-  courseUpload,
-  admin_controller.updateCourse
-);
 adminRouter.delete(
-  "/delete-course/:courseId",
-  courseUpload,
-  admin_controller.deleteCourse
-);
-adminRouter.delete(
-  "/delete-lesson/:lessonId",
+  "/courses/:courseId/lessons/:lessonId",
   courseUpload,
   admin_controller.deleteLesson
 );

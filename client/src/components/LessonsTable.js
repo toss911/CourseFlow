@@ -76,7 +76,7 @@ const LessonTable = ({ currentCourseData, innerRef }) => {
   const handleDeleteLesson = async (lessonId, courseId, adminId) => {
     setIsDeleting(true);
     const result = await axios.delete(
-      `http://localhost:4000/admin/delete-lesson/${lessonId}?courseId=${courseId}&byAdmin=${adminId}`
+      `http://localhost:4000/admin/courses/${courseId}/lessons/${lessonId}?byAdmin=${adminId}`
     );
     if (/success/.test(result.data.message)) {
       setIsDeleting(false);

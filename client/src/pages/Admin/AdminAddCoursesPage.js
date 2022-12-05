@@ -64,7 +64,7 @@ const AdminAddCourses = () => {
         formData.append("sub_lesson_videos", video);
       }
       const result = await axios.post(
-        `http://localhost:4000/admin/add-course?byAdmin=${adminId}`,
+        `http://localhost:4000/admin/courses?byAdmin=${adminId}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

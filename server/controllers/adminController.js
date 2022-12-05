@@ -136,7 +136,7 @@ export const addCourse = async (req, res) => {
 export const getCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
-    const adminId = req.query.adminId;
+    const adminId = req.query.byAdmin;
 
     const courseData = await pool.query(
       `
@@ -203,7 +203,7 @@ export const getCourse = async (req, res) => {
 export const updateCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
-    const adminId = req.query.adminId;
+    const adminId = req.query.byAdmin;
     const mediaFiles = req.files;
 
     const updatedCourse = {
@@ -409,7 +409,7 @@ export const updateCourse = async (req, res) => {
 export const deleteCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
-    const adminId = req.query.adminId;
+    const adminId = req.query.byAdmin;
 
     // Step1: Delete all media related to that course from cloudinary
     const courseMediaFiles = await pool.query(
@@ -475,7 +475,7 @@ export const deleteCourse = async (req, res) => {
     );
 
     return res.json({
-      message: "course deleted",
+      message: "Course has been successfully deleted",
     });
   } catch (eror) {
     return res.sendStatus(500);
@@ -1253,7 +1253,7 @@ export const editLesson = async (req, res) => {
 export const deleteLesson = async (req, res) => {
   try {
     const lessonId = req.params.lessonId;
-    const courseId = req.query.courseId;
+    const courseId = req.params.courseId;
     const adminId = req.query.byAdmin;
 
     /* Validate whether this admin owned the course or not */

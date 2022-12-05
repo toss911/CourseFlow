@@ -39,7 +39,7 @@ function RoutesEditCourse() {
   const getCourseData = async () => {
     setIsLoading(true);
     const result = await axios.get(
-      `http://localhost:4000/admin/get-course/${courseId}?adminId=${adminId}`
+      `http://localhost:4000/admin/courses/${courseId}?byAdmin=${adminId}`
     );
     setEditCourseFields(result.data.data);
     setFilesEditCourse(result.data);
