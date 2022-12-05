@@ -404,8 +404,6 @@ export const updateCourse = async (req, res) => {
   }
 };
 
-// DELETE course
-
 export const deleteCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
@@ -609,7 +607,7 @@ export const getAllCoursesData = async (req, res) => {
   }
 };
 
-export const postNewAssignment = async (req, res) => {
+export const addAssignment = async (req, res) => {
   try {
     const admin_id = req.query.byAdmin;
     const sub_lesson_id = req.body.sub_lesson_id;
@@ -754,12 +752,13 @@ export const getAllAssignment = async (req, res) => {
 };
 
 export const getAssignmentById = async (req, res) => {
-  const admin_id = req.query.byAdmin;
-  const assignment_id = req.params.assignmentId;
+  try {
+    const admin_id = req.query.byAdmin;
+    const assignment_id = req.params.assignmentId;
 
-  /* Validate whether this admin owned the course or not */
-  let doesAdminOwnThisCourse = await pool.query(
-    `
+    /* Validate whether this admin owned the course or not */
+    let doesAdminOwnThisCourse = await pool.query(
+      `
   SELECT EXISTS 
   (SELECT *
     FROM courses
@@ -771,17 +770,17 @@ export const getAssignmentById = async (req, res) => {
   ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
   WHERE courses.admin_id = $1 AND assignments.assignment_id = $2)
   `,
-    [admin_id, assignment_id]
-  );
-  doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
-  if (!doesAdminOwnThisCourse) {
-    return res
-      .status(403)
-      .json({ message: "You have no permission to see this assignment" });
-  }
+      [admin_id, assignment_id]
+    );
+    doesAdminOwnThisCourse = doesAdminOwnThisCourse.rows[0].exists;
+    if (!doesAdminOwnThisCourse) {
+      return res
+        .status(403)
+        .json({ message: "You have no permission to see this assignment" });
+    }
 
-  let data = await pool.query(
-    `
+    let data = await pool.query(
+      `
     SELECT courses.course_id, lessons.lesson_id, sub_lessons.sub_lesson_id, assignments.detail
     FROM courses
     INNER JOIN lessons
@@ -792,17 +791,20 @@ export const getAssignmentById = async (req, res) => {
     ON sub_lessons.sub_lesson_id = assignments.sub_lesson_id
     WHERE courses.admin_id = $1 AND assignments.assignment_id = $2
     `,
-    [admin_id, assignment_id]
-  );
+      [admin_id, assignment_id]
+    );
 
-  data = data.rows[0];
-  data = {
-    ...data,
-    course_id: String(data.course_id),
-    lesson_id: String(data.lesson_id),
-    sub_lesson_id: String(data.sub_lesson_id),
-  };
-  return res.json({ data });
+    data = data.rows[0];
+    data = {
+      ...data,
+      course_id: String(data.course_id),
+      lesson_id: String(data.lesson_id),
+      sub_lesson_id: String(data.sub_lesson_id),
+    };
+    return res.json({ data });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
 
 export const editAssignment = async (req, res) => {
@@ -999,6 +1001,15 @@ export const addLesson = async (req, res) => {
       ]
     );
 
+    await pool.query(
+      `
+      UPDATE courses
+      SET updated_date = $1
+      WHERE course_id = $2
+      `,
+      [new Date(), courseId]
+    );
+
     let resultAfterAdded = await pool.query(
       `
       SELECT lessons.lesson_id, lessons.lesson_name, lessons.sequence, COUNT(sub_lessons.sub_lesson_id)
@@ -1023,22 +1034,23 @@ export const addLesson = async (req, res) => {
 };
 
 export const getLesson = async (req, res) => {
-  const courseId = req.params.courseId;
-  const lessonId = req.params.lessonId;
+  try {
+    const courseId = req.params.courseId;
+    const lessonId = req.params.lessonId;
 
-  const lessonData = await pool.query(
-    `
+    const lessonData = await pool.query(
+      `
     SELECT lesson_name, sequence
     FROM lessons
     WHERE course_id = $1 AND lesson_id =$2
     `,
-    [courseId, lessonId]
-  );
-  const lessonName = lessonData.rows[0].lesson_name;
-  const lessonSequence = lessonData.rows[0].sequence;
+      [courseId, lessonId]
+    );
+    const lessonName = lessonData.rows[0].lesson_name;
+    const lessonSequence = lessonData.rows[0].sequence;
 
-  let subLessonData = await pool.query(
-    `
+    let subLessonData = await pool.query(
+      `
     SELECT sub_lessons.sub_lesson_name AS name, sub_lessons.video_directory AS dir, sub_lessons.sub_lesson_id AS id
     FROM lessons
     INNER JOIN sub_lessons
@@ -1046,24 +1058,27 @@ export const getLesson = async (req, res) => {
     WHERE lessons.course_id = $1 AND lessons.lesson_id = $2
     ORDER BY sub_lessons.sequence ASC
     `,
-    [courseId, lessonId]
-  );
-  subLessonData = subLessonData.rows;
-  const subLessons = [];
-  for (let subLesson of subLessonData) {
-    subLessons.push({
-      sub_lesson_id: subLesson.id,
-      sub_lesson_name: subLesson.name,
-      video: JSON.parse(subLesson.dir).url,
+      [courseId, lessonId]
+    );
+    subLessonData = subLessonData.rows;
+    const subLessons = [];
+    for (let subLesson of subLessonData) {
+      subLessons.push({
+        sub_lesson_id: subLesson.id,
+        sub_lesson_name: subLesson.name,
+        video: JSON.parse(subLesson.dir).url,
+      });
+    }
+    return res.json({
+      data: {
+        lesson_name: lessonName,
+        lesson_sequence: lessonSequence,
+        sub_lessons: subLessons,
+      },
     });
+  } catch (error) {
+    return res.sendStatus(500);
   }
-  return res.json({
-    data: {
-      lesson_name: lessonName,
-      lesson_sequence: lessonSequence,
-      sub_lessons: subLessons,
-    },
-  });
 };
 
 export const editLesson = async (req, res) => {
@@ -1241,6 +1256,15 @@ export const editLesson = async (req, res) => {
     );
     resultAfterAdded = resultAfterAdded.rows;
 
+    await pool.query(
+      `
+      UPDATE courses
+      SET updated_date = $1
+      WHERE course_id = $2
+      `,
+      [new Date(), courseId]
+    );
+
     return res.json({
       message: "Lesson has been editied successfully",
       data: resultAfterAdded,
@@ -1344,6 +1368,15 @@ export const deleteLesson = async (req, res) => {
       [courseId]
     );
     resultAfterAdded = resultAfterAdded.rows;
+
+    await pool.query(
+      `
+      UPDATE courses
+      SET updated_date = $1
+      WHERE course_id = $2
+      `,
+      [new Date(), courseId]
+    );
 
     return res.json({
       message: "Lesson deleted successfully",

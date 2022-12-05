@@ -59,7 +59,7 @@ adminRouter.delete(
 
 /* assignments CRUD */
 adminRouter.get("/assignments", protect, admin_controller.getAllCoursesData);
-adminRouter.post("/assignments", protect, admin_controller.postNewAssignment);
+adminRouter.post("/assignments", protect, admin_controller.addAssignment);
 adminRouter.get(
   "/assignments/list",
   protect,
