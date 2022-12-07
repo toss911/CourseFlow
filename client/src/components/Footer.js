@@ -35,9 +35,6 @@ export function Footer() {
           >
             All Courses
           </Text>
-          <Text variant="body2" color="gray.500" pl="132px">
-            Bundle Package
-          </Text>
         </Flex>
 
         <Flex flexDirection="row">

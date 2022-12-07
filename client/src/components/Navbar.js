@@ -44,7 +44,7 @@ export const Navbar = () => {
           onClick={() => navigate("/")}
           cursor="pointer"
         />
-        <HStack spacing="75px">
+        <Flex gridColumnGap="75px" align="center">
           <Link color="#191C77" onClick={() => navigate("/courses")}>
             Our Courses
           </Link>
@@ -76,7 +76,7 @@ export const Navbar = () => {
                   />
                   Profile
                 </MenuItem>
-                <MenuItem onClick={() => navigate("/mycourses")}>
+                <MenuItem onClick={() => navigate("/subscription")}>
                   <Image
                     borderRadius="full"
                     src="/assets/landing-page/Icon/My course.svg"
@@ -85,9 +85,9 @@ export const Navbar = () => {
                     w="15px"
                     h="15px"
                   />
-                  My courses
+                  My Courses
                 </MenuItem>
-                <MenuItem>
+                <MenuItem onClick={() => navigate("/homework")}>
                   <Image
                     borderRadius="full"
                     src="/assets/landing-page/Icon/Hw.svg"
@@ -98,7 +98,7 @@ export const Navbar = () => {
                   />
                   My Homework
                 </MenuItem>
-                <MenuItem>
+                <MenuItem onClick={() => navigate("/desire")}>
                   <Image
                     borderRadius="full"
                     src="/assets/landing-page/Icon/Desire course.svg"
@@ -107,7 +107,7 @@ export const Navbar = () => {
                     w="15px"
                     h="15px"
                   />
-                  My Desire Courses
+                  My Desired Courses
                 </MenuItem>
                 <MenuDivider />
                 <MenuItem
@@ -136,7 +136,7 @@ export const Navbar = () => {
               Log in
             </Button>
           )}
-        </HStack>
+        </Flex>
       </Flex>
     </Flex>
   );

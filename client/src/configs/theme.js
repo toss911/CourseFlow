@@ -93,6 +93,39 @@ const components = {
         lineHeight: `${1.5 * 12}px`,
         fontWeight: 400,
       },
+      "add-more-files": {
+        bg: "white",
+        color: "blue.500",
+        boxShadow: "shadow1",
+        borderRadius: "full",
+        border: "1px solid",
+        borderColor: "blue.500",
+        fontSizes: "14px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "5px 10px",
+        _hover: {
+          color: "blue.300",
+          borderColor: "blue.300",
+          _disabled: {
+            bg: "white",
+            color: "gray.500",
+            borderColor: "gray.500",
+            opacity: 1,
+          },
+        },
+        _active: {
+          bg: "gray.100",
+          color: "blue.500",
+          borderColor: "blue.500",
+        },
+        _disabled: {
+          bg: "white",
+          color: "gray.500",
+          borderColor: "gray.500",
+          opacity: 1,
+        },
+      },
     },
   },
   FormLabel: {
@@ -182,6 +215,31 @@ const components = {
           opacity: 1,
         },
       },
+      gray: {
+        bg: "white",
+        color: "gray.900",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          bg: "gray.100",
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.400",
+            opacity: 1,
+          },
+        },
+        _active: {
+          bg: "gray.200",
+        },
+        _disabled: {
+          color: "gray.600",
+          bg: "gray.400",
+          opacity: 1,
+        },
+      },
       success: {
         bg: "blue.500",
         borderColor: "blue.500",
@@ -197,6 +255,67 @@ const components = {
           opacity: 0.5,
         },
         _active: {
+          opacity: 1,
+        },
+      },
+      "save draft": {
+        bg: "white",
+        color: "blue.500",
+        boxShadow: "shadow1",
+        borderRadius: "12px",
+        border: "1px solid",
+        borderColor: "blue.500",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          color: "blue.300",
+          borderColor: "blue.300",
+          _disabled: {
+            bg: "white",
+            color: "gray.500",
+            borderColor: "gray.500",
+            opacity: 1,
+          },
+        },
+        _active: {
+          bg: "gray.100",
+          color: "blue.500",
+          borderColor: "blue.500",
+        },
+        _disabled: {
+          bg: "white",
+          color: "gray.500",
+          borderColor: "gray.500",
+          opacity: 1,
+        },
+      },
+      error: {
+        bg: "#E53E3E",
+        color: "white",
+        boxShadow: "shadow1",
+        borderRadius: "12px",
+        height: "60px",
+        fontSizes: "16px",
+        fontWeight: 700,
+        lineHeight: `${1.5 * 16}px`,
+        padding: "18px 32px",
+        _hover: {
+          bg: "#fd4545",
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.400",
+            opacity: 1,
+          },
+        },
+        _active: {
+          bg: "#b63535",
+        },
+        _disabled: {
+          color: "gray.600",
+          bg: "gray.400",
           opacity: 1,
         },
       },
@@ -230,6 +349,120 @@ const components = {
             borderColor: "purple",
             backgroundImage: "url('/assets/misc/warning-icon.svg')",
             backgroundPosition: "95% 52.5%",
+            backgroundRepeat: "no-repeat",
+          },
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.200",
+            borderColor: "gray.400",
+            opacity: 1,
+          },
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Select: {
+    variants: {
+      default: {
+        field: {
+          border: "1px solid",
+          borderColor: "gray.400",
+          borderRadius: "8px",
+          bg: "white",
+          color: "black",
+          fontSize: "16px",
+          fontWeight: 400,
+          lineHeight: "normal",
+          _focus: {
+            borderColor: "orange.500",
+          },
+          _invalid: {
+            pr: "5%",
+            borderColor: "purple",
+            backgroundImage: "url('/assets/misc/warning-icon.svg')",
+            backgroundPosition: "92.5% 52.5%",
+            backgroundRepeat: "no-repeat",
+          },
+          _disabled: {
+            color: "gray.600",
+            bg: "gray.200",
+            borderColor: "gray.400",
+            opacity: 1,
+          },
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  Textarea: {
+    variants: {
+      default: {
+        border: "1px solid",
+        borderColor: "gray.400",
+        borderRadius: "8px",
+        p: "12px 30px 12px 12px",
+        bg: "white",
+        color: "black",
+        fontSize: "16px",
+        fontWeight: 400,
+        lineHeight: "normal",
+        _placeholder: {
+          color: "gray.600",
+        },
+        _focus: {
+          borderColor: "orange.500",
+        },
+        _invalid: {
+          color: "black",
+          pr: "5%",
+          borderColor: "purple",
+          backgroundImage: "url('/assets/misc/warning-icon.svg')",
+          backgroundPosition: "97.5% 52.5%",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "25px",
+        },
+        _disabled: {
+          color: "gray.600",
+          bg: "gray.200",
+          borderColor: "gray.400",
+          opacity: 1,
+        },
+      },
+    },
+    defaultProps: {
+      variant: "default",
+    },
+  },
+  NumberInput: {
+    variants: {
+      default: {
+        field: {
+          border: "1px solid",
+          borderColor: "gray.400",
+          borderRadius: "8px",
+          p: "12px 16px 12px 12px",
+          bg: "white",
+          color: "black",
+          fontSize: "16px",
+          fontWeight: 400,
+          lineHeight: "normal",
+          _placeholder: {
+            color: "gray.600",
+          },
+          _focus: {
+            borderColor: "orange.500",
+          },
+          _invalid: {
+            color: "black",
+            pr: "5%",
+            borderColor: "purple",
+            backgroundImage: "url('/assets/misc/warning-icon.svg')",
+            backgroundPosition: "92.5% 52.5%",
             backgroundRepeat: "no-repeat",
           },
           _disabled: {
@@ -294,7 +527,7 @@ const components = {
         lineHeight: "150%",
         padding: "4px 8px 4px 8px",
       },
-      "in-progress": {
+      "in progress": {
         color: "#3557CF",
         backgroundColor: "#EBF0FF",
         fontSize: "14px",

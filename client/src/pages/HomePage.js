@@ -13,12 +13,9 @@ function HomePage() {
 
   return (
     <>
-      {/* //Nav section */}
-      {/* //Start Codind here [Sun] */}
+      {/* Nav section */}
       <Navbar />
-      {/* //-----------------------End Nav section-------------------------// */}
-      {/* //Hero section */}
-      {/* //Start Codind here [Sun] */}
+      {/* Hero section */}
       <Flex position="relative">
         <Image
           src="/assets/landing-page/bg/hero.svg"
@@ -52,8 +49,7 @@ function HomePage() {
           </Button>
         </Flex>
       </Flex>
-      {/* //-----------------------End Hero section-------------------------// */}
-      {/* // Features Section */}
+      {/* Features Section */}
       <Box w="100vw">
         <Flex className="feature" justify="center" align="center">
           <Box position="relative">
@@ -428,8 +424,9 @@ function HomePage() {
               interval={2000}
               autoPlay
               showArrows={false}
+              showThumbs={false}
             >
-              {SlideData.map((slide) => {
+              {SlideData.map((slide, key) => {
                 return (
                   <Flex
                     flexDirection="column"
@@ -443,6 +440,7 @@ function HomePage() {
                     w="578.78px"
                     h="309.48px"
                     position="relative"
+                    key={key}
                   >
                     <Image
                       src={slide.image}
@@ -451,6 +449,7 @@ function HomePage() {
                       h="240px"
                       position="absolute"
                       right="350px"
+                      objectFit="contain"
                     />
                     <Image
                       src="/assets/landing-page/review/quote-large.svg"
@@ -522,7 +521,7 @@ function HomePage() {
         />
       </Flex>
       {/* //-----------------------End Review section-------------------------// */}
-      1 {/* //Pre-Footer section */}
+      {/* //Pre-Footer section */}
       <PreFooter />
       {/* //-----------------------End Pre-Footer section-------------------------// */}
       {/* //Footer section  */}

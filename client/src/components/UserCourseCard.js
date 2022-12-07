@@ -16,11 +16,6 @@ export function UserCourseCard({ coursesCount }) {
       overflow="hidden"
       mb="24px"
       bg="white"
-      _hover={{
-        background: "white",
-        border: "solid 1px",
-        borderColor: "blue.200",
-      }}
       align="center"
     >
       <Box w="357px" mt="32px">
@@ -28,7 +23,7 @@ export function UserCourseCard({ coursesCount }) {
           src={
             contextState.user.avatar_directory
               ? contextState.user.avatar_directory.url
-              : null
+              : "assets/misc/user-icon.svg"
           }
           w="120px"
           h="120px"
@@ -53,13 +48,21 @@ export function UserCourseCard({ coursesCount }) {
           boxShadow="shadow1"
           borderRadius="8px"
           gap="24px"
-          borderWidth="16px"
+          p="16px"
           alignItems="start"
+          _hover={{
+            border: "solid 1px",
+            borderColor: "blue.200",
+          }}
         >
           <Text textAlign="start" variant="body2">
             Course In progress
           </Text>
-          <Heading variant="headline3">{coursesCount["in progress"]}</Heading>
+          <Heading variant="headline3">
+            {Boolean(coursesCount["in progress"])
+              ? coursesCount["in progress"]
+              : "0"}
+          </Heading>
         </Flex>
         <Flex
           backgroundColor="gray.200"
@@ -68,14 +71,22 @@ export function UserCourseCard({ coursesCount }) {
           w="134px"
           boxShadow="shadow1"
           borderRadius="8px"
-          alignItems="start"
           gap="24px"
-          borderWidth="16px"
+          p="16px"
+          alignItems="start"
+          _hover={{
+            border: "solid 1px",
+            borderColor: "blue.200",
+          }}
         >
           <Text textAlign="start" variant="body2" w="110px">
             Course Complete
           </Text>
-          <Heading variant="headline3">{coursesCount["completed"]}</Heading>
+          <Heading variant="headline3">
+            {Boolean(coursesCount["completed"])
+              ? coursesCount["completed"]
+              : "0"}
+          </Heading>
         </Flex>
       </Box>
     </Box>

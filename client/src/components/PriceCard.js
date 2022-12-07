@@ -76,11 +76,11 @@ export const PriceCard = (props) => {
       display="flex"
       flexDirection="column"
       ml="24px"
+      w="357px"
       border="10px"
       p="5"
       shadow="md"
       borderRadius="8px"
-      w="fit-content"
       h="fit-content"
       gap="20px"
       position="sticky"
@@ -101,7 +101,7 @@ export const PriceCard = (props) => {
         {props.subscribeStatus ? (
           <Button
             variant="primary"
-            onClick={() => navigate(`/learning/${props.courseId}`)}
+            onClick={() => navigate(`/courses/${props.courseId}/learning`)}
           >
             Start Learning
           </Button>
@@ -143,6 +143,7 @@ export const PriceCard = (props) => {
         onClose={onClose}
         closeOnOverlayClick={false}
         size="lg"
+        preserveScrollBarGap
       >
         <ModalOverlay />
         <ModalContent borderRadius="24px">

@@ -3,7 +3,7 @@ import { Footer } from "../components/Footer";
 import { CourseCard } from "../components/CourseCard";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Pagination } from "antd";
-import "antd/dist/antd.css";
+import "antd/dist/antd.min.css";
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -18,34 +18,28 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import useCourses from "../hooks/useCourses";
-
-const coursesPerPage = 12;
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function OurCourses() {
-  const [keywords, setKeywords] = useState("");
-  const [page, setPage] = useState(1);
-  const { getCourses, courses, isLoading, setIsLoading } = useCourses();
-
-  const handleSearchTextChange = (event) => {
-    setKeywords(event.target.value);
-  };
+  const [searchText, setSearchText] = useState("");
+  const { getCourses, courses, isLoading } = useCourses();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setIsLoading(true);
-    const getData = setTimeout(() => {
-      getCourses({ keywords, page });
-    }, 1000);
-    return () => clearTimeout(getData);
-  }, [keywords, page]);
+    /* Set state to initialize input (search) field value */
+    setSearchText(
+      Boolean(searchParams.get("search")) ? searchParams.get("search") : ""
+    );
+    getCourses(searchParams.get("search"), searchParams.get("page"));
+  }, [searchParams.get("search"), searchParams.get("page")]);
 
-  // Get current posts
-  const indexOfLastCourse = page * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
-
-  // Change page
   const paginate = (pageNumber) => {
-    setPage(pageNumber);
+    if (searchParams.get("search")) {
+      navigate(`.?search=${searchParams.get("search")}&page=${pageNumber}`);
+    } else {
+      navigate(`.?page=${pageNumber}`);
+    }
     window.scrollTo(0, 150);
   };
 
@@ -62,11 +56,22 @@ function OurCourses() {
           <Box mb="100px">
             <InputGroup w="357px">
               <Input
-                type="string"
+                type="text"
                 placeholder="Search..."
                 pl="40px"
-                onChange={handleSearchTextChange}
-                value={keywords}
+                onChange={(event) => {
+                  setSearchText(event.target.value);
+                }}
+                onKeyPress={(event) => {
+                  if (event.key === "Enter") {
+                    if (Boolean(event.target.value)) {
+                      navigate(`.?search=${event.target.value}`);
+                    } else {
+                      navigate(".");
+                    }
+                  }
+                }}
+                value={searchText}
               />
               <InputLeftElement
                 pointerEvents="none"
@@ -85,17 +90,20 @@ function OurCourses() {
             emptyColor="gray.200"
             color="blue.500"
             size="xl"
-            mb="187px"
+            mb="17%"
           />
-        ) : typeof courses !== "undefined" && courses.length > 0 ? (
+        ) : !Object.keys(courses).length > 0 ? null : courses.data.length >
+          0 ? (
           <Flex
+            ml="7.5%"
             flexDirection="row"
-            justifyContent="center"
+            justifyContent="flex-start"
+            alignItems="center"
             mb="180px"
             flexWrap="wrap"
-            w="70%"
+            w="100vw"
           >
-            {currentCourses.map((course, key) => {
+            {courses.data.map((course, key) => {
               return (
                 <CourseCard
                   key={key}
@@ -110,20 +118,21 @@ function OurCourses() {
             })}
           </Flex>
         ) : (
-          <Text as="i" color="black" mb="187px">
+          <Text as="i" color="black" mb="17%">
             Course not found
           </Text>
         )}
       </Center>
       <Center mb="20">
         <Pagination
-          total={courses.length}
-          current={page}
-          pageSize={coursesPerPage}
+          total={courses.count}
+          current={Number(searchParams.get("page")) || 1}
+          pageSize={12}
           onChange={paginate}
+          showSizeChanger={false}
+          hideOnSinglePage={Number(courses.count) === 0 ? true : false}
         />
       </Center>
-
       <Footer />
     </Box>
   );

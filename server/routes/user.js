@@ -14,6 +14,8 @@ userRouter.put(
   user_controller.updateProfile
 );
 
-userRouter.get("/mycourses", protect, user_controller.subscribedCourses);
+userRouter.get("/subscription", protect, user_controller.subscribedCourses);
+
+userRouter.get("/desired", protect, user_controller.desiredCourses);
 
 export default userRouter;

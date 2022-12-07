@@ -71,15 +71,16 @@ export const updateProfile = async (req, res) => {
       } else {
         if (/change/i.test(action)) {
           if (prevAvatar !== null) {
-            await cloudinaryUpload(prevAvatar, "delete");
+            await cloudinaryUpload(prevAvatar, "delete", "avatar");
           }
           updatedUser.avatar = await cloudinaryUpload(
             ...req.files.avatar,
-            "upload"
+            "upload",
+            "avatar"
           );
         } else if (/delete/.test(action)) {
           if (prevAvatar !== null) {
-            await cloudinaryUpload(prevAvatar, "delete");
+            await cloudinaryUpload(prevAvatar, "delete", "avatar");
           }
           updatedUser.avatar = null;
         }
@@ -135,15 +136,16 @@ export const updateProfile = async (req, res) => {
         } else {
           if (/change/i.test(action)) {
             if (prevAvatar !== null) {
-              await cloudinaryUpload(prevAvatar, "delete");
+              await cloudinaryUpload(prevAvatar, "delete", "avatar");
             }
             updatedUser.avatar = await cloudinaryUpload(
               ...req.files.avatar,
-              "upload"
+              "upload",
+              "avatar"
             );
           } else if (/delete/.test(action)) {
             if (prevAvatar !== null) {
-              await cloudinaryUpload(prevAvatar, "delete");
+              await cloudinaryUpload(prevAvatar, "delete", "avatar");
             }
             updatedUser.avatar = null;
           }
@@ -216,10 +218,13 @@ export const subscribedCourses = async (req, res) => {
       INNER JOIN subscriptions
       ON courses.course_id = subscriptions.course_id
       WHERE subscriptions.user_id = $1
-      GROUP BY courses.course_id 
-      ORDER BY courses.course_id ASC`,
+      GROUP BY courses.course_id, subscriptions.created_date
+      ORDER BY subscriptions.created_date DESC`,
       [userId]
     );
+    for (let course of subscribedCourses.rows) {
+      course.cover_image_directory = JSON.parse(course.cover_image_directory);
+    }
     subscribedCourses = subscribedCourses.rows;
 
     let coursesStatus = await pool.query(
@@ -263,6 +268,52 @@ export const subscribedCourses = async (req, res) => {
       coursesCount,
     });
   } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+export const desiredCourses = async (req, res) => {
+  try {
+    const userId = req.query.byUser;
+    const page = req.query.page;
+    const coursesPerPage = 6;
+    const offset = (page - 1) * coursesPerPage;
+
+    let coursesCount = await pool.query(
+      `
+      SELECT COUNT(course_id) AS courses_count
+      FROM desired_courses
+      WHERE user_id = $1
+      `,
+      [userId]
+    );
+    coursesCount = Number(coursesCount.rows[0].courses_count);
+
+    let desiredCourses = await pool.query(
+      `
+    SELECT desired_courses.course_id, courses.course_name, courses.summary, courses.cover_image_directory, courses.learning_time, COUNT(lessons.lesson_id)
+    FROM desired_courses
+    INNER JOIN courses
+    ON courses.course_id = desired_courses.course_id
+    INNER JOIN lessons
+    ON courses.course_id = lessons.course_id
+    WHERE desired_courses.user_id = $1
+    GROUP BY desired_courses.course_id, courses.course_id, desired_courses.created_date
+    ORDER BY desired_courses.created_date DESC
+    LIMIT $2 OFFSET $3`,
+      [userId, coursesPerPage, offset]
+    );
+    desiredCourses = desiredCourses.rows;
+
+    for (let course of desiredCourses) {
+      course.cover_image_directory = JSON.parse(course.cover_image_directory);
+    }
+
+    return res.json({
+      data: desiredCourses,
+      count: coursesCount,
+    });
+  } catch (err) {
     return res.sendStatus(500);
   }
 };

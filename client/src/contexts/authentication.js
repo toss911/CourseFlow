@@ -12,6 +12,7 @@ function AuthProvider(props) {
     user: null,
     previousUrl: null,
   });
+  const [contextAdminState, setContextAdminState] = useState({ user: null });
 
   const navigate = useNavigate();
 
@@ -57,12 +58,6 @@ function AuthProvider(props) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setContextState({ ...contextState, user: null });
-    navigate("/");
-  };
-
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   if (isAuthenticated && !contextState.user) {
@@ -71,15 +66,58 @@ function AuthProvider(props) {
     setContextState({ ...contextState, user: userDataFromToken });
   }
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    setContextState({ ...contextState, user: null });
+    navigate("/");
+  };
+  // -------------------------------------Admin Login-------------------------------
+  const loginAdmin = async (data) => {
+    try {
+      const result = await axios.post(
+        "http://localhost:4000/auth/loginAdmin",
+        data
+      );
+      if (result.data.token) {
+        const adminToken = result.data.token;
+        localStorage.setItem("adminToken", adminToken);
+        const userDataFromToken = jwtDecode(adminToken);
+        setContextAdminState({ ...contextAdminState, user: userDataFromToken });
+        navigate("/admin");
+      } else {
+        return result.data.message;
+      }
+    } catch (error) {
+      alert(`ERROR: Please try again later`);
+    }
+  };
+
+  const logoutAdmin = () => {
+    localStorage.removeItem("adminToken");
+    setContextAdminState({ ...contextAdminState, user: null });
+    navigate("/admin");
+  };
+
+  const isAdminAuthenticated = Boolean(localStorage.getItem("adminToken"));
+  if (isAdminAuthenticated && !contextAdminState.user) {
+    const adminToken = localStorage.getItem("adminToken");
+    const userDataFromToken = jwtDecode(adminToken);
+    setContextAdminState({ ...contextAdminState, user: userDataFromToken });
+  }
+
   return (
     <AuthContext.Provider
       value={{
         contextState,
         setContextState,
+        contextAdminState,
         login,
         logout,
         register,
         isAuthenticated,
+        logoutAdmin,
+        loginAdmin,
+        isAdminAuthenticated,
       }}
     >
       {props.children}

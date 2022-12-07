@@ -6,6 +6,8 @@ import coursesRouter from "./routes/courses.js";
 import userRouter from "./routes/user.js";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
+import assignmentRouter from "./routes/assignment.js";
+import adminRouter from "./routes/admin.js";
 
 async function init() {
   dotenv.config();
@@ -25,6 +27,8 @@ async function init() {
   app.use("/auth", authRouter);
   app.use("/courses", coursesRouter);
   app.use("/user", userRouter);
+  app.use("/assignment", assignmentRouter);
+  app.use("/admin", adminRouter);
 
   app.get("*", (req, res) => {
     res.status(404).send("Not found");
